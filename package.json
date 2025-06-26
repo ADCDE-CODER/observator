@@ -1,0 +1,17 @@
+{
+  "name": "web",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "node server.js"
+  },
+  "keywords": [],
+  "author": "ADCDE",
+  "license": "AGPL-3.0-only",
+  "description": "",
+  "type": "module",
+  "dependencies": {
+    "dotenv": "^16.5.0",
+    "openai": "^5.7.0"
+  }
+}
