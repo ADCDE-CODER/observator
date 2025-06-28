@@ -29,43 +29,48 @@
     </header>
 
     <main class="content-main">
-        <div class="content-main__history">
-            <h2>History</h2>
-            <aside>
-                <nav class="content-main__menu">
-                    <ul>
-                        <li><a href=""></a>History</li>
-                        <li><a href=""></a>History</li>
-                        <li><a href=""></a>History</li>
-                        <li><a href=""></a>History</li>
-                    </ul>
-                </nav>
-            </aside>
-        </div>
-        <div class="content-main__section">
-            <section class="content-main__page" id="chat">
+        <section class="content-main__page" id="chat">
+            <div class="content-main__history">
+                <h2>History</h2>
+                <aside>
+                    <nav class="content-main__menu">
+                        <ul>
+                            <li><a href=""></a>History</li>
+                            <li><a href=""></a>History</li>
+                            <li><a href=""></a>History</li>
+                            <li><a href=""></a>History</li>
+                        </ul>
+                    </nav>
+                </aside>
+            </div>
+            <div class="content-main__chat">
                 <h2>Chat</h2>
                 <div class="content-main__output"></div>
                 <div class="content-main__button">
                     <input type="text" placeholder="Type here">
                     <button>Send</button>
                 </div>
-            </section>
-            <section class="content-main__page" id="image">
-                <h2>Image</h2>
-            </section>
-            <section class="content-main__page" id="video">
-                <h2>Video</h2>
-            </section>
-            <section class="content-main__page" id="post">
-                <h2>Post</h2>
-            </section>
-        </div>
-        <form class="content-main__settings" action="" method="POST">
-            <label for="max-tokens">Max Tokens:</label>
-            <input id="max-tokens" type="text" value="20" name="max-tokens">
-            <button type="submit">Apply</button>
-        </form>
+            </div>
+            <div class="content-main__settings">
+                <h2>Settings</h2>
+                <form action="" method="POST">
+                    <div>
+                        <label for="max-tokens">Max Tokens:</label>
+                        <input id="max-tokens" type="text" value="20" name="max-tokens">
+                    </div>
+                    <button type="submit">Apply</button>
+                </form>
+            </div>
+        </section>
+        <section class="content-main__page" id="image">
+            <h2>Image</h2>
+        </section>
+        <section class="content-main__page" id="video">
+            <h2>Video</h2>
+        </section>
+        <section class="content-main__page" id="post">
+            <h2>Post</h2>
+        </section>
     </main>
 
 </body>
