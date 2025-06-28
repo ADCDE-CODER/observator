@@ -1,0 +1,128 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+
+a {
+    text-decoration: none;
+}
+
+/* Header */
+
+.nav-header {
+    background-color: lightblue;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;  
+}
+
+.nav-header__logo {
+
+}
+
+.nav-header__content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2em;
+}
+
+.nav-header__menu > ul {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    gap: 1em;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-header__profile {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5em;
+}
+
+/* Main */
+
+.content-main {
+    background-color: red;
+    height: 100vh;
+}
+
+#chat {
+    display: flex;
+    justify-content: space-between;
+    margin: 0% 1%;
+    height: 100%;
+}
+
+.content-main__history {
+    background-color: bisque;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    overflow-y: auto;
+    width: 20%;
+}
+
+.content-main__menu > ul {
+    background-color: coral;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1em;
+    list-style-type: none;
+    padding: 0;
+}
+
+.content-main__chat {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.content-main__output {
+    background-color: aliceblue;
+    padding: 10%;
+}
+
+.content-main__button {
+    background-color: aquamarine;
+    padding: 5%;
+}
+
+.content-main__settings {
+    background-color: azure;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    overflow-y: auto;
+    width: 20%;
+}
+
+.content-main__settings > form {
+    background-color: chocolate;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1em;
+}
+
+#image {
+    display: none;
+}
+
+#video {
+    display: none;
+}
+
+#post {
+    display: none;
+}
