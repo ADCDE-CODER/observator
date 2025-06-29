@@ -1,6 +1,9 @@
 body {
     margin: 0;
     padding: 0;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    height: 100vh;
 }
 
 a {
@@ -48,7 +51,7 @@ a {
 
 .content-main {
     background-color: red;
-    height: 100vh;
+    overflow: auto;
 }
 
 #chat {
