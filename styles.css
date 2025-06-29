@@ -67,8 +67,19 @@ a {
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    overflow-y: auto;
     width: 20%;
+    height: 100%;
+}
+
+.content-main__history > aside {
+    width: 100%;
+    height: 100%;
+}
+
+.content-main__menu {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
 }
 
 .content-main__menu > ul {
@@ -87,16 +98,38 @@ a {
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
+    width: 100%;
 }
 
 .content-main__output {
     background-color: aliceblue;
-    padding: 10%;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
 }
 
 .content-main__button {
     background-color: aquamarine;
-    padding: 5%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 1%;
+    gap: 1em;
+}
+
+.content-main__button > input {
+    border: none;
+    border-radius: 20px;
+    padding: 10px;
+    width: 50%;
+}
+
+.content-main__button > button {
+    border: none;
+    border-radius: 20px;
+    padding: 10px;
 }
 
 .content-main__settings {
@@ -105,8 +138,8 @@ a {
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    overflow-y: auto;
     width: 20%;
+    height: 100%;
 }
 
 .content-main__settings > form {
@@ -116,6 +149,16 @@ a {
     justify-content: center;
     align-items: center;
     gap: 1em;
+    width: 100%;
+    overflow-y: auto;
+}
+
+.content-main__label{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
 }
 
 #image {
