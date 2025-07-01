@@ -13,15 +13,15 @@ a {
 
 /* Header */
 
-.nav-header {
+#nav-header {
     background-color: lightblue;
     display: flex;
     justify-content: space-around;
     align-items: center;  
 }
 
-.nav-header__logo {
-
+#nav-header__logo {
+    cursor: pointer;
 }
 
 .nav-header__content {
@@ -48,9 +48,16 @@ a {
     gap: 0.5em;
 }
 
+/* Login */
+
+#login-content {
+    background-color: beige;
+    display: none;
+}
+
 /* Main */
 
-.content-main {
+#content-main {
     background-color: red;
     overflow: auto;
 }

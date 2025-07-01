@@ -8,9 +8,9 @@
 </head>
 <body>
 
-    <header class="nav-header">
-        <div class="nav-header__logo">
-            <a href=""> <img src="logo.png" alt="logo image"> </a>
+    <header id="nav-header">
+        <div id="nav-header__logo">
+            <img src="logo.png" alt="logo image">
         </div>
         <div class="nav-header__content">
             <nav class="nav-header__menu">
@@ -23,12 +23,24 @@
             </nav>
             <div class="nav-header__profile">
                 <img src="profile.png" alt="">
-                <button>Sign in</button>
+                <button id="loginMenu-button">Login menu</button>
             </div>
         </div>
     </header>
 
-    <main class="content-main">
+    <div id="login-content">
+        <div class="login-content__label">
+            <label for="email">Email:</label>
+            <input id="email" type="text" name="email">
+        </div>
+        <div class="login-content__label">
+            <label for="password">Password:</label>
+            <input id="password" type="text" name="password">
+        </div>
+        <button id="login">Login</button>
+    </div>
+
+    <main id="content-main">
         <section class="content-main__page" id="chat">
             <div class="content-main__chats">
                 <h2>Chats</h2>
