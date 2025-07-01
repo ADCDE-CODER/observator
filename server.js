@@ -1,6 +1,40 @@
 import { config } from "dotenv";
 import OpenAI from "openai";
 import readline from "readline";
+import express from "express";
+import cors from "cors";
+
+const PORT = 3000;
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+app.listen(PORT, () => {
+    console.log("Your port is: " + "http://localhost:" + PORT);
+});
+
+config();
+
+const client = new OpenAI({ 
+    baseURL: "https://openrouter.ai/api/v1",
+    apiKey: process.env.API_KEY 
+});
+
+app.post("/prompt", async (req, res) => {
+    console.log("Request: " + req.body.prompt);
+
+    const responder = async (input) => {
+        try {
+            return await createChatResponder(client, "mistralai/mistral-small-3.2-24b-instruct:free", input, 10);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    const output = await responder(req.body.prompt);
+    console.log("Response: ", output.content);
+    res.json(output.content);
+})
 
 async function createChatResponder(client, model, input, maxTokens) {
     try {
@@ -33,7 +67,7 @@ function createUserInterface(io, responder) {
     });
 }
 
-function main() {
+/* function main() {
     config();
     
     const client = new OpenAI({ 
@@ -59,4 +93,4 @@ function main() {
     createUserInterface(io, responder);
 }
 
-main();
+main(); */
