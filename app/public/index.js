@@ -1,21 +1,33 @@
-const logoButton = document.getElementById("nav-header__logo");
-const loginMenuButton = document.getElementById("loginMenu-button");
-const sendButton = document.getElementById("send-button");
-
-const loginContent = document.getElementById("login-content");
+const signMenu = document.getElementById("sign-menu");
 const contentMain = document.getElementById("content-main");
 
+const logoButton = document.getElementById("nav-header__logo");
+
 logoButton.addEventListener("click", () => {
-    loginContent.style.display = "none";
+    signMenu.style.display = "none";
     contentMain.style.display = "block";
 });
 
+const loginMenuButton = document.getElementById("loginMenu-button");
+
 loginMenuButton.addEventListener("click", () => {
-    loginContent.style.display = "block";
+    signMenu.style.display = "block";
     contentMain.style.display = "none";
 }); 
 
+const navHeader = document.getElementById("nav-header");
+const signUpButton = document.getElementById("signup-button");
+
+signUpButton.addEventListener("click", async () => {
+    const email = document.getElementById("create-email").value;
+    const password = document.getElementById("create-password").value;
+
+    console.log("Email: " + email + " and password: " + password);
+});
+
 let isNewChat = false;
+
+const sendButton = document.getElementById("send-button");
 
 sendButton.addEventListener("click", async () => {
     const input = document.getElementById("prompt-input").value;
