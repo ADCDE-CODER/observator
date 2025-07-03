@@ -3,6 +3,7 @@ import OpenAI from "openai";
 import readline from "readline";
 import express from "express";
 import cors from "cors";
+import { userRouter } from "./routes/userRoutes.js";
 
 const PORT = 3000;
 const app = express();
@@ -13,7 +14,9 @@ app.listen(PORT, () => {
     console.log("Your port is: " + "http://localhost:" + PORT);
 });
 
-config();
+app.use("/user", userRouter);
+
+config({ path: "./app/.env" });
 
 const client = new OpenAI({ 
     baseURL: "https://openrouter.ai/api/v1",
