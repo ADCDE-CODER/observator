@@ -48,9 +48,9 @@ a {
     gap: 0.5em;
 }
 
-/* Login */
+/* Sign menu*/
 
-#login-content {
+#sign-menu {
     background-color: beige;
     display: none;
 }
