@@ -11,7 +11,7 @@ logoButton.addEventListener("click", () => {
 const loginMenuButton = document.getElementById("loginMenu-button");
 
 loginMenuButton.addEventListener("click", () => {
-    signMenu.style.display = "block";
+    signMenu.style.display = "flex";
     contentMain.style.display = "none";
 }); 
 
