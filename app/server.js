@@ -1,20 +1,12 @@
 import { config } from "dotenv";
 import OpenAI from "openai";
-import readline from "readline";
-import express from "express";
-import cors from "cors";
-import { userRouter } from "./routes/userRoutes.js";
+import { app } from "./app.js";
 
 const PORT = 3000;
-const app = express();
-app.use(cors());
-app.use(express.json());
 
 app.listen(PORT, () => {
     console.log("Your port is: " + "http://localhost:" + PORT);
 });
-
-app.use("/user", userRouter);
 
 config({ path: "./app/.env" });
 
