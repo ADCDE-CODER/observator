@@ -51,8 +51,41 @@ a {
 /* Sign menu*/
 
 #sign-menu {
-    background-color: beige;
+    background-color: #1b1b1b;
+    color: white;
+    position: relative;
     display: none;
+    justify-content: center;
+    align-items: center;
+    overflow: scroll;
+}
+
+.card {
+    background-color: #212121;
+    box-shadow: 0 0 #ffff, 0px 2px 14px rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    position: absolute;
+    padding: 2rem;
+    width: 25%;
+}
+
+.card > h1, .menu > h2 {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.menu, .menu__label {
+    margin: 1rem 0rem;
+}
+
+.menu__label > input, .menu > button {
+    width: 100%;
+    box-sizing: border-box;
+    border: none;
+    padding: 1rem;
+    border-radius: 10px;
 }
 
 /* Main */
