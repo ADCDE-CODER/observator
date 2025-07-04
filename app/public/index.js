@@ -15,14 +15,33 @@ loginMenuButton.addEventListener("click", () => {
     contentMain.style.display = "none";
 }); 
 
-const navHeader = document.getElementById("nav-header");
 const signUpButton = document.getElementById("signup-button");
 
 signUpButton.addEventListener("click", async () => {
     const email = document.getElementById("create-email").value;
     const password = document.getElementById("create-password").value;
+    
+    try {
+        const response = await fetch("http://localhost:3000/user/create", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ user: {email, password} })
+        });
 
-    console.log("Email: " + email + " and password: " + password);
+        const data = await response.json();
+
+        if (response.ok) {
+            signMenu.style.display = "none";
+            contentMain.style.display = "block";
+        } else {
+            alert(`Signup failed: ${data.error} (status: ${response.status})`);
+        }
+    } catch (error) {
+        console.log("Fetch error: ", error.message);
+        alert("Network error or server not reachable.");
+    }
 });
 
 let isNewChat = false;
