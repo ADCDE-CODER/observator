@@ -1,4 +1,4 @@
-import { createUser, readUser, updateUser, deleteUser } from "../models/userModel.js";
+import { createUser, readUsers, readUser, updateUser, deleteUser } from "../models/userModel.js";
 
 const createUserPost = (req, res) => {
     const { email, password } = req.body.user;
@@ -12,9 +12,9 @@ const createUserPost = (req, res) => {
     }
 };
 
-const readUserGet = (req, res) => {
+const readUsersGet = (req, res) => {
     try {
-        const users = readUser();
+        const users = readUsers();
         res.status(200).json({ success: true, users});   
     } catch (error) {
         console.error("Failed to read users:", error.message);
@@ -22,4 +22,22 @@ const readUserGet = (req, res) => {
     }
 };
 
-export { createUserPost, readUserGet }
+const readUserPost = (req, res) => {
+    const { email, password} = req.body.user;
+    
+    try {
+        const user = readUser(email, password);
+
+        if (user) {
+            res.status(200).json({ success: true});   
+        } else {
+            res.status(200).json({ success: false});   
+        }
+
+    } catch (error) {
+        console.error("Failed to get user:", error.message);
+        res.status(500).json({ success: false, error: error.message })
+    }
+};
+
+export { createUserPost, readUsersGet, readUserPost }

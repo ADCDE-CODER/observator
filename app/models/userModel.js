@@ -16,8 +16,12 @@ function createUser(email, password) {
 }
 
 // READ
-function readUser() {
+function readUsers() {
     return db.prepare("SELECT * FROM users").all();
+}
+
+function readUser(email, password) {
+    return db.prepare("SELECT * FROM users WHERE email = ? AND password = ?").get(email, password);
 }
 
 // UPDATE
@@ -30,4 +34,4 @@ function deleteUser(id) {
     return db.prepare("DELETE FROM users WHERE id = ?").run(id);
 }
 
-export { createUser, readUser, updateUser, deleteUser };
+export { createUser, readUsers, readUser, updateUser, deleteUser };

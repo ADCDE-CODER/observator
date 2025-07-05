@@ -44,6 +44,38 @@ signUpButton.addEventListener("click", async () => {
     }
 });
 
+const signInButton = document.getElementById("signin-button");
+
+signInButton.addEventListener("click", async () => {
+    const email = document.getElementById("read-email").value;
+    const password = document.getElementById("read-password").value;
+
+    try {
+        const response = await fetch("http://localhost:3000/user/auth", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify( {user: {email, password}} )
+        });
+
+        const user = await response.json();
+
+        if (response.ok) {
+            if (user.success) {
+                alert("You sign in!");
+            } else {
+                alert("There is no account!");
+            }  
+        } else {
+            alert(`Signin failed: ${user.error} (status: ${response.status})`);
+        } 
+    } catch (error) {
+        console.log("Sign in error: ", error.message);
+        alert("Server error while signing in.");
+    }
+});
+
 let isNewChat = false;
 
 const sendButton = document.getElementById("send-button");
