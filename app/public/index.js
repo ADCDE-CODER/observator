@@ -18,8 +18,11 @@ loginMenuButton.addEventListener("click", () => {
 const signUpButton = document.getElementById("signup-button");
 
 signUpButton.addEventListener("click", async () => {
-    const email = document.getElementById("create-email").value;
-    const password = document.getElementById("create-password").value;
+    const emailInput = document.getElementById("create-email");
+    const passwordInput = document.getElementById("create-password");
+
+    const email = emailInput.value;
+    const password = passwordInput.value;
     
     try {
         const response = await fetch("http://localhost:3000/user/create", {
@@ -33,8 +36,10 @@ signUpButton.addEventListener("click", async () => {
         const data = await response.json();
 
         if (response.ok) {
-            signMenu.style.display = "none";
-            contentMain.style.display = "block";
+            emailInput.value = "";
+            passwordInput.value = "";
+
+            alert("Your account is created!");
         } else {
             alert(`Signup failed: ${data.error} (status: ${response.status})`);
         }
@@ -47,8 +52,11 @@ signUpButton.addEventListener("click", async () => {
 const signInButton = document.getElementById("signin-button");
 
 signInButton.addEventListener("click", async () => {
-    const email = document.getElementById("read-email").value;
-    const password = document.getElementById("read-password").value;
+    const emailInput = document.getElementById("read-email");
+    const passwordInput = document.getElementById("read-password");
+
+    const email = emailInput.value;
+    const password = passwordInput.value;
 
     try {
         const response = await fetch("http://localhost:3000/user/auth", {
@@ -63,6 +71,9 @@ signInButton.addEventListener("click", async () => {
 
         if (response.ok) {
             if (user.success) {
+                emailInput.value = "";
+                passwordInput.value = "";
+
                 alert("You sign in!");
             } else {
                 alert("There is no account!");
