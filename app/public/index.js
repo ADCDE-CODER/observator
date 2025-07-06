@@ -1,12 +1,19 @@
 function hidePages() {
+    const navHeaderMenu = document.getElementById("nav-header__menu");
+    navHeaderMenu.style.display = "none";
+
+    const navHeaderProfile = document.getElementById("nav-header__profile");
+    navHeaderProfile.style.display = "none";
+
     const pages = document.getElementsByClassName("content-main__page");
     
     for (let i = 0; i < pages.length; i++) {
-        const element = pages[i];
-        element.style.display = "none";
+        const page = pages[i];
+        page.style.display = "none";
     }
-    const welcomeScreen = document.getElementById("welcome");
-    welcomeScreen.style.display = "flex";
+    
+    const welcomeScreenPage = document.getElementById("welcome");
+    welcomeScreenPage.style.display = "flex";
 }
 
 const signMenu = document.getElementById("sign-menu");
