@@ -1,3 +1,14 @@
+function hidePages() {
+    const pages = document.getElementsByClassName("content-main__page");
+    
+    for (let i = 0; i < pages.length; i++) {
+        const element = pages[i];
+        element.style.display = "none";
+    }
+    const welcomeScreen = document.getElementById("welcome");
+    welcomeScreen.style.display = "flex";
+}
+
 const signMenu = document.getElementById("sign-menu");
 const contentMain = document.getElementById("content-main");
 

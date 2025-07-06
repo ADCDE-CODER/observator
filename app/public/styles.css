@@ -95,8 +95,15 @@ a {
     overflow: auto;
 }
 
+#welcome {
+    background-color: #1b1b1b;
+    color: white;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
 #chat {
-    display: flex;
     justify-content: space-between;
     margin: 0% 1%;
     height: 100%;
@@ -209,13 +216,13 @@ a {
 }
 
 #image {
-    display: none;
+    background-color: aquamarine;
 }
 
 #video {
-    display: none;
+    background-color: yellow;
 }
 
 #post {
-    display: none;
+    background-color: green;
 }
