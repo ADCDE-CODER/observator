@@ -1,7 +1,7 @@
 const navHeaderMenu = document.getElementById("nav-header__menu");
 const navHeaderProfile = document.getElementById("nav-header__profile");
 
-function showPage(id) {
+function showPage(id, storeHistory) {
     const pages = document.getElementsByClassName("content-main__page");
     
     for (let i = 0; i < pages.length; i++) {
@@ -12,33 +12,51 @@ function showPage(id) {
         } else {
             page.style.display = "none";
         }
-
-        if (id == "welcome" || id == "sign-menu") {
-            navHeaderMenu.style.display = "none";
-            navHeaderProfile.style.display = "none";
-        } else {
-            navHeaderMenu.style.display = "flex";
-            navHeaderProfile.style.display = "flex";
-        }
-
-        if (id == "chat") {
-            loginMenuButton.style.display = "none";
-        } else {
-            loginMenuButton.style.display = "flex";
-        }
     }
-}
+
+    if (id == "welcome" || id == "sign-menu") {
+        navHeaderMenu.style.display = "none";
+        navHeaderProfile.style.display = "none";
+        loginMenuButton.style.display = "flex";
+    } else {
+        navHeaderMenu.style.display = "flex";
+        navHeaderProfile.style.display = "flex";
+        loginMenuButton.style.display = "none";
+    }
+    
+    if (storeHistory) {
+        history.pushState({ page: id }, "", "");
+    }
+};
+
+document.addEventListener("DOMContentLoaded", () => {
+    const navLinks = document.querySelectorAll("#nav-header__menu a");
+
+    for (let i = 0; i < navLinks.length; i++) {
+        const navLink = navLinks[i];
+        navLink.addEventListener("click", (event) => {
+            event.preventDefault();
+
+            const pageID = navLink.getAttribute("href").substring(1);
+            showPage(pageID, true);
+        })
+    }
+});
+
+window.addEventListener("popstate", (event) => {
+    showPage(event.state.page, false);
+});
 
 const logoButton = document.getElementById("nav-header__logo");
 
 logoButton.addEventListener("click", () => {
-    showPage("welcome");
+    showPage("welcome", true);
 });
 
 const loginMenuButton = document.getElementById("loginMenu-button");
 
 loginMenuButton.addEventListener("click", () => {
-    showPage("sign-menu");
+    showPage("sign-menu", true);
 }); 
 
 const signUpButton = document.getElementById("signup-button");
@@ -100,7 +118,7 @@ signInButton.addEventListener("click", async () => {
                 emailInput.value = "";
                 passwordInput.value = "";
 
-                showPage("chat");
+                showPage("chat", true);
                 alert("You sign in!");
             } else {
                 alert("There is no account!");
