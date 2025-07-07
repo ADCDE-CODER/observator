@@ -1,37 +1,44 @@
 const navHeaderMenu = document.getElementById("nav-header__menu");
 const navHeaderProfile = document.getElementById("nav-header__profile");
-const welcomeScreenPage = document.getElementById("welcome");
-const chatPage = document.getElementById("chat");
 
-function hidePages() {
-    navHeaderMenu.style.display = "none";
-    navHeaderProfile.style.display = "none";
-
+function showPage(id) {
     const pages = document.getElementsByClassName("content-main__page");
     
     for (let i = 0; i < pages.length; i++) {
         const page = pages[i];
-        page.style.display = "none";
+        
+        if (page.id == id) {
+            page.style.display = "flex";   
+        } else {
+            page.style.display = "none";
+        }
+
+        if (id == "welcome" || id == "sign-menu") {
+            navHeaderMenu.style.display = "none";
+            navHeaderProfile.style.display = "none";
+        } else {
+            navHeaderMenu.style.display = "flex";
+            navHeaderProfile.style.display = "flex";
+        }
+
+        if (id == "chat") {
+            loginMenuButton.style.display = "none";
+        } else {
+            loginMenuButton.style.display = "flex";
+        }
     }
-
-    welcomeScreenPage.style.display = "flex";
 }
-
-const signMenu = document.getElementById("sign-menu");
-const contentMain = document.getElementById("content-main");
 
 const logoButton = document.getElementById("nav-header__logo");
 
 logoButton.addEventListener("click", () => {
-    signMenu.style.display = "none";
-    contentMain.style.display = "block";
+    showPage("welcome");
 });
 
 const loginMenuButton = document.getElementById("loginMenu-button");
 
 loginMenuButton.addEventListener("click", () => {
-    signMenu.style.display = "flex";
-    contentMain.style.display = "none";
+    showPage("sign-menu");
 }); 
 
 const signUpButton = document.getElementById("signup-button");
@@ -93,14 +100,7 @@ signInButton.addEventListener("click", async () => {
                 emailInput.value = "";
                 passwordInput.value = "";
 
-                navHeaderMenu.style.display = "flex";
-                navHeaderProfile.style.display = "flex";
-                welcomeScreenPage.style.display = "none";
-                signMenu.style.display = "none";
-                contentMain.style.display = "block";
-                chatPage.style.display = "flex";
-                loginMenuButton.style.display = "none";
-
+                showPage("chat");
                 alert("You sign in!");
             } else {
                 alert("There is no account!");
