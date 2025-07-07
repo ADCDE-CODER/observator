@@ -9,25 +9,39 @@ body {
 
 a {
     text-decoration: none;
+    padding: 0.3rem;
+    border-radius: 15px;
+    background-color: white;
+    color: black;
+    border: 2px transparent solid;
+    transition: background-color 1s, color 1s, border 1s;
+}
+
+a:hover {
+    background-color: transparent;
+    color: white;
+    border: 2px white solid;
 }
 
 /* Header */
 
 #nav-header {
-    background-color: lightblue;
+    background-color: #2b2b2b;
     display: flex;
     justify-content: space-around;
-    align-items: center;  
+    align-items: center;
+    border-bottom: 1px white solid; 
+    padding: 0.5rem; 
 }
 
-#nav-header__logo {
+#nav-header__logo, .nav-header__content, #nav-header__profile  {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     cursor: pointer;
 }
 
 .nav-header__content {
-    display: flex;
-    justify-content: center;
-    align-items: center;
     gap: 2em;
 }
 
@@ -41,11 +55,12 @@ a {
     padding: 0;
 }
 
-#nav-header__profile {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 0.5em;
+#loginMenu-button {
+    width: 100%;
+    box-sizing: border-box;
+    border: none;
+    padding: 0.5rem;
+    border-radius: 15px;
 }
 
 /* Sign menu*/
