@@ -1,8 +1,10 @@
-function hidePages() {
-    const navHeaderMenu = document.getElementById("nav-header__menu");
-    navHeaderMenu.style.display = "none";
+const navHeaderMenu = document.getElementById("nav-header__menu");
+const navHeaderProfile = document.getElementById("nav-header__profile");
+const welcomeScreenPage = document.getElementById("welcome");
+const chatPage = document.getElementById("chat");
 
-    const navHeaderProfile = document.getElementById("nav-header__profile");
+function hidePages() {
+    navHeaderMenu.style.display = "none";
     navHeaderProfile.style.display = "none";
 
     const pages = document.getElementsByClassName("content-main__page");
@@ -11,8 +13,7 @@ function hidePages() {
         const page = pages[i];
         page.style.display = "none";
     }
-    
-    const welcomeScreenPage = document.getElementById("welcome");
+
     welcomeScreenPage.style.display = "flex";
 }
 
@@ -91,6 +92,14 @@ signInButton.addEventListener("click", async () => {
             if (user.success) {
                 emailInput.value = "";
                 passwordInput.value = "";
+
+                navHeaderMenu.style.display = "flex";
+                navHeaderProfile.style.display = "flex";
+                welcomeScreenPage.style.display = "none";
+                signMenu.style.display = "none";
+                contentMain.style.display = "block";
+                chatPage.style.display = "flex";
+                loginMenuButton.style.display = "none";
 
                 alert("You sign in!");
             } else {
