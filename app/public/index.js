@@ -1,8 +1,6 @@
 const navHeaderMenu = document.getElementById("nav-header__menu");
 const navHeaderProfile = document.getElementById("nav-header__profile");
 
-let isLogin = false;
-
 function showPage(id, storeHistory) {
     const pages = document.getElementsByClassName("content-main__page");
     
@@ -16,7 +14,9 @@ function showPage(id, storeHistory) {
         }
     }
 
-    if (!isLogin) {
+    const isLogin = localStorage.getItem("isLogin");
+    
+    if (isLogin !== "true") {
         navHeaderMenu.style.display = "none";
         navHeaderProfile.style.display = "none";
         loginMenuButton.style.display = "flex";
@@ -66,7 +66,7 @@ loginMenuButton.addEventListener("click", () => {
 const logoutMenuButton = document.getElementById("logoutMenu-button");
 
 logoutMenuButton.addEventListener("click", () => {
-    isLogin = false;
+    localStorage.setItem("isLogin", false);
     localStorage.removeItem("token");
     showPage("welcome", true);
 });
@@ -129,7 +129,7 @@ signInButton.addEventListener("click", async () => {
             if (user.success) {
                 emailInput.value = "";
                 passwordInput.value = "";
-                isLogin = true;
+                localStorage.setItem("isLogin", true);
 
                 showPage("chat", true);
                 alert("You sign in!");
