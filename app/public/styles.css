@@ -55,7 +55,7 @@ a:hover {
     padding: 0;
 }
 
-#loginMenu-button {
+#loginMenu-button, #logoutMenu-button {
     width: 100%;
     box-sizing: border-box;
     border: none;

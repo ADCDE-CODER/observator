@@ -18,10 +18,12 @@ function showPage(id, storeHistory) {
         navHeaderMenu.style.display = "none";
         navHeaderProfile.style.display = "none";
         loginMenuButton.style.display = "flex";
+        logoutMenuButton.style.display = "none";
     } else {
         navHeaderMenu.style.display = "flex";
         navHeaderProfile.style.display = "flex";
         loginMenuButton.style.display = "none";
+        logoutMenuButton.style.display = "flex";
     }
     
     if (storeHistory) {
@@ -58,6 +60,13 @@ const loginMenuButton = document.getElementById("loginMenu-button");
 loginMenuButton.addEventListener("click", () => {
     showPage("sign-menu", true);
 }); 
+
+const logoutMenuButton = document.getElementById("logoutMenu-button");
+
+logoutMenuButton.addEventListener("click", () => {
+    localStorage.removeItem("token");
+    showPage("welcome", true);
+});
 
 const signUpButton = document.getElementById("signup-button");
 
