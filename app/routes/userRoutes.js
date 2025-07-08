@@ -1,12 +1,12 @@
 import express from "express";
-import { createUserPost, readUsersGet, readUserPost } from "../controllers/userController.js"
+import { signUpUserPost, signUpUsersGet, signInUserPost } from "../controllers/userController.js"
 
 const userRouter = express.Router();
 
-userRouter.post("/create", createUserPost);
+userRouter.post("/signup", signUpUserPost);
 
-userRouter.get("/read", readUsersGet);
+userRouter.get("/signup", signUpUsersGet);
 
-userRouter.post("/auth", readUserPost);
+userRouter.post("/signin", signInUserPost);
 
 export { userRouter };

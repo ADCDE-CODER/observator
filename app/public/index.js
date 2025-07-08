@@ -69,12 +69,12 @@ signUpButton.addEventListener("click", async () => {
     const password = passwordInput.value;
     
     try {
-        const response = await fetch("http://localhost:3000/user/create", {
+        const response = await fetch("http://localhost:3000/user/signup", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ user: {email, password} })
+            body: JSON.stringify({ email, password })
         });
 
         const data = await response.json();
@@ -103,12 +103,12 @@ signInButton.addEventListener("click", async () => {
     const password = passwordInput.value;
 
     try {
-        const response = await fetch("http://localhost:3000/user/auth", {
+        const response = await fetch("http://localhost:3000/user/signin", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify( {user: {email, password}} )
+            body: JSON.stringify( { email, password } )
         });
 
         const user = await response.json();

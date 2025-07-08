@@ -1,7 +1,7 @@
 import { createUser, readUsers, readUser, updateUser, deleteUser } from "../models/userModel.js";
 
-const createUserPost = (req, res) => {
-    const { email, password } = req.body.user;
+const signUpUserPost = (req, res) => {
+    const { email, password } = req.body;
     
     try {
         const users = createUser(email, password);
@@ -12,7 +12,7 @@ const createUserPost = (req, res) => {
     }
 };
 
-const readUsersGet = (req, res) => {
+const signUpUsersGet = (req, res) => {
     try {
         const users = readUsers();
         res.status(200).json({ success: true, users});   
@@ -22,8 +22,8 @@ const readUsersGet = (req, res) => {
     }
 };
 
-const readUserPost = (req, res) => {
-    const { email, password} = req.body.user;
+const signInUserPost = (req, res) => {
+    const { email, password} = req.body;
     
     try {
         const user = readUser(email, password);
@@ -40,4 +40,4 @@ const readUserPost = (req, res) => {
     }
 };
 
-export { createUserPost, readUsersGet, readUserPost }
+export { signUpUserPost, signUpUsersGet, signInUserPost };
