@@ -15,20 +15,16 @@ const generateChatPost = async (req, res) => {
         const { userInput } = req.body;
 
         if (userInput) {
-            console.log("Request: " + userInput);
-            
-            const responder = async (input) => {
-                try {
-                    return await createChatResponder(client, "mistralai/mistral-small-3.2-24b-instruct:free", input, 10);
-                } catch (error) {
-                    res.status(500).json( { success:false, error: error.message } );
-                }
+            try {
+                console.log("Request: " + userInput);
+
+                const chatOutput = await createChatResponder(client, "mistralai/mistral-small-3.2-24b-instruct:free", userInput, 10);
+
+                console.log("Response: ", chatOutput.content);
+                res.status(200).json( { success: true, output: chatOutput.content });
+            } catch (error) {
+                res.status(500).json( { success:false, error: error.message } );
             }
-            const chatOutput = await responder(userInput);
-        
-            console.log("Response: ", chatOutput.content);
-            
-            res.status(200).json( { success: true, output: chatOutput.content });
         } else {
             res.status(200).json( { success: false, error: "Failed to read user input" } );
         }
@@ -55,7 +51,7 @@ async function createChatResponder(client, model, input, maxTokens) {
     }
 }
 
-function createUserInterface(io, responder) {
+/* function createUserInterface(io, responder) {
     io.prompt();
     io.on("line", async (input) => {
         try {
@@ -68,7 +64,7 @@ function createUserInterface(io, responder) {
     });
 }
 
-/* function main() {
+function main() {
     config();
     
     const client = new OpenAI({ 
