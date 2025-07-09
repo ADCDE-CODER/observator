@@ -129,8 +129,10 @@ signInButton.addEventListener("click", async () => {
             if (user.success) {
                 emailInput.value = "";
                 passwordInput.value = "";
-                localStorage.setItem("isLogin", true);
 
+                localStorage.setItem("isLogin", true);
+                localStorage.setItem("token", user.token);
+                
                 showPage("chat", true);
                 alert("You sign in!");
             } else {
@@ -150,31 +152,49 @@ let isNewChat = false;
 const sendButton = document.getElementById("send-button");
 
 sendButton.addEventListener("click", async () => {
-    const input = document.getElementById("prompt-input").value;
+    const userInput = document.getElementById("prompt-input").value;
+    const userParameter = document.createElement("p");
+    userParameter.innerText = userInput;
     
     if (!isNewChat) {
-        const menuContent = document.getElementById("content-main__menuContent");
-        const para2 = document.createElement("p");
-        para2. innerText = input;
-        menuContent.appendChild(para2);
+        const chatMenuContent = document.getElementById("content-main__menuContent");
+        chatMenuContent.appendChild(userParameter);
         isNewChat = true;
     }
 
-    const output = document.getElementsByClassName("content-main__output")[0];
-    const paraInput = document.createElement("p");
-    paraInput.innerText = input;
-    output.appendChild(paraInput);
+    const output = document.getElementById("content-main__output");
+    output.appendChild(userParameter);
 
-    const response = await fetch("http://localhost:3000/prompt", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({prompt: input})
-    });
+    try {
+        const token = localStorage.getItem("token");
+        
+        const response = await fetch("http://localhost:3000/chat/prompt", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}` 
+            },
+            body: JSON.stringify({ userInput })
+        });
 
-    const para = document.createElement("p");
-    const result = await response.json();
-    para.innerText = result;
-    output.appendChild(para);
+        const result = await response.json();
+        
+        const chatParameter = document.createElement("p");
+       
+        if (response.ok) {
+            
+            if (result.success) {
+                chatParameter.innerText = result.output;
+            } else {
+                chatParameter.innerText = result.error;
+            }
+            
+            output.appendChild(chatParameter);  
+        } else {
+            alert(`Chat failed: ${result.error} (status: ${response.status})`);
+        }   
+    } catch (error) {
+        console.log("Chat prompt error: ", error.message);
+        alert("Server error while process chat prompt.");
+    }
 });
