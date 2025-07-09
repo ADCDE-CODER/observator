@@ -1,6 +1,7 @@
 import { config } from "dotenv";
 import OpenAI from "openai";
 import { app } from "./app.js";
+import jwt from "jsonwebtoken";
 
 const PORT = 3000;
 
@@ -15,21 +16,52 @@ const client = new OpenAI({
     apiKey: process.env.API_KEY 
 });
 
-app.post("/prompt", async (req, res) => {
-    console.log("Request: " + req.body.prompt);
+function authToken(req, res, next) {
+    const authHeaders = req.headers['authorization'];
+    const token = authHeaders && authHeaders.split(" ")[1];
 
-    const responder = async (input) => {
+    if (token) {
         try {
-            return await createChatResponder(client, "mistralai/mistral-small-3.2-24b-instruct:free", input, 10);
+            const user = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+            req.user = user;
+            next();
         } catch (error) {
-            console.log(error);
+            console.error(error);
+            res.status(403).json({ error: "Invalid or expired token" });
         }
+    } else {
+        return res.status(401).json({ error: "Access denied: No token" })
     }
+};
 
-    const output = await responder(req.body.prompt);
-    console.log("Response: ", output.content);
-    res.json(output.content);
-})
+app.post("/chat/prompt", authToken, async (req, res) => {
+    const user = req.user;
+    
+    if (user) {
+        const { userInput } = req.body;
+
+        if (userInput) {
+            console.log("Request: " + userInput);
+            
+            const responder = async (input) => {
+                try {
+                    return await createChatResponder(client, "mistralai/mistral-small-3.2-24b-instruct:free", input, 10);
+                } catch (error) {
+                    res.status(500).json( { success:false, error: error.message } );
+                }
+            }
+            const chatOutput = await responder(userInput);
+        
+            console.log("Response: ", chatOutput.content);
+            
+            res.status(200).json( { success: true, output: chatOutput.content });
+        } else {
+            res.status(200).json( { success: false, error: "Failed to read user input" } );
+        }
+    } else {
+        res.status(200).json( { success: false, error: "Failed to access user" } );
+    }
+});
 
 async function createChatResponder(client, model, input, maxTokens) {
     try {
