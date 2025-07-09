@@ -8,6 +8,24 @@ const client = new OpenAI({
     apiKey: process.env.API_KEY 
 });
 
+async function createChatResponder(client, model, input, maxTokens) {
+    try {
+        const completion = await client.chat.completions.create({
+            model: model,
+            max_tokens: maxTokens,
+            messages: [
+                {
+                    role: "user",
+                    content: input
+                }
+            ]
+        })
+        return completion.choices[0].message;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 const generateChatPost = async (req, res) => {
     const user = req.user;
     
@@ -32,24 +50,6 @@ const generateChatPost = async (req, res) => {
         res.status(200).json( { success: false, error: "Failed to access user" } );
     }
 };
-
-async function createChatResponder(client, model, input, maxTokens) {
-    try {
-        const completion = await client.chat.completions.create({
-            model: model,
-            max_tokens: maxTokens,
-            messages: [
-                {
-                    role: "user",
-                    content: input
-                }
-            ]
-        })
-        return completion.choices[0].message;
-    } catch (error) {
-        console.log(error);
-    }
-}
 
 /* function createUserInterface(io, responder) {
     io.prompt();
