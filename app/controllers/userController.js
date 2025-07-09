@@ -1,4 +1,8 @@
 import { createUser, readUsers, readUser, updateUser, deleteUser } from "../models/userModel.js";
+import jwt from "jsonwebtoken";
+import { config } from "dotenv";
+
+config();
 
 const signUpUserPost = (req, res) => {
     const { email, password } = req.body;
@@ -7,7 +11,7 @@ const signUpUserPost = (req, res) => {
         const users = createUser(email, password);
         res.status(201).json({ success: true });
     } catch (error) {
-        console.log("User creation failed: ", error.message);
+        console.error("User creation failed: ", error.message);
         res.status(500).json({ success: false, error: error.message });
     }
 };
@@ -29,9 +33,10 @@ const signInUserPost = (req, res) => {
         const user = readUser(email, password);
 
         if (user) {
-            res.status(200).json({ success: true});   
+            const token = jwt.sign({ email: user.email }, process.env.ACCESS_TOKEN_SECRET);
+            res.status(200).json({ success: true, token});   
         } else {
-            res.status(200).json({ success: false});   
+            res.status(200).json({ success: false, error: "Invalid credentials"});   
         }
 
     } catch (error) {
