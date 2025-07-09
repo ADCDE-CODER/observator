@@ -170,7 +170,7 @@ a:hover {
     width: 100%;
 }
 
-.content-main__output {
+#content-main__output {
     background-color: aliceblue;
     width: 100%;
     height: 100%;
