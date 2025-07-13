@@ -8,11 +8,28 @@ const client = new OpenAI({
     apiKey: process.env.API_KEY 
 });
 
-async function createChatResponder(client, model, input, maxTokens) {
+async function createChatResponder(client, model, input, settings) {
     try {
         const completion = await client.chat.completions.create({
             model: model,
-            max_tokens: maxTokens,
+            reasoning: {
+                effort: settings.effort,
+                max_tokens: settings.reasoning_max_tokens,
+                exclude: settings.exclude
+            },  
+            usage: {
+                include: settings.include
+            },
+            stream: settings.stream,
+            max_tokens: settings.max_tokens,
+            temperature: settings.temperature,
+            seed: settings.seed,
+            top_p: settings.top_p,
+            top_k: settings.top_k,
+            frequency_penalty: settings.frequency_penalty,
+            presence_penalty: settings.presence_penalty,
+            repetition_penalty: settings.repetition_penalty,
+            logit_bias: settings.logit_bias,
             messages: [
                 {
                     role: "user",
@@ -30,13 +47,13 @@ const generateChatPost = async (req, res) => {
     const user = req.user;
     
     if (user) {
-        const { userInput } = req.body;
+        const { userInput, chatSettingsData: chatSettings } = req.body;
 
         if (userInput) {
             try {
                 console.log("Request: " + userInput);
 
-                const chatOutput = await createChatResponder(client, "mistralai/mistral-small-3.2-24b-instruct:free", userInput, 10);
+                const chatOutput = await createChatResponder(client, "mistralai/mistral-small-3.2-24b-instruct:free", userInput, chatSettings);
 
                 console.log("Response: ", chatOutput.content);
                 res.status(200).json( { success: true, output: chatOutput.content });
