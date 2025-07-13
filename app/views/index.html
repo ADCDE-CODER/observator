@@ -82,10 +82,62 @@
             </div>
             <div class="content-main__settings">
                 <h2>Settings</h2>
-                <form action="" method="POST">
+                <form id="chat-form__settings">
                     <div class="content-main__label">
-                        <label for="max-tokens">Max Tokens:</label>
-                        <input id="max-tokens" type="text" value="20" name="max-tokens">
+                        <h3>Reasoning</h3>
+                        <label for="effort">Effort:</label>
+                        <input id="effort" type="text" name="effort">
+
+                        <label for="reasoning-max-tokens">Max tokens:</label>
+                        <input id="reasoning-max-tokens" type="number" name="reasoning-max-tokens">
+
+                        <label for="exclude">Exclude:</label>
+                        <input id="exclude" type="checkbox" name="exclude">
+                    </div>
+                    <div class="content-main__label">
+                        <h3>Usage</h3>
+                        <label for="include">Include:</label>
+                        <input id="include" type="checkbox" name="include">
+                    </div>
+                    <div class="content-main__label">
+                        <label for="stream">Stream:</label>
+                        <input id="stream" type="checkbox" name="stream">
+                    </div>
+                    <div class="content-main__label">
+                        <label for="max-tokens">Max tokens:</label>
+                        <input id="max-tokens" type="number" name="max-tokens">
+                    </div>
+                    <div class="content-main__label">
+                        <label for="temperature">Temperature:</label>
+                        <input id="temperature" type="number" name="temperature">
+                    </div>
+                    <div class="content-main__label">
+                        <label for="seed">Seed:</label>
+                        <input id="seed" type="number" name="seed">
+                    </div>
+                    <div class="content-main__label">
+                        <label for="top-p">Top-p:</label>
+                        <input id="top-p" type="number" name="top-p">
+                    </div>
+                    <div class="content-main__label">
+                        <label for="top-k">Top-k:</label>
+                        <input id="top-k" type="number" name="top-k">
+                    </div>
+                    <div class="content-main__label">
+                        <label for="frequency-penalty">Frequency penalty:</label>
+                        <input id="frequency-penalty" type="number" name="frequency-penalty">
+                    </div>
+                    <div class="content-main__label">
+                        <label for="presence-penalty">Presence penalty:</label>
+                        <input id="presence-penalty" type="number" name="presence-penalty">
+                    </div>
+                    <div class="content-main__label">
+                        <label for="repetition-penalty">Repetition penalty:</label>
+                        <input id="repetition-penalty" type="number" name="repetition-penalty">
+                    </div>
+                    <div class="content-main__label">
+                        <label for="logit-bias">Logit bias:</label>
+                        <input id="logit-bias" type="text" name="logit-bias">
                     </div>
                     <button type="submit">Apply</button>
                 </form>
