@@ -212,15 +212,14 @@ a:hover {
     max-width: 20%;
 }
 
-.content-main__settings > form {
+#chat-form__settings{
     background-color: chocolate;
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
     gap: 1em;
     width: 100%;
-    overflow-y: auto;
+    overflow-y: scroll;
 }
 
 .content-main__label{
