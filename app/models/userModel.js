@@ -21,7 +21,7 @@ function readUsers() {
 }
 
 function readUser(email, password) {
-    return db.prepare("SELECT * FROM users WHERE email = ? AND password = ?").get(email, password);
+    return db.prepare("SELECT id, email FROM users WHERE email = ? AND password = ?").get(email, password);
 }
 
 // UPDATE
