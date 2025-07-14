@@ -47,7 +47,7 @@ const generateChatPost = async (req, res) => {
     const user = req.user;
     
     if (user) {
-        const { userInput, chatSettingsData: chatSettings } = req.body;
+        const { userInput, chatSettings } = req.body;
 
         if (userInput) {
             try {
