@@ -1,5 +1,6 @@
 import { config } from "dotenv";
 import OpenAI from "openai";
+import { createChatMessage, readAllChatMessages, readChatMessage, updateChatMessage, deleteChatMessage } from "../models/chatModel.js";
 
 config({ path: "./app/.env" });
 
@@ -43,11 +44,11 @@ async function createChatResponder(client, model, input, settings) {
     }
 }
 
-const generateChatPost = async (req, res) => {
+const createChatMessagePost = async (req, res) => {
     const user = req.user;
     
     if (user) {
-        const { userInput, chatSettings } = req.body;
+        const { user, userInput, chatSettings } = req.body;
 
         if (userInput) {
             try {
@@ -56,6 +57,10 @@ const generateChatPost = async (req, res) => {
                 const chatOutput = await createChatResponder(client, "mistralai/mistral-small-3.2-24b-instruct:free", userInput, chatSettings);
 
                 console.log("Response: ", chatOutput.content);
+
+                const userMessage = createChatMessage(user.id, "user", userInput);
+                const aiMessage = createChatMessage(user.id, "ai", chatOutput.content);
+
                 res.status(200).json( { success: true, output: chatOutput.content });
             } catch (error) {
                 res.status(500).json( { success:false, error: error.message } );
@@ -65,6 +70,16 @@ const generateChatPost = async (req, res) => {
         }
     } else {
         res.status(200).json( { success: false, error: "Failed to access user" } );
+    }
+};
+
+const readAllChatMessagesGet = (req, res) => {
+    try {
+        const chatMessages = readAllChatMessages();
+        res.status(200).json({ success: true, chatMessages});   
+    } catch (error) {
+        console.error("Failed to read all chat messages:", error.message);
+        res.status(500).json({ success: false, error: error.message })
     }
 };
 
@@ -109,4 +124,4 @@ function main() {
 
 main(); */
 
-export { generateChatPost };
+export { createChatMessagePost, readAllChatMessagesGet };

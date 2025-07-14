@@ -15,10 +15,14 @@ db.exec(chatTable);
 
 // CREATE
 function createChatMessage(userId, sender, message) {
-    return db.prepare("INSERT INTO chat(user_id, sender, message) VALUES (?, ?, ?)".run(userId, sender, message));
+    return db.prepare("INSERT INTO chat(user_id, sender, message) VALUES (?, ?, ?)").run(userId, sender, message);
 };
 
 // READ
+function readAllChatMessages() {
+    return db.prepare("SELECT * FROM chat ORDER BY timestamp ASC").all();
+};
+
 function readChatMessage(userId) {
     return db.prepare("SELECT sender, message, timestamp FROM chat WHERE user_id = ? ORDER BY timestamp ASC").all(userId);
 };
@@ -33,4 +37,4 @@ function deleteChatMessage(id) {
     db.prepare("DELETE FROM chat WHERE id = ?").run(id);
 };
 
-export { createChatMessage, readChatMessage, updateChatMessage, deleteChatMessage };
+export { createChatMessage, readAllChatMessages,readChatMessage, updateChatMessage, deleteChatMessage };

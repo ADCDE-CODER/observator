@@ -34,7 +34,7 @@ const signInUserPost = (req, res) => {
 
         if (user) {
             const token = jwt.sign({ email: user.email }, process.env.ACCESS_TOKEN_SECRET);
-            res.status(200).json({ success: true, token});   
+            res.status(200).json({ success: true, user, token});   
         } else {
             res.status(200).json({ success: false, error: "Invalid credentials"});   
         }

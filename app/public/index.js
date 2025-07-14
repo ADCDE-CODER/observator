@@ -131,6 +131,7 @@ signInButton.addEventListener("click", async () => {
                 passwordInput.value = "";
 
                 localStorage.setItem("isLogin", true);
+                localStorage.setItem("user", JSON.stringify(user.user));
                 localStorage.setItem("token", user.token);
                 
                 showPage("chat", true);
@@ -206,6 +207,7 @@ sendButton.addEventListener("click", async () => {
     output.appendChild(userParameter);
 
     try {
+        const user = JSON.parse(localStorage.getItem("user"));
         const token = localStorage.getItem("token");
         const chatSettings = JSON.parse(localStorage.getItem("chatSettings"));
         
@@ -215,7 +217,7 @@ sendButton.addEventListener("click", async () => {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}` 
             },
-            body: JSON.stringify({ userInput, chatSettings })
+            body: JSON.stringify({ user, userInput, chatSettings })
         });
 
         const result = await response.json();
