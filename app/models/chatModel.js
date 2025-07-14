@@ -1,4 +1,4 @@
-import { db } from "../config/database";
+import { db } from "../config/database.js";
 
 const chatTable = ` 
     CREATE TABLE IF NOT EXISTS chat (
@@ -14,18 +14,18 @@ const chatTable = `
 db.exec(chatTable);
 
 // CREATE
-function createChatMessage(user_id, sender, message) {
-    return db.prepare("INSERT INTO chat(user_id, sender, message) VALUES (?, ?, ?)".run(user_id, sender, message));
+function createChatMessage(userId, sender, message) {
+    return db.prepare("INSERT INTO chat(user_id, sender, message) VALUES (?, ?, ?)".run(userId, sender, message));
 };
 
 // READ
-function readChatMessage(user_id) {
-    return db.prepare("SELECT sender, message, timestamp FROM chat WHERE user_id = ? ORDER BY timestamp ASC").all(user_id);
+function readChatMessage(userId) {
+    return db.prepare("SELECT sender, message, timestamp FROM chat WHERE user_id = ? ORDER BY timestamp ASC").all(userId);
 };
 
 // UPDATE
-function updateChatMessage(sender, message, user_id) {
-    db.prepare("UPDATE chat SET sender = ?, message = ?, WHERE = ?").run(sender, message, user_id);
+function updateChatMessage(sender, message, userId) {
+    db.prepare("UPDATE chat SET sender = ?, message = ?, WHERE = ?").run(sender, message, userId);
 };
 
 // DELETE
