@@ -1,6 +1,6 @@
 import { db } from "../config/database.js";
 
-const chatTable = ` 
+const messagesTable = ` 
     CREATE TABLE IF NOT EXISTS messages (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         chat_id INTEGER NOT NULL,
@@ -11,7 +11,7 @@ const chatTable = `
     );
 `;
 
-db.exec(chatTable);
+db.exec(messagesTable);
 
 // CREATE
 function createChatMessage(chatId, sender, message) {
