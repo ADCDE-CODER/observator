@@ -1,40 +1,40 @@
 import { db } from "../config/database.js";
 
 const chatTable = ` 
-    CREATE TABLE IF NOT EXISTS chat (
+    CREATE TABLE IF NOT EXISTS messages (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER NOT NULL,
-        sender TEXT NOT NULL, -- 'AI' or 'User'
+        chat_id INTEGER NOT NULL,
+        sender TEXT CHECK(sender IN 'user', 'ai') NOT NULL,
         message TEXT NOT NULL,
-        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (user_id) REFERENCES users(id)
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (chat_id) REFERENCES chats(id)
     );
 `;
 
 db.exec(chatTable);
 
 // CREATE
-function createChatMessage(userId, sender, message) {
-    return db.prepare("INSERT INTO chat(user_id, sender, message) VALUES (?, ?, ?)").run(userId, sender, message);
+function createChatMessage(chatId, sender, message) {
+    return db.prepare("INSERT INTO messages(chat_id, sender, message) VALUES (?, ?, ?)").run(chatId, sender, message);
 };
 
 // READ
 function readAllChatMessages() {
-    return db.prepare("SELECT * FROM chat ORDER BY timestamp ASC").all();
+    return db.prepare("SELECT * FROM messages ORDER BY created_at ASC").all();
 };
 
-function readChatMessage(userId) {
-    return db.prepare("SELECT sender, message, timestamp FROM chat WHERE user_id = ? ORDER BY timestamp ASC").all(userId);
+function readChatMessage(chatId) {
+    return db.prepare("SELECT sender, message, created_at FROM messages WHERE chat_id = ? ORDER BY created_at ASC").all(chatId);
 };
 
 // UPDATE
-function updateChatMessage(sender, message, userId) {
-    db.prepare("UPDATE chat SET sender = ?, message = ?, WHERE = ?").run(sender, message, userId);
+function updateChatMessage(sender, message, chatId) {
+    db.prepare("UPDATE messages SET sender = ?, message = ?, WHERE = ?").run(sender, message, chatId);
 };
 
 // DELETE
 function deleteChatMessage(id) {
-    db.prepare("DELETE FROM chat WHERE id = ?").run(id);
+    db.prepare("DELETE FROM messages WHERE id = ?").run(id);
 };
 
 export { createChatMessage, readAllChatMessages,readChatMessage, updateChatMessage, deleteChatMessage };
