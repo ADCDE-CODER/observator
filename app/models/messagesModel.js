@@ -4,7 +4,7 @@ const messagesTable = `
     CREATE TABLE IF NOT EXISTS messages (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         chat_id INTEGER NOT NULL,
-        sender TEXT CHECK(sender IN 'user', 'ai') NOT NULL,
+        sender TEXT CHECK(sender IN ('user', 'ai')) NOT NULL,
         message TEXT NOT NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (chat_id) REFERENCES chats(id)
