@@ -1,4 +1,4 @@
-import { db } from "../config/database";
+import { db } from "../config/database.js";
 
 const chatsTable = `
     CREATE TABLE IF NOT EXISTS chats (
