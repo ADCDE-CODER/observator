@@ -14,26 +14,26 @@ db.exec(chatsTable);
 
 // CREATE 
 function createChat(userId, title) {
-    db.prepare("INSERT INTO chats(user_id, title) VALUES (?, ?)").run(userId, title);
+    return db.prepare("INSERT INTO chats(user_id, title) VALUES (?, ?)").run(userId, title);
 };
 
 // READ
 function readAllChats() {
-    db.prepare("SELECT * FROM chats ORDER BY created_at ASC").all();
+    return db.prepare("SELECT * FROM chats ORDER BY created_at ASC").all();
 };
 
 function readChat(userId) {
-    db.prepare("SELECT * FROM chats WHERE = ? ORDER BY created_at ASC").all(userId);
+    return db.prepare("SELECT * FROM chats WHERE = ? ORDER BY created_at ASC").all(userId);
 };
 
 // UPDATE
 function updateChat(title, userId) {
-    db.prepare("UPDATE chats SET title = ?, WHERE user_id = ?").run(title, userId);
+    return db.prepare("UPDATE chats SET title = ?, WHERE user_id = ?").run(title, userId);
 };
 
 // DELETE
 function deleteChat(id) {
-    db.prepare("DELETE FROM chats WHERE id = ?").run(id);
+    return db.prepare("DELETE FROM chats WHERE id = ?").run(id);
 };
 
 export { createChat, readAllChats, readChat, updateChat, deleteChat };

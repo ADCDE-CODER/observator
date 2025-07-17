@@ -29,12 +29,12 @@ function readChatMessage(chatId) {
 
 // UPDATE
 function updateChatMessage(sender, message, chatId) {
-    db.prepare("UPDATE messages SET sender = ?, message = ?, WHERE chat_id = ?").run(sender, message, chatId);
+    return db.prepare("UPDATE messages SET sender = ?, message = ?, WHERE chat_id = ?").run(sender, message, chatId);
 };
 
 // DELETE
 function deleteChatMessage(id) {
-    db.prepare("DELETE FROM messages WHERE id = ?").run(id);
+    return db.prepare("DELETE FROM messages WHERE id = ?").run(id);
 };
 
 export { createChatMessage, readAllChatMessages,readChatMessage, updateChatMessage, deleteChatMessage };
