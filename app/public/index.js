@@ -188,6 +188,83 @@ chatFormSettings.addEventListener("submit", (event) => {
     localStorage.setItem("chatSettings", JSON.stringify(chatSettings));
 });
 
+const chatButton = document.getElementById("chat-button");
+
+chatButton.addEventListener("click", async () => {
+    try {
+        const user = JSON.parse(localStorage.getItem("user"));
+
+        const response = await fetch("http://localhost:3000/chat/new", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ user })
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+
+            if (result.success) {
+                const chatMenuContent = document.getElementById("content-main__menuContent");
+                const chatParameter = document.createElement("p");
+
+                chatParameter.innerText = result.lastChatItem.title;
+                chatMenuContent.appendChild(chatParameter);
+
+            } else {
+                alert(result.error);
+            }
+
+        } else {
+            alert(`New chat failed: ${result.error} (status: ${response.status})`);
+        }
+
+    } catch (error) {
+        console.log("New chat error: ", error.message);
+        alert("Server error while process new chat.");
+    }
+});
+
+document.addEventListener("DOMContentLoaded", async () => {
+    try {
+        const user = JSON.parse(localStorage.getItem("user"));
+
+        const response = await fetch("http://localhost:3000/chat/one", {
+            method: "POST", 
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ user })
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+
+            if (result.success) {
+                const chatMenuContent = document.getElementById("content-main__menuContent");
+                
+                result.chats.forEach( (chat) => {
+                    const chatParameter = document.createElement("p");
+                    chatParameter.innerText = chat.title;
+                    chatMenuContent.appendChild(chatParameter);
+                });
+            } else {
+                alert(result.error);
+            }
+
+        } else {
+            alert(`Read chat failed: ${result.error} (status: ${response.status})`);
+        }
+
+    } catch (error) {
+        console.log("New chat error: ", error.message);
+        alert("Server error while process read chat.");
+    }
+});
+
 let isNewChat = false;
 
 const sendButton = document.getElementById("send-button");
