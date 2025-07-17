@@ -2,7 +2,7 @@ import { db } from "../config/database.js";
 
 const chatsTable = `
     CREATE TABLE IF NOT EXISTS chats (
-        id INTERGER PRIMARY KEY AUTOINCREMENT,
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id INTERGER NOT NULL,
         title TEXT NOT NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
