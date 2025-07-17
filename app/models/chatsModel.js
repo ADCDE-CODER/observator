@@ -23,7 +23,7 @@ function readAllChats() {
 };
 
 function readChat(userId) {
-    return db.prepare("SELECT * FROM chats WHERE = ? ORDER BY created_at ASC").all(userId);
+    return db.prepare("SELECT * FROM chats WHERE user_id = ? ORDER BY created_at ASC").all(userId);
 };
 
 // UPDATE
