@@ -2,7 +2,7 @@ import { createUser, readUsers, readUser, updateUser, deleteUser } from "../mode
 import jwt from "jsonwebtoken";
 import { config } from "dotenv";
 
-config();
+config({ path: "./app/.env"});
 
 const signUpUserPost = (req, res) => {
     const { email, password } = req.body;
