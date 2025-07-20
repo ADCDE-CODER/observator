@@ -209,7 +209,13 @@ chatButton.addEventListener("click", async () => {
             if (result.success) {
                 const chatMenuContent = document.getElementById("content-main__menuContent");
                 const chatLink = document.createElement("a");
-                chatLink.innerText = result.lastChatItem.title;;
+                chatLink.setAttribute("id", result.lastChatItem.id);
+                chatLink.innerText = result.lastChatItem.title;
+                
+                chatLink.addEventListener("click", () => {
+                    localStorage.setItem("selectedChatId", chat.id);
+                });
+
                 chatMenuContent.appendChild(chatLink);
 
             } else {
@@ -248,7 +254,13 @@ document.addEventListener("DOMContentLoaded", async () => {
                     
                     result.chats.forEach( (chat) => {                    
                         const chatLink = document.createElement("a");
+                        chatLink.setAttribute("id", chat.id);
                         chatLink.innerText = chat.title;
+
+                        chatLink.addEventListener("click", () => {
+                            localStorage.setItem("selectedChatId", chat.id);
+                        });
+
                         chatMenuContent.appendChild(chatLink);
                     });
                 } else {
@@ -288,14 +300,15 @@ sendButton.addEventListener("click", async () => {
         const user = JSON.parse(localStorage.getItem("user"));
         const token = localStorage.getItem("token");
         const chatSettings = JSON.parse(localStorage.getItem("chatSettings"));
+        const selectedChatId = localStorage.getItem("selectedChatId");
         
-        const response = await fetch("http://localhost:3000/chat/prompt", {
+        const response = await fetch("http://localhost:3000/message/prompt", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}` 
             },
-            body: JSON.stringify({ user, userInput, chatSettings })
+            body: JSON.stringify({ user, userInput, chatSettings, selectedChatId })
         });
 
         const result = await response.json();
