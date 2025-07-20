@@ -228,40 +228,42 @@ chatButton.addEventListener("click", async () => {
 });
 
 document.addEventListener("DOMContentLoaded", async () => {
-    try {
-        const user = JSON.parse(localStorage.getItem("user"));
+    const user = JSON.parse(localStorage.getItem("user"));
+    
+    if (user != null) {
+        try {
+            const response = await fetch("http://localhost:3000/chat/one", {
+                method: "POST", 
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ user })
+            });
 
-        const response = await fetch("http://localhost:3000/chat/one", {
-            method: "POST", 
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ user })
-        });
+            const result = await response.json();
 
-        const result = await response.json();
+            if (response.ok) {
 
-        if (response.ok) {
+                if (result.success) {
+                    const chatMenuContent = document.getElementById("content-main__menuContent");
+                    
+                    result.chats.forEach( (chat) => {
+                        const chatParameter = document.createElement("p");
+                        chatParameter.innerText = chat.title;
+                        chatMenuContent.appendChild(chatParameter);
+                    });
+                } else {
+                    alert(result.error);
+                }
 
-            if (result.success) {
-                const chatMenuContent = document.getElementById("content-main__menuContent");
-                
-                result.chats.forEach( (chat) => {
-                    const chatParameter = document.createElement("p");
-                    chatParameter.innerText = chat.title;
-                    chatMenuContent.appendChild(chatParameter);
-                });
             } else {
-                alert(result.error);
+                alert(`Read chat failed: ${result.error} (status: ${response.status})`);
             }
 
-        } else {
-            alert(`Read chat failed: ${result.error} (status: ${response.status})`);
+        } catch (error) {
+            console.log("New chat error: ", error.message);
+            alert("Server error while process read chat.");
         }
-
-    } catch (error) {
-        console.log("New chat error: ", error.message);
-        alert("Server error while process read chat.");
     }
 });
 
