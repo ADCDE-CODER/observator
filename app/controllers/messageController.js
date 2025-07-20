@@ -87,6 +87,22 @@ const readAllChatMessagesGet = (req, res) => {
     }
 };
 
+const readChatMessagePost = (req, res) => {
+    const { selectedChatId } = req.body; 
+    
+    if (selectedChatId) {
+        try {
+            const chatMessages = readChatMessage(selectedChatId);
+            res.status(200).json({ success: true, chatMessages});   
+        } catch (error) {
+            console.error("Failed to read all chat messages:", error.message);
+            res.status(500).json({ success: false, error: error.message })
+        }
+    } else {
+        res.status(400).json({ success: false, error: "Missing chat ID" });
+    }
+};
+
 /* function createUserInterface(io, responder) {
     io.prompt();
     io.on("line", async (input) => {
@@ -128,4 +144,4 @@ function main() {
 
 main(); */
 
-export { createChatMessagePost, readAllChatMessagesGet };
+export { createChatMessagePost, readAllChatMessagesGet, readChatMessagePost };
