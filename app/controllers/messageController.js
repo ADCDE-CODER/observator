@@ -1,6 +1,6 @@
 import { config } from "dotenv";
 import OpenAI from "openai";
-import { createChatMessage, readAllChatMessages, readChatMessage, updateChatMessage, deleteChatMessage } from "../models/chatModel.js";
+import { createChatMessage, readAllChatMessages, readChatMessage, updateChatMessage, deleteChatMessage } from "../models/messagesModel.js";
 
 config({ path: "./app/.env" });
 
@@ -48,22 +48,26 @@ const createChatMessagePost = async (req, res) => {
     const user = req.user;
     
     if (user) {
-        const { user, userInput, chatSettings } = req.body;
+        const { user, userInput, chatSettings, selectedChatId } = req.body;
 
         if (userInput) {
-            try {
-                console.log("Request: " + userInput);
+            if (selectedChatId) {
+                try {
+                    console.log("Request: " + userInput);
 
-                const chatOutput = await createChatResponder(client, "mistralai/mistral-small-3.2-24b-instruct:free", userInput, chatSettings);
+                    const chatOutput = await createChatResponder(client, "mistralai/mistral-small-3.2-24b-instruct:free", userInput, chatSettings);
 
-                console.log("Response: ", chatOutput.content);
+                    console.log("Response: ", chatOutput.content);
 
-                const userMessage = createChatMessage(user.id, "user", userInput);
-                const aiMessage = createChatMessage(user.id, "ai", chatOutput.content);
+                    const userMessage = createChatMessage(selectedChatId, "user", userInput);
+                    const aiMessage = createChatMessage(selectedChatId, "ai", chatOutput.content);
 
-                res.status(200).json( { success: true, output: chatOutput.content });
-            } catch (error) {
-                res.status(500).json( { success:false, error: error.message } );
+                    res.status(200).json( { success: true, output: chatOutput.content });
+                } catch (error) {
+                    res.status(500).json( { success:false, error: error.message } );
+                }
+            } else {
+                res.status(400).json({ success: false, error: "Missing chat ID" });
             }
         } else {
             res.status(200).json( { success: false, error: "Failed to read user input" } );

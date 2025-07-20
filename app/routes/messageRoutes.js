@@ -1,11 +1,11 @@
 import express from "express";
 import { authenticateToken } from "../middleware/auth.js";
-import { createChatMessagePost, readAllChatMessagesGet } from "../controllers/chatController.js";
+import { createChatMessagePost, readAllChatMessagesGet } from "../controllers/messageController.js";
 
-const chatRouter = express.Router();
+const messageRouter = express.Router();
 
-chatRouter.post("/prompt", authenticateToken, createChatMessagePost);
+messageRouter.post("/prompt", authenticateToken, createChatMessagePost);
 
-chatRouter.get("/message", readAllChatMessagesGet);
+messageRouter.get("/all", readAllChatMessagesGet);
 
-export { chatRouter };
+export { messageRouter };
