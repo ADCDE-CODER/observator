@@ -208,10 +208,9 @@ chatButton.addEventListener("click", async () => {
 
             if (result.success) {
                 const chatMenuContent = document.getElementById("content-main__menuContent");
-                const chatParameter = document.createElement("p");
-
-                chatParameter.innerText = result.lastChatItem.title;
-                chatMenuContent.appendChild(chatParameter);
+                const chatLink = document.createElement("a");
+                chatLink.innerText = result.lastChatItem.title;;
+                chatMenuContent.appendChild(chatLink);
 
             } else {
                 alert(result.error);
@@ -247,10 +246,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                 if (result.success) {
                     const chatMenuContent = document.getElementById("content-main__menuContent");
                     
-                    result.chats.forEach( (chat) => {
-                        const chatParameter = document.createElement("p");
-                        chatParameter.innerText = chat.title;
-                        chatMenuContent.appendChild(chatParameter);
+                    result.chats.forEach( (chat) => {                    
+                        const chatLink = document.createElement("a");
+                        chatLink.innerText = chat.title;
+                        chatMenuContent.appendChild(chatLink);
                     });
                 } else {
                     alert(result.error);
