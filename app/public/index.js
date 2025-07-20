@@ -213,7 +213,7 @@ chatButton.addEventListener("click", async () => {
                 chatLink.innerText = result.lastChatItem.title;
                 
                 chatLink.addEventListener("click", () => {
-                    localStorage.setItem("selectedChatId", chat.id);
+                    showChat(chat.id);
                 });
 
                 chatMenuContent.appendChild(chatLink);
@@ -258,7 +258,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         chatLink.innerText = chat.title;
 
                         chatLink.addEventListener("click", () => {
-                            localStorage.setItem("selectedChatId", chat.id);
+                            showChat(chat.id);
                         });
 
                         chatMenuContent.appendChild(chatLink);
@@ -277,6 +277,44 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 });
+
+async function showChat(selectedChatId) {
+    localStorage.setItem("selectedChatId", selectedChatId);
+    const output = document.getElementById("content-main__output");
+    output.innerHTML = "";
+
+    try {
+        const response = await fetch("http://localhost:3000/message/one", {
+            method: "POST", 
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ selectedChatId })
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+
+            if (result.success) {    
+                result.chatMessages.forEach( (chatMessage) => {                    
+                    const chatParameter = document.createElement("p");
+                    chatParameter.innerText = chatMessage.message;
+                    output.appendChild(chatParameter);
+                });
+            } else {
+                alert(result.error);
+            }
+
+        } else {
+            alert(`Failed to load chat messages: ${result.error} (status: ${response.status})`);
+        }
+
+    } catch (error) {
+        console.log("Error loading chat messages: ", error.message);
+        alert("Server error while process loading chat message.");
+    }
+};
 
 let isNewChat = false;
 
