@@ -48,18 +48,18 @@ const createChatMessagePost = async (req, res) => {
     const user = req.user;
     
     if (user) {
-        const { userInputValue, chatSettings, selectedChatId } = req.body;
+        const { userInput, settings, chatId } = req.body.data;
 
-        if (userInputValue) {
-            if (selectedChatId) {
+        if (userInput) {
+            if (chatId) {
                 try {
-                    const userMessage = `${user.email}: ${userInputValue}`;
+                    const userMessage = `${user.email}: ${userInput}`;
 
-                    const aiResponse = await createChatResponder(client, "mistralai/mistral-small-3.2-24b-instruct:free", userInputValue, chatSettings);
+                    const aiResponse = await createChatResponder(client, "mistralai/mistral-small-3.2-24b-instruct:free", userInput, settings);
                     const aiMessage = `AI: ${aiResponse.content}`;
                     
-                    const userMessageCreated = createChatMessage(selectedChatId, "user", userMessage);
-                    const aiMessageCreated = createChatMessage(selectedChatId, "ai", aiMessage);
+                    const userMessageCreated = createChatMessage(chatId, "user", userMessage);
+                    const aiMessageCreated = createChatMessage(chatId, "ai", aiMessage);
                     
                     console.log("Request: ", userMessage);
                     console.log("Response: ", aiMessage);

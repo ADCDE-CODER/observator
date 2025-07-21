@@ -357,7 +357,13 @@ sendButton.addEventListener("click", async () => {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${token}` 
                 },
-                body: JSON.stringify({ user, userInputValue, chatSettings, selectedChatId })
+                body: JSON.stringify({ 
+                    data: { 
+                        userInput: userInputValue, 
+                        settings: chatSettings, 
+                        chatId: selectedChatId 
+                    }
+                })
             });
             
             const result = await response.json();
