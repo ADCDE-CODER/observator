@@ -208,8 +208,10 @@ chatButton.addEventListener("click", async () => {
 
             if (result.success) {
                 const chatMenuContent = document.getElementById("content-main__menuContent");
+                
                 const chatLink = document.createElement("a");
-                chatLink.setAttribute("id", result.lastChatItem.id);
+                chatLink.id = result.lastChatItem.id
+                chatLink.classList.add("chatsMenu");
                 chatLink.innerText = result.lastChatItem.title;
                 
                 chatLink.addEventListener("click", () => {
@@ -254,7 +256,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                     
                     result.chats.forEach( (chat) => {                    
                         const chatLink = document.createElement("a");
-                        chatLink.setAttribute("id", chat.id);
+                        chatLink.id = chat.id
+                        chatLink.classList.add("chatsMenu");
                         chatLink.innerText = chat.title;
 
                         chatLink.addEventListener("click", () => {
@@ -282,6 +285,15 @@ async function showChat(selectedChatId) {
     localStorage.setItem("selectedChatId", selectedChatId);
     const output = document.getElementById("content-main__output");
     output.innerHTML = "";
+
+    const chatsMenu = document.getElementsByClassName("chatsMenu");
+
+    for (let i = 0; i < chatsMenu.length; i++) {
+       chatsMenu[i].classList.remove("active");
+    }
+
+    const selectedChat = document.getElementById(selectedChatId);
+    selectedChat.classList.add("active");
 
     try {
         const response = await fetch("http://localhost:3000/message/one", {
