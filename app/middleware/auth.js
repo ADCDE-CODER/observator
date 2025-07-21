@@ -9,21 +9,22 @@ const generateToken = (email) => {
 
 
 function authenticateToken(req, res, next) {
-    const authHeaders = req.headers['authorization'];
-    const token = authHeaders && authHeaders.split(" ")[1];
+    try {
+        const authHeaders = req.headers['authorization'];
+        const token = authHeaders && authHeaders.split(" ")[1];
 
-    if (token) {
-        try {
+        if (token) {
             const decodedUserFromToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
             req.user = decodedUserFromToken;
             next();
-        } catch (error) {
-            console.error(error);
-            res.status(403).json({ error: "Invalid or expired token" });
+        } else {
+            return res.status(401).json({ error: "Access denied: No token" })
         }
-    } else {
-        return res.status(401).json({ error: "Access denied: No token" })
+
+    } catch (error) {
+        console.error(error);
+        res.status(403).json({ error: "Invalid or expired token" });
     }
 };
 
-export { authenticateToken };
+export { generateToken, authenticateToken };
