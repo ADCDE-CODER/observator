@@ -328,55 +328,56 @@ async function showChat(selectedChatId) {
     }
 };
 
-let isNewChat = false;
-
 const sendButton = document.getElementById("send-button");
 
 sendButton.addEventListener("click", async () => {
-    const userInput = document.getElementById("prompt-input").value;
-    const userParameter = document.createElement("p");
-    userParameter.innerText = userInput;
-    
-    if (!isNewChat) {
-        const chatMenuContent = document.getElementById("content-main__menuContent");
-        chatMenuContent.appendChild(userParameter);
-        isNewChat = true;
-    }
-
-    const output = document.getElementById("content-main__output");
-    output.appendChild(userParameter);
-
     try {
-        const user = JSON.parse(localStorage.getItem("user"));
-        const token = localStorage.getItem("token");
-        const chatSettings = JSON.parse(localStorage.getItem("chatSettings"));
-        const selectedChatId = localStorage.getItem("selectedChatId");
-        
-        const response = await fetch("http://localhost:3000/message/prompt", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}` 
-            },
-            body: JSON.stringify({ user, userInput, chatSettings, selectedChatId })
-        });
+        const userInput = document.getElementById("prompt-input");
+        const userInputValue = userInput.value;
 
-        const result = await response.json();
-        
-        const chatParameter = document.createElement("p");
-       
-        if (response.ok) {
-            
-            if (result.success) {
-                chatParameter.innerText = result.output;
-            } else {
-                chatParameter.innerText = result.error;
-            }
-            
-            output.appendChild(chatParameter);  
+        if(!userInputValue.trim()) {
+            alert("Please enter a message.");
         } else {
-            alert(`Chat failed: ${result.error} (status: ${response.status})`);
-        }   
+            const mainOutput = document.getElementById("content-main__output");
+
+            // Collect localStorage values
+            const user = JSON.parse(localStorage.getItem("user"));
+            const token = localStorage.getItem("token");
+            const chatSettings = JSON.parse(localStorage.getItem("chatSettings"));
+            const selectedChatId = localStorage.getItem("selectedChatId");
+            
+            // Display user's message
+            const userParameter = document.createElement("p");
+            userParameter.innerText = `${user.email}: ${userInputValue}`;
+            mainOutput.appendChild(userParameter);
+            
+            const response = await fetch("http://localhost:3000/message/prompt", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}` 
+                },
+                body: JSON.stringify({ user, userInputValue, chatSettings, selectedChatId })
+            });
+            
+            const result = await response.json();
+            
+            if (response.ok) {
+                
+                // Display AI's message or error 
+                const aiParameter = document.createElement("p");
+                if (result.success) {
+                    aiParameter.innerText = result.aiMessage;
+                    userInput.value = "";
+                } else {
+                    aiParameter.innerText = result.error;
+                }
+
+                mainOutput.appendChild(aiParameter);  
+            } else {
+                alert(`Chat failed: ${result.error} (status: ${response.status})`);
+            }   
+        }  
     } catch (error) {
         console.log("Chat prompt error: ", error.message);
         alert("Server error while process chat prompt.");
