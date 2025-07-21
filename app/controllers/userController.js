@@ -1,8 +1,5 @@
 import { createUser, readUsers, readUser, updateUser, deleteUser } from "../models/userModel.js";
-import jwt from "jsonwebtoken";
-import { config } from "dotenv";
-
-config({ path: "./app/.env"});
+import { generateToken } from "../middleware/auth.js";
 
 const signUpUserPost = (req, res) => {
     const { email, password } = req.body;
@@ -27,20 +24,19 @@ const signUpUsersGet = (req, res) => {
 };
 
 const signInUserPost = (req, res) => {
-    const { email, password} = req.body;
-    
     try {
+        const { email, password} = req.body;
         const user = readUser(email, password);
 
         if (user) {
-            const token = jwt.sign({ email: user.email }, process.env.ACCESS_TOKEN_SECRET);
+            const token = generateToken(email);
             res.status(200).json({ success: true, user, token});   
         } else {
-            res.status(200).json({ success: false, error: "Invalid credentials"});   
+            res.status(401).json({ success: false, error: "Invalid credentials"});   
         }
 
     } catch (error) {
-        console.error("Failed to get user:", error.message);
+        console.error("Failed to sign in:", error.message);
         res.status(500).json({ success: false, error: error.message })
     }
 };

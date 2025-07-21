@@ -3,6 +3,11 @@ import jwt from "jsonwebtoken";
 
 config();
 
+const generateToken = (email) => {
+    return jwt.sign({ email: email }, process.env.ACCESS_TOKEN_SECRET);
+};
+
+
 function authenticateToken(req, res, next) {
     const authHeaders = req.headers['authorization'];
     const token = authHeaders && authHeaders.split(" ")[1];
