@@ -48,21 +48,23 @@ const createChatMessagePost = async (req, res) => {
     const user = req.user;
     
     if (user) {
-        const { user, userInput, chatSettings, selectedChatId } = req.body;
+        const { userInputValue, chatSettings, selectedChatId } = req.body;
 
-        if (userInput) {
+        if (userInputValue) {
             if (selectedChatId) {
                 try {
-                    console.log("Request: " + userInput);
+                    const userMessage = `${user.email}: ${userInputValue}`;
 
-                    const chatOutput = await createChatResponder(client, "mistralai/mistral-small-3.2-24b-instruct:free", userInput, chatSettings);
+                    const aiResponse = await createChatResponder(client, "mistralai/mistral-small-3.2-24b-instruct:free", userInputValue, chatSettings);
+                    const aiMessage = `AI: ${aiResponse.content}`;
+                    
+                    const userMessageCreated = createChatMessage(selectedChatId, "user", userMessage);
+                    const aiMessageCreated = createChatMessage(selectedChatId, "ai", aiMessage);
+                    
+                    console.log("Request: ", userMessage);
+                    console.log("Response: ", aiMessage);
 
-                    console.log("Response: ", chatOutput.content);
-
-                    const userMessage = createChatMessage(selectedChatId, "user", userInput);
-                    const aiMessage = createChatMessage(selectedChatId, "ai", chatOutput.content);
-
-                    res.status(200).json( { success: true, output: chatOutput.content });
+                    res.status(200).json({ success: true, aiMessage: aiMessage });
                 } catch (error) {
                     res.status(500).json( { success:false, error: error.message } );
                 }
