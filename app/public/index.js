@@ -215,7 +215,7 @@ chatButton.addEventListener("click", async () => {
                 chatLink.innerText = result.lastChatItem.title;
                 
                 chatLink.addEventListener("click", () => {
-                    showChat(chat.id);
+                    showChat(result.lastChatItem.id);
                 });
 
                 chatMenuContent.appendChild(chatLink);
