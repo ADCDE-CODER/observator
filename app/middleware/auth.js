@@ -4,11 +4,11 @@ import jwt from "jsonwebtoken";
 config();
 
 const generateToken = (email) => {
-    return jwt.sign({ email: email }, process.env.ACCESS_TOKEN_SECRET);
+    return jwt.sign({email: email}, process.env.ACCESS_TOKEN_SECRET);
 };
 
 
-function authenticateToken(req, res, next) {
+function verifyToken(req, res, next) {
     try {
         const authHeaders = req.headers['authorization'];
         const token = authHeaders && authHeaders.split(" ")[1];
@@ -27,4 +27,4 @@ function authenticateToken(req, res, next) {
     }
 };
 
-export { generateToken, authenticateToken };
+export { generateToken, verifyToken };
