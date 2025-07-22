@@ -3,43 +3,75 @@ import { createChat, readAllChats, readChat, updateChat, deleteChat } from "../m
 const createChatPost = (req, res) => {
     const { user } = req.body;
 
-    try {
-        let chats = readChat(user.id);
-        let chatIndex = chats.length + 1;
+    if (user) {
+        try {
+            let chat = readChat(user.id);
 
-        // Create a new chat
-        const newChat = createChat(user.id, "New Chat " + chatIndex);
+            if (chat) {
+                let chatIndex = chat.length + 1;
 
-        // List of chats is uppdated
-        chats = readChat(user.id);
+                try {
+                    const chatCreated = createChat(user.id, "New Chat " + chatIndex);
+                    chat = readChat(user.id); // List of chats is uppdated
+                    const lastChatItem = chat[chat.length - 1];
 
-        const lastChatItem = chats[chats.length - 1];
-        res.status(200).json({ success: true, lastChatItem });
-    } catch (error) {
-        console.error("Failed to create new chat:", error.message);
-        res.status(500).json({ success: false, error: error.message});
+                    res.status(201).json({success: true, lastChatItem: lastChatItem, message: "Your chat is successfully created!"});
+                } catch (error) {
+                    const errorMessage = `Failed to create a new chat: ${error.message}`;
+                    console.error(errorMessage);
+                    res.status(500).json({success: false, error: errorMessage});
+                }
+      
+            } else {
+                res.status(400).json({success: false, error: "No chat found"});
+            }
+  
+        } catch (error) {
+            const errorMessage = `Failed to read chat: ${error.message}`;
+            console.error(errorMessage);
+            res.status(500).json({success: false, error: errorMessage});
+        }
+    } else {
+        res.status(400).json({success: false, error: "No user found"});
     }
 };
 
 const readAllChatsGet = (req, res) => {
     try {
-        const allChats = readAllChats();
-        res.status(200).json({ success: true, allChats });
+        const chats = readAllChats();
+
+        if (chats) {
+            res.status(200).json({success: true, chats: chats, message: "Successful to get all chats"});
+        } else {
+            res.status(400).json({success: false, error: "Could not find all chats"});
+        }
     } catch (error) {
-        console.error("Failed to read all chats:", error.message);
-        res.status(500).json({ success: false, error: error.message});
+        const errorMessage = `Failed to read all chats: ${error.message}`;
+        console.error(errorMessage);
+        res.status(500).json({ success: false, error: errorMessage});
     }
 };
 
 const readChatPost = (req, res) => {
     const { user } = req.body;
-    
-    try {
-        const chats = readChat(user.id);
-        res.status(200).json({ success: true, chats });
-    } catch (error) {
-        console.error("Failed to read chat:", error.message);
-        res.status(500).json({ success: false, error: error.message});
+
+    if (user) {
+        try {
+            const chats = readChat(user.id);
+
+            if (chats) {
+                res.status(200).json({success: true, chats: chats});
+            } else {
+                res.status(400).json({success: false, error: "Could not find all chats"});
+            }
+
+        } catch (error) {
+            const errorMessage = `Failed to read chat: ${error.message}`;
+            console.error(errorMessage);
+            res.status(500).json({success: false, error: errorMessage});
+        }
+    } else {
+        res.status(400).json({success: false, error: "No user found"});
     }
 };
 
