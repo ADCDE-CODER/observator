@@ -1,4 +1,4 @@
-import { createUser, readUsers, readUser, updateUser, deleteUser } from "../models/userModel.js";
+import { createUser, readAllUsers, readUser, updateUser, deleteUser } from "../models/userModel.js";
 import { generateToken } from "../middleware/auth.js";
 
 const signUpUserPost = (req, res) => {
@@ -15,7 +15,7 @@ const signUpUserPost = (req, res) => {
 
 const signUpUsersGet = (req, res) => {
     try {
-        const users = readUsers();
+        const users = readAllUsers();
         res.status(200).json({ success: true, users});   
     } catch (error) {
         console.error("Failed to read users:", error.message);
