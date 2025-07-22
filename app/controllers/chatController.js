@@ -1,4 +1,4 @@
-import { createChat, readAllChats, readChat, updateChat, deleteChat } from "../models/chatsModel.js";
+import { createChat, readAllChats, readChat, updateChat, deleteChat } from "../models/chatModel.js";
 
 const createChatPost = (req, res) => {
     const { user } = req.body;

@@ -1,6 +1,6 @@
 import { config } from "dotenv";
 import OpenAI from "openai";
-import { createChatMessage, readAllChatMessages, readChatMessage, updateChatMessage, deleteChatMessage } from "../models/messagesModel.js";
+import { createChatMessage, readAllChatMessages, readChatMessage, updateChatMessage, deleteChatMessage } from "../models/messageModel.js";
 
 config({ path: "./app/.env" });
 
