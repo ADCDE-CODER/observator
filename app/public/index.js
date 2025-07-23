@@ -86,7 +86,12 @@ signUpButton.addEventListener("click", async () => {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ email, password })
+            body: JSON.stringify({
+                data: {
+                    email: email, 
+                    password: password
+                }
+            })
         });
 
         const data = await response.json();
@@ -120,7 +125,12 @@ signInButton.addEventListener("click", async () => {
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify( { email, password } )
+            body: JSON.stringify({ 
+                data: {
+                    email: email, 
+                    password: password
+                } 
+            })
         });
 
         const user = await response.json();
@@ -199,7 +209,11 @@ chatButton.addEventListener("click", async () => {
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ user })
+            body: JSON.stringify({ 
+                data: { 
+                    user: user 
+                }
+            })
         });
 
         const result = await response.json();
@@ -244,7 +258,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ user })
+                body: JSON.stringify({ 
+                    data: { 
+                        user: user 
+                    }
+                })
             });
 
             const result = await response.json();
@@ -301,7 +319,11 @@ async function showChat(selectedChatId) {
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ selectedChatId })
+            body: JSON.stringify({ 
+                data: { 
+                    chatId: selectedChatId 
+                }
+            })
         });
 
         const result = await response.json();

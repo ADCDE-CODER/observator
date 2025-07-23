@@ -1,7 +1,7 @@
 import { createChat, readAllChats, readChat, updateChat, deleteChat } from "../models/chatModel.js";
 
 const createChatPost = (req, res) => {
-    const { user } = req.body;
+    const { user } = req.body.data;
 
     if (user) {
         try {
@@ -53,7 +53,7 @@ const readAllChatsGet = (req, res) => {
 };
 
 const readChatPost = (req, res) => {
-    const { user } = req.body;
+    const { user } = req.body.data;
 
     if (user) {
         try {

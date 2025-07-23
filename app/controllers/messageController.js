@@ -100,11 +100,11 @@ const readAllChatMessagesGet = (req, res) => {
 };
 
 const readChatMessagePost = (req, res) => {
-    const { selectedChatId } = req.body; 
+    const { chatId } = req.body.data; 
     
-    if (selectedChatId) {
+    if (chatId) {
         try {
-            const chatMessages = readChatMessage(selectedChatId);
+            const chatMessages = readChatMessage(chatId);
             res.status(200).json({success: true, chatMessages: chatMessages, message: "Successful to get message"});   
         } catch (error) {
             const errorMessage = `Failed to read message: ${error.message}`;

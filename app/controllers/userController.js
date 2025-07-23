@@ -2,12 +2,12 @@ import { createUser, readAllUsers, readUser, updateUser, deleteUser } from "../m
 import { generateToken } from "../middleware/auth.js";
 
 const signUpUserPost = (req, res) => {
-    const {email, password} = req.body;
+    const {email, password} = req.body.data;
 
     if (email && password) {      
         try {
             const usersCreated = createUser(email, password);
-            res.status(201).json({success: true, message: "Your account is created!"});
+            res.status(201).json({success: true, message: "Your account is successfully created!"});
         } catch (error) {
             const errorMessage = `User creation failed: ${error.message}`;
             console.error(errorMessage);
@@ -36,7 +36,7 @@ const signUpUsersGet = (req, res) => {
 };
 
 const signInUserPost = (req, res) => {
-    const {email, password} = req.body;
+    const {email, password} = req.body.data;
     
     if (email && password) {
         try {
