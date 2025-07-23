@@ -60,7 +60,7 @@ const readChatPost = (req, res) => {
             const chats = readChat(user.id);
 
             if (chats) {
-                res.status(200).json({success: true, chats: chats});
+                res.status(200).json({success: true, chats: chats, message: "Successful to get chat"});
             } else {
                 res.status(400).json({success: false, error: "Could not find all chats"});
             }
