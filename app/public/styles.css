@@ -143,7 +143,6 @@ a:hover, a.active {
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    justify-content: center;
     gap: 1em;
 }
 
