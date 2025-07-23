@@ -10,38 +10,35 @@ const client = new OpenAI({
 });
 
 async function createChatResponder(client, model, input, settings) {
-    try {
-        const completion = await client.chat.completions.create({
-            model: model,
-            reasoning: {
-                effort: settings.effort,
-                max_tokens: settings.reasoning_max_tokens,
-                exclude: settings.exclude
-            },  
-            usage: {
-                include: settings.include
-            },
-            stream: settings.stream,
-            max_tokens: settings.max_tokens,
-            temperature: settings.temperature,
-            seed: settings.seed,
-            top_p: settings.top_p,
-            top_k: settings.top_k,
-            frequency_penalty: settings.frequency_penalty,
-            presence_penalty: settings.presence_penalty,
-            repetition_penalty: settings.repetition_penalty,
-            logit_bias: settings.logit_bias,
-            messages: [
-                {
-                    role: "user",
-                    content: input
-                }
-            ]
-        })
-        return completion.choices[0].message;
-    } catch (error) {
-        console.log(error);
-    }
+    const completion = await client.chat.completions.create({
+        model: model,
+        reasoning: {
+            effort: settings.effort,
+            max_tokens: settings.reasoning_max_tokens,
+            exclude: settings.exclude
+        },  
+        usage: {
+            include: settings.include
+        },
+        stream: settings.stream,
+        max_tokens: settings.max_tokens,
+        temperature: settings.temperature,
+        seed: settings.seed,
+        top_p: settings.top_p,
+        top_k: settings.top_k,
+        frequency_penalty: settings.frequency_penalty,
+        presence_penalty: settings.presence_penalty,
+        repetition_penalty: settings.repetition_penalty,
+        logit_bias: settings.logit_bias,
+        messages: [
+            {
+                role: "user",
+                content: input
+            }
+        ]
+    })
+    
+    return completion.choices[0].message;
 }
 
 const createChatMessagePost = async (req, res) => {
@@ -51,41 +48,54 @@ const createChatMessagePost = async (req, res) => {
         const { userInput, settings, chatId } = req.body.data;
 
         if (userInput) {
-            if (chatId) {
-                try {
-                    const userMessage = `${user.email}: ${userInput}`;
+            if (settings) {
+                if (chatId) {
+                    try {
+                        const aiResponse = await createChatResponder(client, "mistralai/mistral-small-3.2-24b-instruct:free", userInput, settings);
+                        const userMessage = `${user.email}: ${userInput}`;
+                        const aiMessage = `AI: ${aiResponse.content}`;
 
-                    const aiResponse = await createChatResponder(client, "mistralai/mistral-small-3.2-24b-instruct:free", userInput, settings);
-                    const aiMessage = `AI: ${aiResponse.content}`;
-                    
-                    const userMessageCreated = createChatMessage(chatId, "user", userMessage);
-                    const aiMessageCreated = createChatMessage(chatId, "ai", aiMessage);
-                    
-                    console.log("Request: ", userMessage);
-                    console.log("Response: ", aiMessage);
+                        try {                          
+                            const userMessageCreated = createChatMessage(chatId, "user", userMessage);
+                            const aiMessageCreated = createChatMessage(chatId, "ai", aiMessage);
+                            
+                            console.log("Request: ", userMessage);
+                            console.log("Response: ", aiMessage);
 
-                    res.status(200).json({ success: true, aiMessage: aiMessage });
-                } catch (error) {
-                    res.status(500).json( { success:false, error: error.message } );
+                            res.status(200).json({success: true, aiMessage: aiMessage, message: "Created AI message successfully"});
+                        } catch (error) {
+                            const errorMessage = `Failed to create user or AI message: ${error.message}`;
+                            console.error(errorMessage);
+                            res.status(500).json({success: false, error: errorMessage});
+                        }
+
+                    } catch (error) {                 
+                        const errorMessage = `Failed to create AI response: ${error.message}`;
+                        console.error(errorMessage);
+                        res.status(500).json({success: false, error: errorMessage});
+                    }
+                } else {
+                    res.status(400).json({success: false, error: "Missing chat ID"});
                 }
             } else {
-                res.status(400).json({ success: false, error: "Missing chat ID" });
+                res.status(400).json({success: false, error: "Missing chat settings"});
             }
         } else {
-            res.status(200).json( { success: false, error: "Failed to read user input" } );
+            res.status(400).json({success: false, error: "Missing user input"});
         }
     } else {
-        res.status(200).json( { success: false, error: "Failed to access user" } );
+        res.status(400).json({success: false, error: "No user found"});
     }
 };
 
 const readAllChatMessagesGet = (req, res) => {
     try {
         const chatMessages = readAllChatMessages();
-        res.status(200).json({ success: true, chatMessages});   
+        res.status(200).json({success: true, chatMessages: chatMessages, message: "Successful to get all messages"});   
     } catch (error) {
-        console.error("Failed to read all chat messages:", error.message);
-        res.status(500).json({ success: false, error: error.message })
+        const errorMessage = `Failed to read all chat messages: ${error.message}`;
+        console.error(errorMessage);
+        res.status(500).json({success: false, error: errorMessage});
     }
 };
 
@@ -95,13 +105,14 @@ const readChatMessagePost = (req, res) => {
     if (selectedChatId) {
         try {
             const chatMessages = readChatMessage(selectedChatId);
-            res.status(200).json({ success: true, chatMessages});   
+            res.status(200).json({success: true, chatMessages: chatMessages, message: "Successful to get message"});   
         } catch (error) {
-            console.error("Failed to read all chat messages:", error.message);
-            res.status(500).json({ success: false, error: error.message })
+            const errorMessage = `Failed to read message: ${error.message}`;
+            console.error(errorMessage);
+            res.status(500).json({success: false, error: errorMessage});
         }
     } else {
-        res.status(400).json({ success: false, error: "Missing chat ID" });
+        res.status(400).json({success: false, error: "Missing chat ID"});
     }
 };
 
