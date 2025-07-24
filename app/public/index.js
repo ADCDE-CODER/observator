@@ -94,19 +94,26 @@ signUpButton.addEventListener("click", async () => {
             })
         });
 
-        const data = await response.json();
+        const result = await response.json();
 
         if (response.ok) {
-            emailInput.value = "";
-            passwordInput.value = "";
 
-            alert("Your account is created!");
+            if (result.success) {
+                emailInput.value = "";
+                passwordInput.value = "";
+
+                alert(result.message);
+            } else {
+                alert(result.error);
+            }
+
         } else {
-            alert(`Signup failed: ${data.error} (status: ${response.status})`);
+            alert(`${result.error} (status: ${response.status})`);
         }
     } catch (error) {
-        console.log("Fetch error: ", error.message);
-        alert("Network error or server not reachable.");
+        const errorMessage = `Sign up error: ${error.message}`;
+        console.log(errorMessage);
+        alert(errorMessage);
     }
 });
 
@@ -133,28 +140,29 @@ signInButton.addEventListener("click", async () => {
             })
         });
 
-        const user = await response.json();
+        const result = await response.json();
 
         if (response.ok) {
-            if (user.success) {
+            if (result.success) {
                 emailInput.value = "";
                 passwordInput.value = "";
 
                 localStorage.setItem("isLogin", true);
-                localStorage.setItem("user", JSON.stringify(user.user));
-                localStorage.setItem("token", user.token);
+                localStorage.setItem("user", JSON.stringify(result.user));
+                localStorage.setItem("token", result.token);
                 
                 showPage("chat", true);
-                alert("You sign in!");
+                alert(result.message);
             } else {
-                alert("There is no account!");
+                alert(result.error);
             }  
         } else {
-            alert(`Signin failed: ${user.error} (status: ${response.status})`);
+            alert(`${result.error} (status: ${response.status})`);
         } 
     } catch (error) {
-        console.log("Sign in error: ", error.message);
-        alert("Server error while signing in.");
+        const errorMessage = `Sign in error: ${error.message}`;
+        console.log(errorMessage);
+        alert(errorMessage);
     }
 });
 
@@ -234,6 +242,7 @@ chatButton.addEventListener("click", async () => {
 
                 chatMenuContent.appendChild(chatLink);
 
+                alert(result.message);
             } else {
                 alert(result.error);
             }
@@ -243,8 +252,9 @@ chatButton.addEventListener("click", async () => {
         }
 
     } catch (error) {
-        console.log("New chat error: ", error.message);
-        alert("Server error while process new chat.");
+        const errorMessage = `New chat error: ${error.message}`;
+        console.log(errorMessage);
+        alert(errorMessage);
     }
 });
 
@@ -284,17 +294,20 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                         chatMenuContent.appendChild(chatLink);
                     });
+
+                    console.log(result.message);
                 } else {
                     alert(result.error);
                 }
 
             } else {
-                alert(`Read chat failed: ${result.error} (status: ${response.status})`);
+                alert(`Get chat failed: ${result.error} (status: ${response.status})`);
             }
 
         } catch (error) {
-            console.log("New chat error: ", error.message);
-            alert("Server error while process read chat.");
+            const errorMessage = `Get chat error: ${error.message}`;
+            console.log(errorMessage);
+            alert(errorMessage);
         }
     }
 });
@@ -336,6 +349,8 @@ async function showChat(selectedChatId) {
                     chatParameter.innerText = chatMessage.message;
                     output.appendChild(chatParameter);
                 });
+                
+                console.log(result.message);
             } else {
                 alert(result.error);
             }
@@ -345,8 +360,9 @@ async function showChat(selectedChatId) {
         }
 
     } catch (error) {
-        console.log("Error loading chat messages: ", error.message);
-        alert("Server error while process loading chat message.");
+        const errorMessage = `Error loading chat messages: ${error.message}`;
+        console.log(errorMessage);
+        alert(errorMessage);
     }
 };
 
@@ -403,11 +419,12 @@ sendButton.addEventListener("click", async () => {
 
                 mainOutput.appendChild(aiParameter);  
             } else {
-                alert(`Chat failed: ${result.error} (status: ${response.status})`);
+                alert(`Chat prompt failed: ${result.error} (status: ${response.status})`);
             }   
         }  
     } catch (error) {
-        console.log("Chat prompt error: ", error.message);
-        alert("Server error while process chat prompt.");
+        const errorMessage = `Chat prompt error: ${error.message}`;
+        console.log(errorMessage);
+        alert(errorMessage);
     }
 });
