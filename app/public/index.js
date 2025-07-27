@@ -1,3 +1,19 @@
+function saveToLocalStorage(key, value) {
+    localStorage.setItem(key, JSON.stringify(value));
+};
+
+function loadFromLocalStorage(key) {
+    return JSON.parse(localStorage.getItem(key));
+};
+
+function removeLocalStorage(key) {
+    localStorage.removeItem(key);
+};
+
+function clearLocalStorage() {
+    localStorage.clear();
+};
+
 const navHeaderMenu = document.getElementById("nav-header__menu");
 const navHeaderProfile = document.getElementById("nav-header__profile");
 
@@ -13,10 +29,20 @@ function showPage(id, storeHistory) {
             page.style.display = "none";
         }
     }
-
-    const isLogin = localStorage.getItem("isLogin");
     
-    if (isLogin !== "true") {
+    if (storeHistory) {
+        history.pushState({ page: id }, "", "");
+    }
+
+    updateNavbarUI();
+    loadChatMenu();  
+};
+
+function updateNavbarUI() {  
+
+    const user = loadFromLocalStorage("user");
+
+    if (!user) {
         navHeaderMenu.style.display = "none";
         navHeaderProfile.style.display = "none";
         loginMenuButton.style.display = "flex";
@@ -28,9 +54,7 @@ function showPage(id, storeHistory) {
         logoutMenuButton.style.display = "flex";
     }
     
-    if (storeHistory) {
-        history.pushState({ page: id }, "", "");
-    }
+    console.log({...localStorage});
 };
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -66,8 +90,7 @@ loginMenuButton.addEventListener("click", () => {
 const logoutMenuButton = document.getElementById("logoutMenu-button");
 
 logoutMenuButton.addEventListener("click", () => {
-    localStorage.setItem("isLogin", false);
-    localStorage.removeItem("token");
+    clearLocalStorage();
     showPage("welcome", true);
 });
 
@@ -147,10 +170,9 @@ signInButton.addEventListener("click", async () => {
                 emailInput.value = "";
                 passwordInput.value = "";
 
-                localStorage.setItem("isLogin", true);
-                localStorage.setItem("user", JSON.stringify(result.user));
-                localStorage.setItem("token", result.token);
-                
+                saveToLocalStorage("token", result.token);
+                saveToLocalStorage("user", result.user);
+
                 showPage("chat", true);
                 alert(result.message);
             } else {
@@ -203,14 +225,14 @@ chatFormSettings.addEventListener("submit", (event) => {
     });
 
     console.log("Data: ", chatSettings);
-    localStorage.setItem("chatSettings", JSON.stringify(chatSettings));
+    saveToLocalStorage("chatSettings", chatSettings);
 });
 
 const chatButton = document.getElementById("chat-button");
 
 chatButton.addEventListener("click", async () => {
     try {
-        const user = JSON.parse(localStorage.getItem("user"));
+        const user = loadFromLocalStorage("user");
 
         const response = await fetch("http://localhost:3000/chat/new", {
             method: "POST",
@@ -258,10 +280,11 @@ chatButton.addEventListener("click", async () => {
     }
 });
 
-document.addEventListener("DOMContentLoaded", async () => {
-    const user = JSON.parse(localStorage.getItem("user"));
+async function loadChatMenu() {
+    const user = loadFromLocalStorage("user");
+    const chatMenuContent = document.getElementById("content-main__menuContent");
     
-    if (user != null) {
+    if (user) {
         try {
             const response = await fetch("http://localhost:3000/chat/one", {
                 method: "POST", 
@@ -280,7 +303,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (response.ok) {
 
                 if (result.success) {
-                    const chatMenuContent = document.getElementById("content-main__menuContent");
                     
                     result.chats.forEach( (chat) => {                    
                         const chatLink = document.createElement("a");
@@ -309,11 +331,13 @@ document.addEventListener("DOMContentLoaded", async () => {
             console.log(errorMessage);
             alert(errorMessage);
         }
+    } else {
+        chatMenuContent.innerHTML = "";
     }
-});
+};
 
 async function showChat(selectedChatId) {
-    localStorage.setItem("selectedChatId", selectedChatId);
+    saveToLocalStorage("selectedChatId", selectedChatId);
     const output = document.getElementById("content-main__output");
     output.innerHTML = "";
 
@@ -379,10 +403,10 @@ sendButton.addEventListener("click", async () => {
             const mainOutput = document.getElementById("content-main__output");
 
             // Collect localStorage values
-            const user = JSON.parse(localStorage.getItem("user"));
-            const token = localStorage.getItem("token");
-            const chatSettings = JSON.parse(localStorage.getItem("chatSettings"));
-            const selectedChatId = localStorage.getItem("selectedChatId");
+            const user = loadFromLocalStorage("user");
+            const token = loadFromLocalStorage("token");
+            const chatSettings = loadFromLocalStorage("chatSettings");
+            const selectedChatId = loadFromLocalStorage("selectedChatId");
             
             // Display user's message
             const userParameter = document.createElement("p");
