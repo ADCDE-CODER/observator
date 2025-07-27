@@ -1,18 +1,4 @@
-function saveToLocalStorage(key, value) {
-    localStorage.setItem(key, JSON.stringify(value));
-};
-
-function loadFromLocalStorage(key) {
-    return JSON.parse(localStorage.getItem(key));
-};
-
-function removeLocalStorage(key) {
-    localStorage.removeItem(key);
-};
-
-function clearLocalStorage() {
-    localStorage.clear();
-};
+import { saveToLocalStorage, loadFromLocalStorage, removeLocalStorage, clearLocalStorage } from "./localStorage.js";
 
 const navHeaderMenu = document.getElementById("nav-header__menu");
 const navHeaderProfile = document.getElementById("nav-header__profile");
@@ -58,6 +44,8 @@ function updateNavbarUI() {
 };
 
 document.addEventListener("DOMContentLoaded", () => {
+    showPage('welcome', true);
+
     const navLinks = document.querySelectorAll("#nav-header__menu a");
 
     for (let i = 0; i < navLinks.length; i++) {
