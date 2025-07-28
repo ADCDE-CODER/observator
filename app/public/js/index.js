@@ -1,4 +1,4 @@
-import { saveToLocalStorage, loadFromLocalStorage, removeLocalStorage, clearLocalStorage } from "./localStorage.js";
+import { saveToLocalStorage, loadFromLocalStorage, removeLocalStorage, clearLocalStorage } from "./utils/localStorage.js";
 
 const navHeaderMenu = document.getElementById("nav-header__menu");
 const navHeaderProfile = document.getElementById("nav-header__profile");
