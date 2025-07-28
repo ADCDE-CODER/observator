@@ -2,6 +2,7 @@ import { saveToLocalStorage, loadFromLocalStorage, removeLocalStorage, clearLoca
 import { signupUser } from "./api/signup.js";
 import { signinUser } from "./api/signin.js";
 import { createChat } from "./api/createChat.js";
+import { fetchChat } from "./api/fetchChat.js";
 
 const navHeaderMenu = document.getElementById("nav-header__menu");
 const navHeaderProfile = document.getElementById("nav-header__profile");
@@ -99,7 +100,7 @@ signUpButton.addEventListener("click", async () => {
     if (result.ok && result.success) {
         emailInput.value = "";
         passwordInput.value = "";
-        
+
         alert(result.message);
     } else {
         alert(`${result.error} (status: ${result.status})`);
@@ -202,52 +203,28 @@ async function loadChatMenu() {
     const chatMenuContent = document.getElementById("content-main__menuContent");
     
     if (user) {
-        try {
-            const response = await fetch("http://localhost:3000/chat/one", {
-                method: "POST", 
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ 
-                    data: { 
-                        user: user 
-                    }
-                })
+        const result = await fetchChat(user);
+
+        if (result.ok && result.success) {
+                
+            result.chats.forEach( (chat) => {                    
+                const chatLink = document.createElement("a");
+                chatLink.id = chat.id
+                chatLink.classList.add("chatsMenu");
+                chatLink.innerText = chat.title;
+
+                chatLink.addEventListener("click", () => {
+                    showChat(chat.id);
+                });
+
+                chatMenuContent.appendChild(chatLink);
             });
 
-            const result = await response.json();
-
-            if (response.ok) {
-
-                if (result.success) {
-                    
-                    result.chats.forEach( (chat) => {                    
-                        const chatLink = document.createElement("a");
-                        chatLink.id = chat.id
-                        chatLink.classList.add("chatsMenu");
-                        chatLink.innerText = chat.title;
-
-                        chatLink.addEventListener("click", () => {
-                            showChat(chat.id);
-                        });
-
-                        chatMenuContent.appendChild(chatLink);
-                    });
-
-                    console.log(result.message);
-                } else {
-                    alert(result.error);
-                }
-
-            } else {
-                alert(`Get chat failed: ${result.error} (status: ${response.status})`);
-            }
-
-        } catch (error) {
-            const errorMessage = `Get chat error: ${error.message}`;
-            console.log(errorMessage);
-            alert(errorMessage);
+            console.log(result.message);
+        } else {
+            alert(`Get chat failed: ${result.error} (status: ${result.status})`);
         }
+
     } else {
         chatMenuContent.innerHTML = "";
     }
