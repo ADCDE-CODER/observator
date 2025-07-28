@@ -3,6 +3,7 @@ import { signupUser } from "./api/signup.js";
 import { signinUser } from "./api/signin.js";
 import { createChat } from "./api/createChat.js";
 import { fetchChat } from "./api/fetchChat.js";
+import { fetchMessage } from "./api/fetchMessage.js";
 
 const navHeaderMenu = document.getElementById("nav-header__menu");
 const navHeaderProfile = document.getElementById("nav-header__profile");
@@ -244,43 +245,18 @@ async function showChat(selectedChatId) {
     const selectedChat = document.getElementById(selectedChatId);
     selectedChat.classList.add("active");
 
-    try {
-        const response = await fetch("http://localhost:3000/message/one", {
-            method: "POST", 
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ 
-                data: { 
-                    chatId: selectedChatId 
-                }
-            })
+    const result = await fetchMessage(selectedChatId);
+
+    if (result.ok && result.success) {
+        result.chatMessages.forEach( (chatMessage) => {                    
+            const chatParameter = document.createElement("p");
+            chatParameter.innerText = chatMessage.message;
+            output.appendChild(chatParameter);
         });
-
-        const result = await response.json();
-
-        if (response.ok) {
-
-            if (result.success) {    
-                result.chatMessages.forEach( (chatMessage) => {                    
-                    const chatParameter = document.createElement("p");
-                    chatParameter.innerText = chatMessage.message;
-                    output.appendChild(chatParameter);
-                });
-                
-                console.log(result.message);
-            } else {
-                alert(result.error);
-            }
-
-        } else {
-            alert(`Failed to load chat messages: ${result.error} (status: ${response.status})`);
-        }
-
-    } catch (error) {
-        const errorMessage = `Error loading chat messages: ${error.message}`;
-        console.log(errorMessage);
-        alert(errorMessage);
+        
+        console.log(result.message);
+    } else {
+        alert(`${result.error} (status: ${result.status})`);
     }
 };
 
