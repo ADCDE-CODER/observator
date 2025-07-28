@@ -4,6 +4,7 @@ import { signinUser } from "./api/signin.js";
 import { createChat } from "./api/createChat.js";
 import { fetchChat } from "./api/fetchChat.js";
 import { fetchMessage } from "./api/fetchMessage.js";
+import { createMessage } from "./api/createMessage.js";
 
 const navHeaderMenu = document.getElementById("nav-header__menu");
 const navHeaderProfile = document.getElementById("nav-header__profile");
@@ -263,62 +264,39 @@ async function showChat(selectedChatId) {
 const sendButton = document.getElementById("send-button");
 
 sendButton.addEventListener("click", async () => {
-    try {
-        const userInput = document.getElementById("prompt-input");
-        const userInputValue = userInput.value;
+    const userInput = document.getElementById("prompt-input");
+    const userInputValue = userInput.value;
 
-        if(!userInputValue.trim()) {
-            alert("Please enter a message.");
+    if(!userInputValue.trim()) {
+        alert("Please enter a message.");
+    } else {
+        const mainOutput = document.getElementById("content-main__output");
+
+        // Collect localStorage values
+        const user = loadFromLocalStorage("user");
+        const token = loadFromLocalStorage("token");
+        const chatSettings = loadFromLocalStorage("chatSettings");
+        const selectedChatId = loadFromLocalStorage("selectedChatId");
+        
+        // Display user's message
+        const userParameter = document.createElement("p");
+        userParameter.innerText = `${user.email}: ${userInputValue}`;
+        mainOutput.appendChild(userParameter);
+        
+        const result = await createMessage(token, userInputValue, chatSettings, selectedChatId);
+        
+        const aiParameter = document.createElement("p");
+        
+        if (result.ok && result.success) {
+            // Display AI's message
+            aiParameter.innerText = result.aiMessage;
+            
+            // Clear user's input
+            userInput.value = "";
         } else {
-            const mainOutput = document.getElementById("content-main__output");
+            aiParameter.innerText = `Chat prompt failed: ${result.error} (status: ${result.status})`;
+        }   
 
-            // Collect localStorage values
-            const user = loadFromLocalStorage("user");
-            const token = loadFromLocalStorage("token");
-            const chatSettings = loadFromLocalStorage("chatSettings");
-            const selectedChatId = loadFromLocalStorage("selectedChatId");
-            
-            // Display user's message
-            const userParameter = document.createElement("p");
-            userParameter.innerText = `${user.email}: ${userInputValue}`;
-            mainOutput.appendChild(userParameter);
-            
-            const response = await fetch("http://localhost:3000/message/prompt", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}` 
-                },
-                body: JSON.stringify({ 
-                    data: { 
-                        userInput: userInputValue, 
-                        settings: chatSettings, 
-                        chatId: selectedChatId 
-                    }
-                })
-            });
-            
-            const result = await response.json();
-            
-            if (response.ok) {
-                
-                // Display AI's message or error 
-                const aiParameter = document.createElement("p");
-                if (result.success) {
-                    aiParameter.innerText = result.aiMessage;
-                    userInput.value = "";
-                } else {
-                    aiParameter.innerText = result.error;
-                }
-
-                mainOutput.appendChild(aiParameter);  
-            } else {
-                alert(`Chat prompt failed: ${result.error} (status: ${response.status})`);
-            }   
-        }  
-    } catch (error) {
-        const errorMessage = `Chat prompt error: ${error.message}`;
-        console.log(errorMessage);
-        alert(errorMessage);
-    }
+        mainOutput.appendChild(aiParameter); 
+    }  
 });
