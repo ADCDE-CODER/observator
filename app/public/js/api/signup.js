@@ -21,4 +21,4 @@ async function signupUser(email, password) {
     }
 };
 
-export {signupUser};
+export { signupUser };
