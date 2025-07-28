@@ -1,5 +1,6 @@
 import { saveToLocalStorage, loadFromLocalStorage, removeLocalStorage, clearLocalStorage } from "./utils/localStorage.js";
 import { signupUser } from "./api/signup.js";
+import { signinUser } from "./api/signin.js";
 
 const navHeaderMenu = document.getElementById("nav-header__menu");
 const navHeaderProfile = document.getElementById("nav-header__profile");
@@ -113,43 +114,20 @@ signInButton.addEventListener("click", async () => {
     const email = emailInput.value;
     const password = passwordInput.value;
 
-    try {
-        const response = await fetch("http://localhost:3000/user/signin", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ 
-                data: {
-                    email: email, 
-                    password: password
-                } 
-            })
-        });
+    const result = await signinUser(email, password);
 
-        const result = await response.json();
+    if (result.ok && result.success) {
+        emailInput.value = "";
+        passwordInput.value = "";
 
-        if (response.ok) {
-            if (result.success) {
-                emailInput.value = "";
-                passwordInput.value = "";
+        saveToLocalStorage("token", result.token);
+        saveToLocalStorage("user", result.user);
 
-                saveToLocalStorage("token", result.token);
-                saveToLocalStorage("user", result.user);
-
-                showPage("chat", true);
-                alert(result.message);
-            } else {
-                alert(result.error);
-            }  
-        } else {
-            alert(`${result.error} (status: ${response.status})`);
-        } 
-    } catch (error) {
-        const errorMessage = `Sign in error: ${error.message}`;
-        console.log(errorMessage);
-        alert(errorMessage);
-    }
+        showPage("chat", true);
+        alert(result.message);
+    } else {
+        alert(`${result.error} (status: ${result.status})`);
+    } 
 });
 
 const chatFormSettings = document.getElementById("chat-form__settings");
