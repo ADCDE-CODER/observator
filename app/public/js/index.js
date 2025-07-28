@@ -1,6 +1,7 @@
 import { saveToLocalStorage, loadFromLocalStorage, removeLocalStorage, clearLocalStorage } from "./utils/localStorage.js";
 import { signupUser } from "./api/signup.js";
 import { signinUser } from "./api/signin.js";
+import { createChat } from "./api/createChat.js";
 
 const navHeaderMenu = document.getElementById("nav-header__menu");
 const navHeaderProfile = document.getElementById("nav-header__profile");
@@ -173,52 +174,26 @@ chatFormSettings.addEventListener("submit", (event) => {
 const chatButton = document.getElementById("chat-button");
 
 chatButton.addEventListener("click", async () => {
-    try {
-        const user = loadFromLocalStorage("user");
+    const user = loadFromLocalStorage("user");
+    const result = await createChat(user);
 
-        const response = await fetch("http://localhost:3000/chat/new", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ 
-                data: { 
-                    user: user 
-                }
-            })
+    if (result.ok && result.success) {
+        const chatMenuContent = document.getElementById("content-main__menuContent");
+        
+        const chatLink = document.createElement("a");
+        chatLink.id = result.lastChatItem.id
+        chatLink.classList.add("chatsMenu");
+        chatLink.innerText = result.lastChatItem.title;
+        
+        chatLink.addEventListener("click", () => {
+            showChat(result.lastChatItem.id);
         });
 
-        const result = await response.json();
+        chatMenuContent.appendChild(chatLink);
 
-        if (response.ok) {
-
-            if (result.success) {
-                const chatMenuContent = document.getElementById("content-main__menuContent");
-                
-                const chatLink = document.createElement("a");
-                chatLink.id = result.lastChatItem.id
-                chatLink.classList.add("chatsMenu");
-                chatLink.innerText = result.lastChatItem.title;
-                
-                chatLink.addEventListener("click", () => {
-                    showChat(result.lastChatItem.id);
-                });
-
-                chatMenuContent.appendChild(chatLink);
-
-                alert(result.message);
-            } else {
-                alert(result.error);
-            }
-
-        } else {
-            alert(`New chat failed: ${result.error} (status: ${response.status})`);
-        }
-
-    } catch (error) {
-        const errorMessage = `New chat error: ${error.message}`;
-        console.log(errorMessage);
-        alert(errorMessage);
+        alert(result.message);
+    } else {
+        alert(`New chat failed: ${result.error} (status: ${result.status})`);
     }
 });
 
