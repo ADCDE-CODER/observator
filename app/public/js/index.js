@@ -194,7 +194,7 @@ chatButton.addEventListener("click", async () => {
 
         alert(result.message);
     } else {
-        alert(`New chat failed: ${result.error} (status: ${result.status})`);
+        alert(`${result.error} (status: ${result.status})`);
     }
 });
 
@@ -222,7 +222,7 @@ async function loadChatMenu() {
 
             console.log(result.message);
         } else {
-            alert(`Get chat failed: ${result.error} (status: ${result.status})`);
+            alert(`${result.error} (status: ${result.status})`);
         }
 
     } else {
