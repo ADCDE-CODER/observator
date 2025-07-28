@@ -1,4 +1,5 @@
 import { saveToLocalStorage, loadFromLocalStorage, removeLocalStorage, clearLocalStorage } from "./utils/localStorage.js";
+import { signupUser } from "./api/signup.js";
 
 const navHeaderMenu = document.getElementById("nav-header__menu");
 const navHeaderProfile = document.getElementById("nav-header__profile");
@@ -90,41 +91,16 @@ signUpButton.addEventListener("click", async () => {
 
     const email = emailInput.value;
     const password = passwordInput.value;
-    
-    try {
-        const response = await fetch("http://localhost:3000/user/signup", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                data: {
-                    email: email, 
-                    password: password
-                }
-            })
-        });
 
-        const result = await response.json();
+    const result = await signupUser(email, password);
 
-        if (response.ok) {
-
-            if (result.success) {
-                emailInput.value = "";
-                passwordInput.value = "";
-
-                alert(result.message);
-            } else {
-                alert(result.error);
-            }
-
-        } else {
-            alert(`${result.error} (status: ${response.status})`);
-        }
-    } catch (error) {
-        const errorMessage = `Sign up error: ${error.message}`;
-        console.log(errorMessage);
-        alert(errorMessage);
+    if (result.ok && result.success) {
+        emailInput.value = "";
+        passwordInput.value = "";
+        
+        alert(result.message);
+    } else {
+        alert(`${result.error} (status: ${result.status})`);
     }
 });
 
