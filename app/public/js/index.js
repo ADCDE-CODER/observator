@@ -12,6 +12,8 @@ document.addEventListener("DOMContentLoaded", () => {
     setupNavigationEvents();
     
     showPage('welcome', true);
+    
+    loadChatMenu();  
 
     const navLinks = document.querySelectorAll("#nav-header__menu a");
 
@@ -66,6 +68,7 @@ signInButton.addEventListener("click", async () => {
         saveToLocalStorage("user", result.user);
 
         showPage("chat", true);
+        loadChatMenu();  
         alert(result.message);
     } else {
         alert(`${result.error} (status: ${result.status})`);
