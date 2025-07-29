@@ -1,5 +1,6 @@
 import { clearLocalStorage } from "../utils/localStorage.js";
 import { showPage } from "../components/showPage.js";
+import { loadChatMenu } from "../services/chatService.js";
 
 function setupNavigationEvents() {
     // Handle browser back/forward

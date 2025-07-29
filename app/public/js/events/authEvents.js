@@ -2,6 +2,7 @@ import { signupUser } from "../api/signup.js";
 import { signinUser } from "../api/signin.js";
 import { saveToLocalStorage } from "../utils/localStorage.js";
 import { showPage } from "../components/showPage.js";
+import { loadChatMenu } from "../services/chatService.js";
 
 function setupAuthEvents() {
     const signUpButton = document.getElementById("signup-button");
