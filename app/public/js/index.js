@@ -12,9 +12,8 @@ document.addEventListener("DOMContentLoaded", () => {
     setupChatEvents();
     
     showPage('welcome', true);
+    loadChatMenu();
     
-    loadChatMenu();  
-
     const navLinks = document.querySelectorAll("#nav-header__menu a");
 
     for (let i = 0; i < navLinks.length; i++) {
