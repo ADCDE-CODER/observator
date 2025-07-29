@@ -5,13 +5,17 @@ import { renderChatList } from "../components/chatList.js";
 
 async function createChatAndReloadMenu() {
     const user = loadFromLocalStorage("user");
-    const result = await createChat(user);
+    if (user) {
+        const result = await createChat(user);
 
-    if (result.ok && result.success) {
-        await loadChatMenu();
-        alert(result.message);
+        if (result.ok && result.success) {
+            renderChatList(result.lastChatItem);
+            alert(result.message);
+        } else {
+            alert(`${result.error} (status: ${result.status})`);
+        }
     } else {
-        alert(`${result.error} (status: ${result.status})`);
+        alert("No user found!");
     }
 };
 
