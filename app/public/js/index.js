@@ -6,8 +6,11 @@ import { fetchChat } from "./api/fetchChat.js";
 import { fetchMessage } from "./api/fetchMessage.js";
 import { createMessage } from "./api/createMessage.js";
 import { showPage } from "./components/showPage.js";
+import { setupNavigationEvents } from "./events/navigationEvents.js";
 
 document.addEventListener("DOMContentLoaded", () => {
+    setupNavigationEvents();
+    
     showPage('welcome', true);
 
     const navLinks = document.querySelectorAll("#nav-header__menu a");
@@ -21,29 +24,6 @@ document.addEventListener("DOMContentLoaded", () => {
             showPage(pageID, true);
         })
     }
-});
-
-window.addEventListener("popstate", (event) => {
-    showPage(event.state.page, false);
-});
-
-const logoButton = document.getElementById("nav-header__logo");
-
-logoButton.addEventListener("click", () => {
-    showPage("welcome", true);
-});
-
-const loginMenuButton = document.getElementById("loginMenu-button");
-
-loginMenuButton.addEventListener("click", () => {
-    showPage("sign-menu", true);
-}); 
-
-const logoutMenuButton = document.getElementById("logoutMenu-button");
-
-logoutMenuButton.addEventListener("click", () => {
-    clearLocalStorage();
-    showPage("welcome", true);
 });
 
 const signUpButton = document.getElementById("signup-button");
