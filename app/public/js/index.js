@@ -5,49 +5,7 @@ import { createChat } from "./api/createChat.js";
 import { fetchChat } from "./api/fetchChat.js";
 import { fetchMessage } from "./api/fetchMessage.js";
 import { createMessage } from "./api/createMessage.js";
-
-const navHeaderMenu = document.getElementById("nav-header__menu");
-const navHeaderProfile = document.getElementById("nav-header__profile");
-
-function showPage(id, storeHistory) {
-    const pages = document.getElementsByClassName("content-main__page");
-    
-    for (let i = 0; i < pages.length; i++) {
-        const page = pages[i];
-        
-        if (page.id == id) {
-            page.style.display = "flex";   
-        } else {
-            page.style.display = "none";
-        }
-    }
-    
-    if (storeHistory) {
-        history.pushState({ page: id }, "", "");
-    }
-
-    updateNavbarUI();
-    loadChatMenu();  
-};
-
-function updateNavbarUI() {  
-
-    const user = loadFromLocalStorage("user");
-
-    if (!user) {
-        navHeaderMenu.style.display = "none";
-        navHeaderProfile.style.display = "none";
-        loginMenuButton.style.display = "flex";
-        logoutMenuButton.style.display = "none";
-    } else {
-        navHeaderMenu.style.display = "flex";
-        navHeaderProfile.style.display = "flex";
-        loginMenuButton.style.display = "none";
-        logoutMenuButton.style.display = "flex";
-    }
-    
-    console.log({...localStorage});
-};
+import { showPage } from "./components/showPage.js";
 
 document.addEventListener("DOMContentLoaded", () => {
     showPage('welcome', true);
