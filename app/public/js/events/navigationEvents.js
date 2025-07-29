@@ -1,3 +1,4 @@
+import { clearLocalStorage } from "../utils/localStorage.js";
 import { showPage } from "../components/showPage.js";
 
 function setupNavigationEvents() {
