@@ -1,15 +1,15 @@
-import { saveToLocalStorage, loadFromLocalStorage, removeLocalStorage, clearLocalStorage } from "./utils/localStorage.js";
-import { createChat } from "./api/createChat.js";
-import { fetchChat } from "./api/fetchChat.js";
-import { fetchMessage } from "./api/fetchMessage.js";
+import { saveToLocalStorage, loadFromLocalStorage } from "./utils/localStorage.js";
 import { createMessage } from "./api/createMessage.js";
 import { showPage } from "./components/showPage.js";
 import { setupNavigationEvents } from "./events/navigationEvents.js";
 import { setupAuthEvents } from "./events/authEvents.js";
+import { setupChatEvents } from "./events/chatEvents.js";
+import { loadChatMenu } from "./services/chatService.js";
 
 document.addEventListener("DOMContentLoaded", () => {
     setupNavigationEvents();
     setupAuthEvents();
+    setupChatEvents();
     
     showPage('welcome', true);
     
@@ -67,93 +67,6 @@ chatFormSettings.addEventListener("submit", (event) => {
     console.log("Data: ", chatSettings);
     saveToLocalStorage("chatSettings", chatSettings);
 });
-
-const chatButton = document.getElementById("chat-button");
-
-chatButton.addEventListener("click", async () => {
-    const user = loadFromLocalStorage("user");
-    const result = await createChat(user);
-
-    if (result.ok && result.success) {
-        const chatMenuContent = document.getElementById("content-main__menuContent");
-        
-        const chatLink = document.createElement("a");
-        chatLink.id = result.lastChatItem.id
-        chatLink.classList.add("chatsMenu");
-        chatLink.innerText = result.lastChatItem.title;
-        
-        chatLink.addEventListener("click", () => {
-            showChat(result.lastChatItem.id);
-        });
-
-        chatMenuContent.appendChild(chatLink);
-
-        alert(result.message);
-    } else {
-        alert(`${result.error} (status: ${result.status})`);
-    }
-});
-
-async function loadChatMenu() {
-    const user = loadFromLocalStorage("user");
-    const chatMenuContent = document.getElementById("content-main__menuContent");
-    
-    if (user) {
-        const result = await fetchChat(user);
-
-        if (result.ok && result.success) {
-                
-            result.chats.forEach( (chat) => {                    
-                const chatLink = document.createElement("a");
-                chatLink.id = chat.id
-                chatLink.classList.add("chatsMenu");
-                chatLink.innerText = chat.title;
-
-                chatLink.addEventListener("click", () => {
-                    showChat(chat.id);
-                });
-
-                chatMenuContent.appendChild(chatLink);
-            });
-
-            console.log(result.message);
-        } else {
-            alert(`${result.error} (status: ${result.status})`);
-        }
-
-    } else {
-        chatMenuContent.innerHTML = "";
-    }
-};
-
-async function showChat(selectedChatId) {
-    saveToLocalStorage("selectedChatId", selectedChatId);
-    const output = document.getElementById("content-main__output");
-    output.innerHTML = "";
-
-    const chatsMenu = document.getElementsByClassName("chatsMenu");
-
-    for (let i = 0; i < chatsMenu.length; i++) {
-       chatsMenu[i].classList.remove("active");
-    }
-
-    const selectedChat = document.getElementById(selectedChatId);
-    selectedChat.classList.add("active");
-
-    const result = await fetchMessage(selectedChatId);
-
-    if (result.ok && result.success) {
-        result.chatMessages.forEach( (chatMessage) => {                    
-            const chatParameter = document.createElement("p");
-            chatParameter.innerText = chatMessage.message;
-            output.appendChild(chatParameter);
-        });
-        
-        console.log(result.message);
-    } else {
-        alert(`${result.error} (status: ${result.status})`);
-    }
-};
 
 const sendButton = document.getElementById("send-button");
 
