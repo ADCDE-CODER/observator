@@ -1,5 +1,5 @@
 import { saveToLocalStorage, loadFromLocalStorage } from "./utils/localStorage.js";
-import { createMessage } from "./api/createMessage.js";
+import { createMessage } from "./api/messageApi.js";
 import { showPage } from "./components/showPage.js";
 import { setupNavigationEvents } from "./events/navigationEvents.js";
 import { setupAuthEvents } from "./events/authEvents.js";

@@ -1,5 +1,5 @@
 import { saveToLocalStorage } from "../utils/localStorage.js";
-import { fetchMessage } from "../api/fetchMessage.js";
+import { fetchMessage } from "../api/messageApi.js";
 
 async function renderChatMessages(selectedChatId) {
     saveToLocalStorage("selectedChatId", selectedChatId);
