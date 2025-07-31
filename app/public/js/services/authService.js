@@ -1,5 +1,4 @@
-import { signupUser } from "../api/signup.js";
-import { signinUser } from "../api/signin.js";
+import { signupUser, signinUser } from "../api/authApi.js";
 import { saveToLocalStorage } from "../utils/localStorage.js";
 import { showPage } from "../components/showPage.js";
 import { loadChatMenu } from "../services/chatService.js";
