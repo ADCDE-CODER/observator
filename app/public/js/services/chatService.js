@@ -1,6 +1,5 @@
 import { loadFromLocalStorage } from "../utils/localStorage.js";
-import { createChat } from "../api/createChat.js";
-import { fetchChat } from "../api/fetchChat.js";
+import { createChat, fetchChat } from "../api/chatApi.js";
 import { renderChatList } from "../components/chatList.js";
 
 async function createChatAndReloadMenu() {
