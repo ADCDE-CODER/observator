@@ -20,7 +20,7 @@ async function renderChatMessages(selectedChatId) {
     if (result.ok && result.success) {
         result.chatMessages.forEach( (chatMessage) => {                    
             const chatParameter = document.createElement("p");
-            chatParameter.textContent = `${chatMessage.sender} ${chatMessage.message}`;
+            chatParameter.textContent = `${chatMessage.message}`;
             output.appendChild(chatParameter);
         });
         
