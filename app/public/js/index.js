@@ -12,19 +12,6 @@ document.addEventListener("DOMContentLoaded", () => {
     setupChatEvents();
     setupMessageEvents();
     setupchatSettingsEvents();
-
     showPage('welcome', true);
     loadChatMenu();
-    
-    const navLinks = document.querySelectorAll("#nav-header__menu a");
-
-    for (let i = 0; i < navLinks.length; i++) {
-        const navLink = navLinks[i];
-        navLink.addEventListener("click", (event) => {
-            event.preventDefault();
-
-            const pageID = navLink.getAttribute("href").substring(1);
-            showPage(pageID, true);
-        })
-    }
 });

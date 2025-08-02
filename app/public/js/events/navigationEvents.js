@@ -8,6 +8,21 @@ function setupNavigationEvents() {
         showPage(event.state.page, false);
     });
 
+    // Handle navigation links
+    const navLinks = document.querySelectorAll("#nav-header__menu a");
+    if (navLinks) {
+        for (let i = 0; i < navLinks.length; i++) {
+            const navLink = navLinks[i];
+            navLink.addEventListener("click", (event) => {
+                event.preventDefault();
+                const pageID = navLink.getAttribute("href").substring(1);
+                showPage(pageID, true);
+            })
+        }
+    } else {
+        console.log(`Navigation links are ${navLinks}`);
+    }
+
     // Handle logo click
     const logoButton = document.getElementById("nav-header__logo");
     if (logoButton) {
