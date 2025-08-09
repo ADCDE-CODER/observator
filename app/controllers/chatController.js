@@ -5,15 +5,16 @@ const createChatPost = (req, res) => {
 
     if (user) {
         try {
-            let chat = readChat(user.id);
+            let chats = readChat(user.id);
+            console.log(chats)
 
-            if (chat) {
-                let chatIndex = chat.length + 1;
+            if (chats) {
+                let chatIndex = chats.length + 1;
 
                 try {
                     const chatCreated = createChat(user.id, "New Chat " + chatIndex);
-                    chat = readChat(user.id); // List of chats is uppdated
-                    const lastChatItem = chat[chat.length - 1];
+                    chats = readChat(user.id); // List of chats is uppdated
+                    const lastChatItem = chats[chats.length - 1];
 
                     res.status(201).json({success: true, lastChatItem: lastChatItem, message: "Your chat is successfully created!"});
                 } catch (error) {
