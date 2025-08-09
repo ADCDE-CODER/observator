@@ -76,4 +76,50 @@ const readChatPost = (req, res) => {
     }
 };
 
-export { createChatPost, readAllChatsGet, readChatPost };
+const updateChatPost = (req, res) => {
+    const { user, chatId, title } = req.body.data;
+
+    if (user) {
+        try {
+            const chat = updateChat(title, user.id, chatId);
+
+            if (chat.changes != 0 || chat.lastInsertRowid != 0) {
+                res.status(200).json({success: true, updateChat: chat, message: "Successful to update chat"});
+            } else {
+                res.status(400).json({success: false, error: "Could not update chat"});
+            }
+
+        } catch (error) {
+            const errorMessage = `Failed to update chat: ${error.message}`;
+            console.error(errorMessage);
+            res.status(500).json({success: false, error: errorMessage});
+        }
+    } else {
+        res.status(400).json({success: false, error: "No user found"});
+    }
+};
+
+const deleteChatPost = (req, res) => {
+    const { user, chatId } = req.body.data;
+
+    if (user) {
+        try {
+            const chat = deleteChat(user.id, chatId);
+
+            if (chat.changes != 0 || chat.lastInsertRowid != 0) {
+                res.status(200).json({success: true, deleteChat: chat, message: "Successful to delete chat"});
+            } else {
+                res.status(400).json({success: false, error: "Could not delete chat"});
+            }
+
+        } catch (error) {
+            const errorMessage = `Failed to delete chat: ${error.message}`;
+            console.error(errorMessage);
+            res.status(500).json({success: false, error: errorMessage});
+        }
+    } else {
+        res.status(400).json({success: false, error: "No user found"});
+    }
+};
+
+export { createChatPost, readAllChatsGet, readChatPost, updateChatPost, deleteChatPost };
