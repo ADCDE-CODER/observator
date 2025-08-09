@@ -7,7 +7,7 @@ const messagesTable = `
         sender TEXT CHECK(sender IN ('user', 'ai')) NOT NULL,
         message TEXT NOT NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (chat_id) REFERENCES chats(id)
+        FOREIGN KEY (chat_id) REFERENCES chats(id) ON DELETE CASCADE
     );
 `;
 
