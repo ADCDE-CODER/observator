@@ -2,6 +2,7 @@ import { signupUser, signinUser } from "../api/authApi.js";
 import { saveToLocalStorage } from "../utils/localStorage.js";
 import { showPage } from "../components/showPage.js";
 import { loadChatMenu } from "../services/chatService.js";
+import { initUserSession } from "./userService.js";
 
 async function createAccount() {
     const emailInput = document.getElementById("create-email");
@@ -37,6 +38,8 @@ async function readAccount() {
 
         saveToLocalStorage("token", result.token);
         saveToLocalStorage("user", result.user);
+        
+        initUserSession();
 
         showPage("chat", true);
         loadChatMenu();  
