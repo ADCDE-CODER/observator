@@ -6,7 +6,6 @@ const createChatPost = (req, res) => {
     if (user) {
         try {
             let chats = readChat(user.id);
-            console.log(chats)
 
             if (chats) {
                 let chatIndex = chats.length + 1;
