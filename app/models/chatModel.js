@@ -27,8 +27,8 @@ function readChat(userId) {
 };
 
 // UPDATE
-function updateChat(title, userId) {
-    return db.prepare("UPDATE chats SET title = ?, WHERE user_id = ?").run(title, userId);
+function updateChat(title, userId, id) {
+    return db.prepare("UPDATE chats SET title = ? WHERE user_id = ? AND id = ?").run(title, userId, id);
 };
 
 // DELETE
