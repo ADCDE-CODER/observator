@@ -32,8 +32,8 @@ function updateChat(title, userId, id) {
 };
 
 // DELETE
-function deleteChat(id) {
-    return db.prepare("DELETE FROM chats WHERE id = ?").run(id);
+function deleteChat(userId, id) {
+    return db.prepare("DELETE FROM chats WHERE user_id = ? AND id = ?").run(userId, id);
 };
 
 export { createChat, readAllChats, readChat, updateChat, deleteChat };
