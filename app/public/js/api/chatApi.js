@@ -42,4 +42,51 @@ async function fetchChat(user) {
     }  
 };
 
-export { createChat, fetchChat };
+async function updateChat(user, chatId, title) {
+    try {
+        const response = await fetch("http://localhost:3000/chat/update", {
+            method: "POST", 
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ 
+                data: { 
+                    user: user,
+                    chatId: chatId,
+                    title: title
+                }
+            })
+        });
+
+        const result = await response.json();
+
+        return {ok: response.ok, status: response.status, ...result};
+    } catch (error) {
+        return {ok: false, status: 0, success: false, error: `Update chat error: ${error.message}`};
+    }  
+};
+
+async function deleteChat(user, chatId) {
+    try {
+        const response = await fetch("http://localhost:3000/chat/delete", {
+            method: "POST", 
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ 
+                data: { 
+                    user: user,
+                    chatId: chatId
+                }
+            })
+        });
+
+        const result = await response.json();
+
+        return {ok: response.ok, status: response.status, ...result};
+    } catch (error) {
+        return {ok: false, status: 0, success: false, error: `Delete chat error: ${error.message}`};
+    }  
+};
+
+export { createChat, fetchChat, updateChat, deleteChat };
