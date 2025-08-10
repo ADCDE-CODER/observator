@@ -1,5 +1,5 @@
 import { loadFromLocalStorage } from "../utils/localStorage.js";
-import { createMessage } from "../api/messageApi.js";
+import { createMessage, getMessage } from "../api/messageApi.js";
 
 async function sendRequestMessage() {
     const user = loadFromLocalStorage("user");
@@ -43,4 +43,26 @@ async function sendRequestMessage() {
     }
 };
 
-export { sendRequestMessage };
+async function loadMessagesAndReloadChat(chatId) {
+    const user = loadFromLocalStorage("user");
+    const mainOutput = document.getElementById("content-main__output");
+
+    if (user) {
+        const result = await getMessage(chatId);
+
+        if (result.ok && result.success) {
+            mainOutput.innerHTML = "";
+            result.chatMessages.forEach( (chatMessage) => {
+                const chatParameter = document.createElement("p");
+                chatParameter.textContent = `${chatMessage.message}`;
+                mainOutput.appendChild(chatParameter);
+            });
+        } else {
+            alert(`${result.error} (status: ${result.status})`);
+        }
+    } else {
+        mainOutput.innerHTML = "";
+    }
+}
+
+export { sendRequestMessage, loadMessagesAndReloadChat };
