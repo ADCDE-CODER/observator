@@ -1,5 +1,5 @@
 import { saveToLocalStorage } from "../utils/localStorage.js";
-import { fetchMessage } from "../api/messageApi.js";
+import { getMessage } from "../api/messageApi.js";
 
 async function renderChatMessages(selectedChatId) {
     saveToLocalStorage("selectedChatId", selectedChatId);
@@ -15,7 +15,7 @@ async function renderChatMessages(selectedChatId) {
     const selectedChat = document.getElementById(selectedChatId);
     selectedChat.classList.add("active");
 
-    const result = await fetchMessage(selectedChatId);
+    const result = await getMessage(selectedChatId);
 
     if (result.ok && result.success) {
         result.chatMessages.forEach( (chatMessage) => {                    

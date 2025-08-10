@@ -10,7 +10,7 @@ async function createMessage(token, userInputValue, chatSettings, chatId) {
     return requestApi("http://localhost:3000/message/prompt", "POST", token, data, "Chat prompt error:");
 };
 
-async function fetchMessage(chatId) {
+async function getMessage(chatId) {
     const data = {
         chatId: chatId 
     };
@@ -18,4 +18,4 @@ async function fetchMessage(chatId) {
     return requestApi("http://localhost:3000/message/one", "POST", null, data, "Failed to load chat messages:");
 };
 
-export { createMessage, fetchMessage };
+export { createMessage, getMessage };
