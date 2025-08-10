@@ -1,5 +1,5 @@
 import { loadFromLocalStorage } from "../utils/localStorage.js";
-import { createChat, getChat } from "../api/chatApi.js";
+import { createChat, getChat, updateChat, deleteChat } from "../api/chatApi.js";
 import { renderChatList } from "../components/chatList.js";
 
 async function createChatAndReloadMenu() {
@@ -37,4 +37,38 @@ async function loadChatMenu() {
     }
 };
 
-export { createChatAndReloadMenu, loadChatMenu };
+async function updateChatMenu(chatId, title) {
+    const user = loadFromLocalStorage("user");
+    if (user) {
+        const result = await updateChat(user, chatId, title);
+
+        if (result.ok && result.success) {
+            loadChatMenu();
+            alert(result.message);
+        } else {
+            alert(`${result.error} (status: ${result.status})`);
+        }
+
+    } else {
+        alert("No user found!");
+    }
+};
+
+async function deleteChatMenu(chatId) {
+    const user = loadFromLocalStorage("user");
+    if (user) {
+        const result = await deleteChat(user, chatId);
+
+        if (result.ok && result.success) {
+            loadChatMenu();
+            alert(result.message);
+        } else {
+            alert(`${result.error} (status: ${result.status})`);
+        }
+
+    } else {
+        alert("No user found!");
+    }
+};
+
+export { createChatAndReloadMenu, loadChatMenu, updateChatMenu, deleteChatMenu };
