@@ -13,12 +13,12 @@ function initUserSession() {
         setupChatEvents();
         setupMessageEvents();
         setupchatSettingsEvents();
-        loadChatAndReloadMenu();
         showPage("chat");
     } else {
         setupAuthEvents();
         showPage("welcome");
     }
+    loadChatAndReloadMenu();
     setupNavigationEvents();
 };
 

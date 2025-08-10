@@ -1,6 +1,6 @@
 import { clearLocalStorage } from "../utils/localStorage.js";
+import { initUserSession } from "../services/userService.js";
 import { showPage } from "../components/showPage.js";
-import { loadChatAndReloadMenu } from "../services/chatService.js";
 
 function setupNavigationEvents() {
     // Handle browser back/forward
@@ -48,8 +48,7 @@ function setupNavigationEvents() {
     if (logoutMenuButton) {
         logoutMenuButton.addEventListener("click", () => {
             clearLocalStorage();
-            showPage("welcome", true);
-            loadChatAndReloadMenu();  
+            initUserSession(); 
         });
     } else {
         console.log(`Log out button is ${loginMenuButton}`);
