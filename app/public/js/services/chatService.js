@@ -13,12 +13,13 @@ async function createChatAndReloadMenu() {
         } else {
             alert(`${result.error} (status: ${result.status})`);
         }
+
     } else {
         alert("No user found!");
     }
 };
 
-async function loadChatMenu() {
+async function loadChatAndReloadMenu() {
     const user = loadFromLocalStorage("user");
     const chatMenuContent = document.getElementById("content-main__menuContent");
 
@@ -37,7 +38,7 @@ async function loadChatMenu() {
     }
 };
 
-async function updateChatMenu(chatId, title) {
+async function updateChatAndReloadMenu(chatId, title) {
     const user = loadFromLocalStorage("user");
     if (user) {
         const result = await updateChat(user, chatId, title);
@@ -54,7 +55,7 @@ async function updateChatMenu(chatId, title) {
     }
 };
 
-async function deleteChatMenu(chatId) {
+async function deleteChatAndReloadMenu(chatId) {
     const user = loadFromLocalStorage("user");
     if (user) {
         const result = await deleteChat(user, chatId);
@@ -71,4 +72,4 @@ async function deleteChatMenu(chatId) {
     }
 };
 
-export { createChatAndReloadMenu, loadChatMenu, updateChatMenu, deleteChatMenu };
+export { createChatAndReloadMenu, loadChatAndReloadMenu, updateChatAndReloadMenu, deleteChatAndReloadMenu };

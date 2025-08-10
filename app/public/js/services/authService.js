@@ -1,7 +1,7 @@
 import { signupUser, signinUser } from "../api/authApi.js";
 import { saveToLocalStorage } from "../utils/localStorage.js";
 import { showPage } from "../components/showPage.js";
-import { loadChatMenu } from "../services/chatService.js";
+import { loadChatAndReloadMenu } from "../services/chatService.js";
 import { initUserSession } from "./userService.js";
 
 async function createAccount() {
@@ -42,7 +42,7 @@ async function readAccount() {
         initUserSession();
 
         showPage("chat", true);
-        loadChatMenu();  
+        loadChatAndReloadMenu();  
         alert(result.message);
     } else {
         alert(`${result.error} (status: ${result.status})`);
