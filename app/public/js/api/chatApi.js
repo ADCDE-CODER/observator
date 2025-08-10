@@ -8,7 +8,7 @@ async function createChat(user) {
     return requestApi("http://localhost:3000/chat/new", "POST", null, data, "New chat error:");
 };
 
-async function fetchChat(user) {
+async function getChat(user) {
     const data = {
         user: user
     };
@@ -35,4 +35,4 @@ async function deleteChat(user, chatId) {
     return requestApi("http://localhost:3000/chat/delete", "POST", null, data, "Delete chat error:");
 };
 
-export { createChat, fetchChat, updateChat, deleteChat };
+export { createChat, getChat, updateChat, deleteChat };

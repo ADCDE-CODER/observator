@@ -1,5 +1,5 @@
 import { loadFromLocalStorage } from "../utils/localStorage.js";
-import { createChat, fetchChat } from "../api/chatApi.js";
+import { createChat, getChat } from "../api/chatApi.js";
 import { renderChatList } from "../components/chatList.js";
 
 async function createChatAndReloadMenu() {
@@ -23,7 +23,7 @@ async function loadChatMenu() {
     const chatMenuContent = document.getElementById("content-main__menuContent");
 
     if (user) {
-        const result = await fetchChat(user);
+        const result = await getChat(user);
 
         if (result.ok && result.success) {
             renderChatList(result.chats);
