@@ -1,18 +1,4 @@
-import { saveToLocalStorage } from "../utils/localStorage.js";
-import { getMessages } from "../services/messageService.js";
-
-async function renderChatMessages(selectedChatId) {
-    saveToLocalStorage("selectedChatId", selectedChatId);
-
-    const chatsMenu = document.getElementsByClassName("chatsMenu");
-    for (let i = 0; i < chatsMenu.length; i++) {
-       chatsMenu[i].classList.remove("active");
-    }
-
-    const selectedChat = document.getElementById(selectedChatId);
-    selectedChat.classList.add("active");
-
-    const chatMessages = await getMessages(selectedChatId);
+function renderChatMessages(chatMessages) {
     if (chatMessages) {
         const mainOutput = document.getElementById("content-main__output");
         if (mainOutput) {

@@ -1,4 +1,5 @@
-import { renderChatMessages } from "./chatMessages.js";
+import { saveToLocalStorage } from "../utils/localStorage.js";
+import { loadMessagesAndReloadChat } from "../services/messageService.js";
 
 function renderChat(chat) {
     const chatMenuContent = document.getElementById("content-main__menuContent");
@@ -9,7 +10,8 @@ function renderChat(chat) {
         chatLink.innerText = chat.title;
 
         chatLink.addEventListener("click", () => {
-            renderChatMessages(chat.id);
+            showActiveChat(chat.id);
+            loadMessagesAndReloadChat(chat.id);
         });
 
         chatMenuContent.appendChild(chatLink);
@@ -18,4 +20,20 @@ function renderChat(chat) {
     }
 };
 
-export {  renderChat };
+function showActiveChat(selectedChatId) {
+    saveToLocalStorage("selectedChatId", selectedChatId);
+
+    const chatsMenu = document.getElementsByClassName("chatsMenu");
+    if (chatsMenu) {
+        for (let i = 0; i < chatsMenu.length; i++) {
+            chatsMenu[i].classList.remove("active");
+        }
+
+        const selectedChat = document.getElementById(selectedChatId);
+        selectedChat.classList.add("active");
+    } else {
+        console.log(`Chat menu is ${chatsMenu}`);
+    }    
+};
+
+export { renderChat };
