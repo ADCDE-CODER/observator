@@ -1,5 +1,6 @@
 import { loadFromLocalStorage } from "../utils/localStorage.js";
 import { createMessage, getMessage } from "../api/messageApi.js";
+import {renderChatMessages} from "../components/chatMessages.js";
 
 async function sendRequestMessage() {
     const user = loadFromLocalStorage("user");
@@ -43,22 +44,19 @@ async function sendRequestMessage() {
     }
 };
 
-async function getMessages(chatId) {
+async function loadMessagesAndReloadChat(chatId) {
     const user = loadFromLocalStorage("user");
-
     if (user) {
         const result = await getMessage(chatId);
 
         if (result.ok && result.success) {
-            return result.chatMessages;
+            renderChatMessages(result.chatMessages);
         } else {
             alert(`${result.error} (status: ${result.status})`);
-            return [];
         }
     } else {
         alert("No user found!");
-        return [];
     }
-}
+};
 
-export { sendRequestMessage, getMessages };
+export { sendRequestMessage, loadMessagesAndReloadChat };
