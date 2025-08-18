@@ -43,26 +43,22 @@ async function sendRequestMessage() {
     }
 };
 
-async function loadMessagesAndReloadChat(chatId) {
+async function getMessages(chatId) {
     const user = loadFromLocalStorage("user");
-    const mainOutput = document.getElementById("content-main__output");
 
     if (user) {
         const result = await getMessage(chatId);
 
         if (result.ok && result.success) {
-            mainOutput.innerHTML = "";
-            result.chatMessages.forEach( (chatMessage) => {
-                const chatParameter = document.createElement("p");
-                chatParameter.textContent = `${chatMessage.message}`;
-                mainOutput.appendChild(chatParameter);
-            });
+            return result.chatMessages;
         } else {
             alert(`${result.error} (status: ${result.status})`);
+            return [];
         }
     } else {
-        mainOutput.innerHTML = "";
+        alert("No user found!");
+        return [];
     }
 }
 
-export { sendRequestMessage, loadMessagesAndReloadChat };
+export { sendRequestMessage, getMessages };

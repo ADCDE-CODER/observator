@@ -1,5 +1,5 @@
 import { saveToLocalStorage } from "../utils/localStorage.js";
-import { loadMessagesAndReloadChat } from "../services/messageService.js";
+import { getMessages } from "../services/messageService.js";
 
 async function renderChatMessages(selectedChatId) {
     saveToLocalStorage("selectedChatId", selectedChatId);
@@ -12,7 +12,22 @@ async function renderChatMessages(selectedChatId) {
     const selectedChat = document.getElementById(selectedChatId);
     selectedChat.classList.add("active");
 
-    loadMessagesAndReloadChat(selectedChatId);
+    const chatMessages = await getMessages(selectedChatId);
+    if (chatMessages) {
+        const mainOutput = document.getElementById("content-main__output");
+        if (mainOutput) {
+            mainOutput.innerHTML = "";
+            chatMessages.forEach( (chatMessage) => {
+                const chatParameter = document.createElement("p");
+                chatParameter.textContent = `${chatMessage.message}`;
+                mainOutput.appendChild(chatParameter);
+            });
+        } else {
+            console.log(`Main output is ${mainOutput}`);
+        }
+    } else {
+        console.log(`Chat messages is ${chatMessages}`);
+    }
 };
 
 export { renderChatMessages };
