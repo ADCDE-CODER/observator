@@ -44,7 +44,7 @@ async function updateChatAndReloadMenu(chatId, title) {
         const result = await updateChat(user, chatId, title);
 
         if (result.ok && result.success) {
-            loadChatMenu();
+            loadChatAndReloadMenu();
             alert(result.message);
         } else {
             alert(`${result.error} (status: ${result.status})`);
@@ -61,7 +61,7 @@ async function deleteChatAndReloadMenu(chatId) {
         const result = await deleteChat(user, chatId);
 
         if (result.ok && result.success) {
-            loadChatMenu();
+            loadChatAndReloadMenu();
             alert(result.message);
         } else {
             alert(`${result.error} (status: ${result.status})`);
