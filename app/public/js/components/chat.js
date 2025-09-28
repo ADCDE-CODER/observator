@@ -1,3 +1,4 @@
+import { createChatDropdown } from "./chatDropdown.js";
 import { saveToLocalStorage } from "../utils/localStorage.js";
 import { loadMessagesAndReloadChat } from "../services/messageService.js";
 
@@ -13,6 +14,9 @@ function renderChat(chat) {
             showActiveChat(chat.id);
             loadMessagesAndReloadChat(chat.id);
         });
+
+        const dropdown = createChatDropdown(chat.id);
+        chatLink.appendChild(dropdown);
 
         chatMenuContent.appendChild(chatLink);
     } else {
@@ -36,4 +40,13 @@ function showActiveChat(selectedChatId) {
     }    
 };
 
-export { renderChat };
+function clearChat() {
+    const chatMenuContent = document.getElementById("content-main__menuContent");
+    if (chatMenuContent) {
+        chatMenuContent.innerHTML = "";
+    } else {
+        console.log(`Chat menu content is ${chatMenuContent}`);
+    }
+};
+
+export { renderChat, clearChat };
