@@ -9,18 +9,35 @@ body {
 
 a {
     text-decoration: none;
-    padding: 0.3rem;
+    padding: 8px 12px;
     border-radius: 15px;
     background-color: white;
     color: black;
     border: 2px transparent solid;
     transition: background-color 1s, color 1s, border 1s;
+    cursor: pointer;
 }
 
-a:hover, a.active {
+/* Hover/active state for the link */
+a:hover, 
+a.active {
     background-color: #2b2b2b;
     color: white;
     border: 2px white solid;
+}
+
+/* Button follows link’s hover by default */
+a:hover #chat-dropdown__button,
+a.active #chat-dropdown__button {
+    background-color: #2b2b2b;
+    color: white;
+}
+
+/* Button’s own hover overrides link hover */
+a #chat-dropdown__button:hover,
+a #chat-dropdown__button.active {
+    background-color: #ffffff1f;
+    color: white;
 }
 
 /* Header */
@@ -121,9 +138,10 @@ a:hover, a.active {
 
 #chat {
     justify-content: space-between;
-    margin: 0% 1%;
     height: 100%;
 }
+
+/* Chat menu */
 
 .content-main__chats {
     background-color: bisque;
@@ -148,8 +166,36 @@ a:hover, a.active {
 
 #content-main__menuContent > a{
     display: flex;
-    justify-content: center;
+    justify-content: space-around;
     align-items: center;
+}
+
+#chat-dropdown {
+    position: relative;
+}
+
+#chat-dropdown__button {
+    padding: 0.5rem;
+    border-radius: 10px;
+    border: none;
+    background-color: white;
+    color: #2b2b2b;
+    transition: background-color 1s, color 1s, border 1s;
+    cursor: pointer;
+}
+
+#chat-dropdown__content {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    background-color: #1b1b1b;
+    top: 100%;
+    right: 0%;
+    padding: 4px;
+    gap: 5px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    z-index: 1;
 }
 
 .content-main__chat {
