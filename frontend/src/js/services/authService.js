@@ -1,7 +1,7 @@
 import { signupUser, signinUser } from "../api/authApi.js";
 import { saveToLocalStorage } from "../utils/localStorage.js";
 import { showPage } from "../components/showPage.js";
-import { loadChatAndReloadMenu } from "../services/chatService.js";
+import { loadChatAndReloadMenu } from "./chatService.js";
 import { initUserSession } from "./userService.js";
 
 async function createAccount() {
