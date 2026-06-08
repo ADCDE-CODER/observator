@@ -1,13 +1,12 @@
 {
-  "name": "web",
-  "version": "1.0.0",
+  "name": "Observator",
+  "version": "0.0.0",
   "main": "index.js",
   "scripts": {
     "test": "node --watch-path=./app ./app/server.js"
   },
   "keywords": [],
   "author": "ADCDE",
-  "license": "AGPL-3.0-only",
   "description": "",
   "type": "module",
   "dependencies": {
