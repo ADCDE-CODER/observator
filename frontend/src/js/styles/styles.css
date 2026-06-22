@@ -259,7 +259,7 @@ a #chat-dropdown__button.active {
     overflow-y: scroll;
 }
 
-.content-main__label{
+.content-main__label, .content-main__label > div{
     display: flex;
     flex-direction: column;
     justify-content: center;
