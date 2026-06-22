@@ -8,14 +8,6 @@ async function createChat(user) {
     return requestApi("http://localhost:3000/chat/new", "POST", null, data, "New chat error:");
 };
 
-async function getChat(user) {
-    const data = {
-        user: user
-    };
-
-    return requestApi("http://localhost:3000/chat/one", "POST", null, data, "Get chat error:");
-};
-
 async function updateChat(user, chatId, title) {
     const data = {
         user: user,
@@ -24,6 +16,14 @@ async function updateChat(user, chatId, title) {
     };
 
     return requestApi("http://localhost:3000/chat/update", "POST", null, data, "Update chat error:");
+};
+
+async function readChat(user) {
+    const data = {
+        user: user
+    };
+
+    return requestApi("http://localhost:3000/chat/one", "POST", null, data, "Get chat error:");
 };
 
 async function deleteChat(user, chatId) {
@@ -35,4 +35,4 @@ async function deleteChat(user, chatId) {
     return requestApi("http://localhost:3000/chat/delete", "POST", null, data, "Delete chat error:");
 };
 
-export { createChat, getChat, updateChat, deleteChat };
+export { createChat, readChat, updateChat, deleteChat };
