@@ -1,49 +1,22 @@
 import { signupUser, signinUser } from "../api/authApi.js";
-import { saveToLocalStorage } from "../utils/localStorage.js";
-import { showPage } from "../components/showPage.js";
-import { loadChatAndReloadMenu } from "./chatService.js";
-import { initUserSession } from "./userService.js";
 
-async function createAccount() {
-    const emailInput = document.getElementById("create-email");
-    const passwordInput = document.getElementById("create-password");
-
-    const email = emailInput.value;
-    const password = passwordInput.value;
-
+async function createAccount(email, password) {
     const result = await signupUser(email, password);
 
     if (result.ok && result.success) {
-        emailInput.value = "";
-        passwordInput.value = "";
-
         alert(result.message);
+        return result;
     } else {
         alert(`${result.error} (status: ${result.status})`);
     }
 };
 
-async function readAccount() {
-    const emailInput = document.getElementById("read-email");
-    const passwordInput = document.getElementById("read-password");
-
-    const email = emailInput.value;
-    const password = passwordInput.value;
-
+async function readAccount(email, password) {
     const result = await signinUser(email, password);
 
-    if (result.ok && result.success) {
-        emailInput.value = "";
-        passwordInput.value = "";
-
-        saveToLocalStorage("token", result.token);
-        saveToLocalStorage("user", result.user);
-        
-        initUserSession();
-
-        showPage("chat", true);
-        loadChatAndReloadMenu();  
+    if (result.ok && result.success) {        
         alert(result.message);
+        return result;
     } else {
         alert(`${result.error} (status: ${result.status})`);
     }

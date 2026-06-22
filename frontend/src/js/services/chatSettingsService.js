@@ -1,4 +1,4 @@
-import { saveToLocalStorage } from "../utils/localStorage.js";
+import { authState } from "../state/authState.js";
 
 function saveChatSettings(form) {
     const chatSettings = {};
@@ -30,7 +30,7 @@ function saveChatSettings(form) {
         }
     });
 
-    saveToLocalStorage("chatSettings", chatSettings);
+    authState.setChatSettings(chatSettings);
     console.log("Data: ", chatSettings);
 };
 
