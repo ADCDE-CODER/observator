@@ -1,73 +1,39 @@
-import { updateChatAndReloadMenu, deleteChatAndReloadMenu } from "../services/chatService.js";
+import { createButton } from "./button.js";
+import { createElement } from "./element.js";
 
-function createChatDropdown(chatId) {
-    // Create elements
-    const chatDropdown = document.createElement("div");
-    const dropdownButton = document.createElement("button");
-    const dropdownContent = document.createElement("div");
-
-    // Assign ID:s
-    chatDropdown.id = "chat-dropdown";
-    dropdownButton.id = "chat-dropdown__button"
-    dropdownContent.id = "chat-dropdown__content";
-    
-    // Set property
-    dropdownButton.innerText = "...";
-    dropdownContent.style.display = "none";
+function createChatDropdown({lists = {}}) {
+    const chatDropdown = createElement({tagName: "div", options: {id: "chat-dropdown"}});
+    const content = createElement({tagName: "div", options: {id: "chat-dropdown__content"}});
+    content.style.display = "none";
     
     // Listning for a dropdown button is pressed to show a dropdown 
-    dropdownButton.addEventListener("click", (event) => {
+    const contentButton = createButton({tagName: "button", textContext: "...", options: {id: "chat-dropdown__button"}, onClick: (event) => {
         event.stopPropagation();
-        if (dropdownContent.style.display === "none") {
-            dropdownContent.style.display = "flex";
-            //dropdownButton.style.backgroundColor = "#ffffff1f";
+        if (content.style.display === "none") {
+            content.style.display = "flex";
         } else {
-            dropdownContent.style.display = "none";
-            //dropdownButton.style.backgroundColor = "transparent";
+            content.style.display = "none";
         }
-    });
+    }});
 
     // Listning for when cursor is pressed outside of dropdown element, then hide a dropdown
     document.addEventListener("click", (event) => {
-        if (!dropdownContent.contains(event.target) && !dropdownButton.contains(event.target)) {
-            dropdownContent.style.display = "none";
-            //dropdownButton.style.backgroundColor = "transparent";
-        }
-    });
-   
-    const renameMenu = createDropdownMenu("Rename", () => { 
-        const title = prompt("Please enter to change chat title");
-        if (title) {
-            console.log(title);
-            updateChatAndReloadMenu(chatId, title);
-        } else {
-            return;
+        if (!content.contains(event.target) && !contentButton.contains(event.target)) {
+            content.style.display = "none";
         }
     });
 
-    const deleteMenu = createDropdownMenu("Delete", () => { 
-        if (confirm("Do you want delete chat and messages forever?")) {
-            deleteChatAndReloadMenu(chatId);
-        } else {
+    Object.keys(lists).forEach(key => {
+        const value = lists[key];
+        if (value instanceof Node) {
+            content.appendChild(value);
             return;
         }
     });
     
-    dropdownContent.appendChild(renameMenu);
-    dropdownContent.appendChild(deleteMenu);
-
-    chatDropdown.appendChild(dropdownButton);
-    chatDropdown.appendChild(dropdownContent);
+    chatDropdown.append(contentButton, content);
 
     return chatDropdown;
-};
-
-function createDropdownMenu(name, handler) {
-    const dropdownMenu = document.createElement("a");
-    dropdownMenu.innerText = name;
-    dropdownMenu.addEventListener("click", handler);
-    
-    return dropdownMenu;
 };
 
 export { createChatDropdown };
