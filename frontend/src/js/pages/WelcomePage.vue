@@ -1,7 +1,7 @@
 <script></script>
 
 <template>
-    <section id="welcome" class="content-main__page">
+    <section id="welcome">
         <h2>Welcome!</h2>
     </section>
 </template>
