@@ -1,5 +1,5 @@
 <script setup>
-	import NavbarPage from './pages/NavbarPage.vue';
+	import NavbarPage from './components/Navbar.vue';
 	import { useRouter } from 'vue-router';
 	import { authState } from './state/authState.js';
 
