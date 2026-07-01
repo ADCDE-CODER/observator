@@ -8,9 +8,9 @@
 
 <style scoped>
     #welcome {
+        background-color: var(--color-surface);
+        color: var(--color-on-surface);
         display: flex;
-        background-color: #1b1b1b;
-        color: white;
         justify-content: center;
         align-items: center;
         height: 100%;

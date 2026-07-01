@@ -66,9 +66,9 @@
 
 <style scoped>
     #sign-menu {
+        background-color: var(--color-surface);
+        color: var(--color-on-surface);
         display: flex;
-        background-color: #1b1b1b;
-        color: white;
         position: relative;
         justify-content: center;
         align-items: center;

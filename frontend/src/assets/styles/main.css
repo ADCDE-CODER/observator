@@ -24,7 +24,7 @@
     
     --color-primary-container: #004e5c;
     --color-on-primary-container: #abedff;
-    --secondary-container: #334a51;
+    --color-secondary-container: #334a51;
     --color-on-secondary-container: #cee7ee;
     --color-tertiary-container: #3f4565;
     --color-on-tertiary-container: #dde1ff;
@@ -53,37 +53,4 @@ body {
     grid-template-rows: auto 1fr;
     height: 100vh;
     width: 100vw;
-}
-
-a {
-    text-decoration: none;
-    padding: 8px 12px;
-    border-radius: 15px;
-    background-color: white;
-    color: black;
-    border: 2px transparent solid;
-    transition: background-color 1s, color 1s, border 1s;
-    cursor: pointer;
-}
-
-/* Hover/active state for the link */
-a:hover, 
-a.active {
-    background-color: #2b2b2b;
-    color: white;
-    border: 2px white solid;
-}
-
-/* Button follows link’s hover by default */
-a:hover #chat-dropdown__button,
-a.active #chat-dropdown__button {
-    background-color: #2b2b2b;
-    color: white;
-}
-
-/* Button’s own hover overrides link hover */
-a #chat-dropdown__button:hover,
-a #chat-dropdown__button.active {
-    background-color: #ffffff1f;
-    color: white;
 }

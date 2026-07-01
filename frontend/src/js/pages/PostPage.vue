@@ -8,9 +8,9 @@
 
 <style scoped>
     #post {
+        background-color: var(--color-surface);
+        color: var(--color-on-surface);
         display: flex;
-        background-color: green;
-        color: black;
         justify-content: center;
         align-items: center;
         width: 100%;
