@@ -5,6 +5,7 @@
 	import { useRouter } from "vue-router";
 
 	const router = useRouter();
+	
 	function goLogin() {
 		router.push('/sign');
 	}
@@ -16,34 +17,34 @@
 </script>
 
 <template>
-	<div class="nav-header">
-		<div class="nav-header__content" v-show="!authState.user">
-			<div class="nav-header__logo">
+	<div class="navbar">
+		<div class="navbar-content" v-show="!authState.user">
+			<div class="navbar-logo">
 				<img :src="logo" alt="logo image" @click.prevent="router.push('/welcome')">
 			</div>
-			<button class="primary" @click="goLogin()">Log in</button>
+			<button class="primary-button" @click="goLogin()">Log in</button>
 		</div>
 
-		<div class="nav-header__content" v-show="authState.user">
-			<div class="nav-header__logo">
+		<div class="navbar-content" v-show="authState.user">
+			<div class="navbar-logo">
 				<img :src="logo" alt="logo image" @click.prevent="router.push('/welcome')">
 			</div>
-			<nav class="nav-header__menu">
+			<nav class="navbar-links">
 				<RouterLink class="nav-link" to="/chat">Chat</RouterLink>
 				<RouterLink class="nav-link" to="/image">Image</RouterLink>
 				<RouterLink class="nav-link" to="/video">Video</RouterLink>
 				<RouterLink class="nav-link" to="/post">Post</RouterLink>
 			</nav>
-			<div class="nav-header__profile">
+			<div class="navbar-profile">
 				<img :src="profile" alt="profile image">
 			</div>
-			<button class="secondary" @click="goLogout()">Log out</button>
+			<button class="secondary-button" @click="goLogout()">Log out</button>
 		</div>
 	</div>
 </template>
 
 <style scoped>
-	.nav-header {
+	.navbar {
 		background-color: var(--color-surface-container);
         color: var(--color-on-surface);
 		border-bottom: 1px var(--color-outline) solid; 
@@ -53,14 +54,14 @@
 		padding: 0.5rem; 
 	}
 	
-	.nav-header__content, .nav-header__menu {
+	.navbar-content, .navbar-links {
 		display: flex;
 		justify-content: space-around;
 		align-items: center;
 		gap: 1em;
 	}
 	
-	.nav-header__logo, .nav-header__profile {
+	.navbar-logo, .navbar-profile {
 		display: flex;
 		cursor: pointer;
 	}
@@ -79,7 +80,7 @@
 		color: var(--color-on-secondary-container);
 	}
 
-	.primary, .secondary {
+	.primary-button, .secondary-button {
 		width: 100%;
 		padding: 0.5rem;
 		box-sizing: border-box;
@@ -88,12 +89,12 @@
 		cursor: pointer;
 	}
 
-	.primary {
+	.primary-button {
 		background-color: var(--color-primary);
 		color: var(--color-on-primary);
 	}
 
-	.secondary {
+	.secondary-button {
 		background-color: var(--color-secondary);
 		color: var(--color-on-secondary);
 	}
