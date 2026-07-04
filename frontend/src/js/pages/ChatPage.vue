@@ -1,102 +1,53 @@
 <script setup>
+    import ChatList from '../components/ChatList.vue';
     import { onMounted, ref } from 'vue';
     import { authState } from '../state/authState';
-    import { addChat, getChat, modifyChat, removeChat } from '../services/chatService';
-    import { addMessages, getMessages } from '../services/messageService';
+    import { addMessages } from '../services/messageService';
     import { saveChatSettings } from '../services/chatSettingsService';
+    import { addChat, getChat, modifyChat, removeChat } from '../services/chatService';
 
     const chats = ref([]);
+    const selectedChat = ref(null);
 
     onMounted(async () => {
-        const response = await getChat(authState.user);
-        chats.value = response;
+        await receiveAllChats();
     });
 
-    async function loadChat(user, chatId) {
-        showActiveChatMenu(chatId, "chatsMenu");
-        const messages = await getMessages(user, chatId);
+    async function createChat() {
+        const response = await addChat(authState.user);
+        chats.value.push(response) 
+    }
 
-        const mainOutput = document.getElementById("content-main__output");
-        mainOutput.innerHTML = "";
-        messages.forEach( (chatMessage) => {
-            const chatParameter = document.createElement("p");
-            chatParameter.textContent = `${chatMessage.message}`;
-            mainOutput.appendChild(chatParameter);
+    async function receiveAllChats() {
+        const response = await getChat(authState.user);
+        chats.value = response;
+    }
+
+    async function renameChat(id, title) {
+        const chat = chats.value.find((chat) => {
+            return chat.id === id 
         });
-    }
 
-    function showActiveChatMenu(selectedChatId, className) {
-        authState.setSelectedChatId(selectedChatId);
-
-        const chatsMenu = document.getElementsByClassName(className);
-        if (chatsMenu) {
-            for (let i = 0; i < chatsMenu.length; i++) {
-                chatsMenu[i].classList.remove("active");
-            }
-
-            const selectedChat = document.getElementById(selectedChatId);
-            if(selectedChat != null) {
-                selectedChat.classList.add("active");
-            }
-        } else {
-            console.log(`Chat menu is ${chatsMenu}`);
-        }    
-    };
-    
-    async function newChat(user) {
-        await addChat(user);
-        const response = await getChat(authState.user);
-        chats.value = response;
-    }
-
-    function renameChat(user, chatId) {
-        const title = prompt("Please enter to change chat title");
-        if (title) {
-            modifyChat(user, chatId, title);
-
-            const chatLink = document.getElementById(chatId);
-            chatLink.firstChild.textContent = title;
+        if (chat) {
+            await modifyChat(authState.user, id, title);
+            chat.title = title;
         }
     }
 
-    async function deleteChat(user, chatId) {
-        if (confirm("Do you want delete chat and messages forever?")) {
-            removeChat(user, chatId);
+    async function deleteChat(id) {
+        const index = chats.value.findIndex((chat) => {
+            return chat.id === id 
+        });
 
-            const chatLink = document.getElementById(chatId);
-            chatLink.remove();
-
-            const response = await getChat(authState.user);
-            chats.value = response;
+        if (index !== -1) {
+            await removeChat(authState.user, id);
+            chats.value.splice(index, 1)
         }
     }
 
-    // Listning for a dropdown button is pressed to show a dropdown 
-    function showDropdown(event, chatId) {
-        event.stopPropagation();
-
-        const content = document.getElementById(chatId).childNodes[1].childNodes[1]
-        if (content.style.display === "none") {
-            content.style.display = "flex";
-        } else {
-            content.style.display = "none";
-        }
+    function selectChat(chat) {
+        selectedChat.value = chat;
     }
-
-    // Listning for when cursor is pressed outside of dropdown element, then hide a dropdown
-    document.addEventListener("click", (event) => {
-        const chats = document.getElementsByClassName("chat-dropdown");
-
-        for (let i = 0; i < chats.length; i++) {
-            const chat = chats[i];
-            
-            const contentButton = chat.childNodes[0];
-            const content = chat.childNodes[1];
-            if (!content.contains(event.target) && !contentButton.contains(event.target)) {
-                content.style.display = "none";
-            }
-        }
-    });
 
     async function sendChat() {
         const userInput = document.getElementById("prompt-input");
@@ -130,27 +81,20 @@
 </script>
 
 <template>
-    <section id="chat" class="content-main__page" v-show="!authState.user">
+    <section class="no-chat" v-show="!authState.user">
         <h2>No user</h2>
     </section>
 
-    <section id="chat" class="content-main__page" v-show="authState.user">
-        <div class="content-main__chats">
-            <h2>Chats</h2>
-            <button id="chat-button" @click="newChat(authState.user)">New chat</button>
-            <aside id="content-main__menuContent">
-                <a class="chatsMenu" v-bind:id="chat.id" v-for="chat in chats" :key="chat.id" @click="loadChat(authState.user, chat.id)">
-                    {{ chat.title }}
-                    <div class="chat-dropdown">
-                        <button class="chat-dropdown__button" @click="showDropdown($event, chat.id)">...</button>
-                        <div class="chat-dropdown__content" style="display: none;">
-                            <a @click="renameChat(authState.user, chat.id)">Rename</a>
-                            <a @click="deleteChat(authState.user, chat.id)">Delete</a>
-                        </div>
-                    </div>
-                </a>
-            </aside>
-        </div>
+    <section class="chat" v-show="authState.user"> 
+       <ChatList 
+       :chats="chats" 
+       :selected-chat="selectedChat" 
+       @select-chat="(chat) => selectChat(chat)"
+       @create-chat="() => createChat()"
+       @delete-chat="(id) => deleteChat(id)"
+       @rename-chat="(id, title) => renameChat(id, title)"
+       />
+
         <div class="content-main__chat">
             <h2>Chat</h2>
             <div id="content-main__output"></div>
@@ -226,64 +170,20 @@
 </template>
 
 <style scoped>
-    #chat {
+    .no-chat {
+        background-color: var(--color-surface);
+        color: var(--color-on-surface);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+    }
+    
+    .chat {
         display: flex;
         justify-content: space-between;
         height: 100%;
-    }
-
-    .content-main__chats {
-        background-color: bisque;
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start;
-        align-items: center;
-        width: 100%;
-        height: 100%;
-        max-width: 20%;
-    }
-
-    #content-main__menuContent {
-        background-color: coral;
-        width: 100%;
-        height: 100%;
-        overflow-y: auto;
-        display: flex;
-        flex-direction: column;
-        gap: 1em;
-    }
-
-    #content-main__menuContent > a{
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
-    }
-
-    .chat-dropdown {
-        position: relative;
-    }
-
-    .chat-dropdown__button {
-        padding: 0.5rem;
-        border-radius: 10px;
-        border: none;
-        background-color: white;
-        color: #2b2b2b;
-        transition: background-color 1s, color 1s, border 1s;
-        cursor: pointer;
-    }
-
-    .chat-dropdown__content {
-        position: absolute;
-        flex-direction: column;
-        background-color: #1b1b1b;
-        top: 100%;
-        right: 0%;
-        padding: 4px;
-        gap: 5px;
-        border-radius: 8px;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        z-index: 1;
     }
 
     .content-main__chat {
