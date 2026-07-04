@@ -44,7 +44,7 @@
 </script>
 
 <template>
-    <a class="chat" :class="{chatActive: isChatActive}" @click="emit('select-chat', chat)">
+    <a class="chat" :class="{chatActive: isChatActive}" @click="emit('select-chat', chat.id)">
         {{chat.title}}
         <button class="dropdown-button" @click.stop="showDropdown()">...</button>
         <div class="dropdown-content" :class="{dropdownActive: isDropdownActive}" ref="dropdown">

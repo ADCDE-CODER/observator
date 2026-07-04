@@ -2,9 +2,9 @@
     import ChatItem from './ChatItem.vue';
 
     const emit = defineEmits(["select-chat", "create-chat", "rename-chat", "delete-chat"]);
-    const {chats, selectedChat} = defineProps({
+    const {chats, selectedChatId} = defineProps({
         chats: Array,
-        selectedChat: Object
+        selectedChatId: Number
     });
 </script>
 
@@ -16,8 +16,8 @@
             <ChatItem v-for="chat in chats" 
             :key="chat.id" 
             :chat="chat" 
-            :isChatActive="selectedChat?.id === chat.id" 
-            @select-chat="(chat) => emit('select-chat', chat)" 
+            :isChatActive="selectedChatId === chat.id" 
+            @select-chat="(id) => emit('select-chat', id)" 
             @delete-chat="(id) => emit('delete-chat', id)"
             @rename-chat="(id, title) => emit('rename-chat', id, title)"
             />

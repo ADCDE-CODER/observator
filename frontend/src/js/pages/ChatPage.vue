@@ -7,7 +7,7 @@
     import { addChat, getChat, modifyChat, removeChat } from '../services/chatService';
 
     const chats = ref([]);
-    const selectedChat = ref(null);
+    const selectedChatId = ref(null);
 
     onMounted(async () => {
         await receiveAllChats();
@@ -45,8 +45,8 @@
         }
     }
 
-    function selectChat(chat) {
-        selectedChat.value = chat;
+    function selectChat(id) {
+        selectedChatId.value = id;
     }
 
     async function sendChat() {
@@ -88,8 +88,8 @@
     <section class="chat" v-show="authState.user"> 
        <ChatList 
        :chats="chats" 
-       :selected-chat="selectedChat" 
-       @select-chat="(chat) => selectChat(chat)"
+       :selected-chat-id="selectedChatId" 
+       @select-chat="(id) => selectChat(id)"
        @create-chat="() => createChat()"
        @delete-chat="(id) => deleteChat(id)"
        @rename-chat="(id, title) => renameChat(id, title)"
