@@ -12,57 +12,65 @@
     const messages = ref([]);
 
     onMounted(async () => {
-        await receiveAllChats();
+        if (authState.user != null) {
+            await receiveAllChats(authState.user);
+        }
+
+        if (authState.user != null && authState.selectedChatId != null) {
+            selectedChatId.value = authState.selectedChatId;
+            await receiveAllMessages(authState.user, selectedChatId.value) 
+        }
     });
 
-    async function createChat() {
-        const response = await addChat(authState.user);
+    async function createChat(user) {
+        const response = await addChat(user);
         chats.value.push(response) 
     }
 
-    async function receiveAllChats() {
-        const response = await getChat(authState.user);
+    async function receiveAllChats(user) {
+        const response = await getChat(user);
         chats.value = response;
     }
 
-    async function renameChat(id, title) {
+    async function renameChat(user, id, title) {
         const chat = chats.value.find((chat) => {
             return chat.id === id 
         });
 
         if (chat) {
-            await modifyChat(authState.user, id, title);
+            await modifyChat(user, id, title);
             chat.title = title;
         }
     }
 
-    async function deleteChat(id) {
+    async function deleteChat(user, id) {
         const index = chats.value.findIndex((chat) => {
             return chat.id === id 
         });
 
         if (index !== -1) {
-            await removeChat(authState.user, id);
+            await removeChat(user, id);
             chats.value.splice(index, 1)
         }
     }
 
-    async function selectChat(id) {
+    function selectChat(id) {
         selectedChatId.value = id;
-        await receiveAllMessages(id);
+        authState.setSelectedChatId(id);
     }
 
     function clearSelection() {
         selectedChatId.value = null;
+        authState.setSelectedChatId(null);
     }
 
-    async function createMessage(userInputValue) {
-        const response = await addMessages(authState.user, userInputValue, authState.token, authState.chatSettings, authState.selectedChatId);
+    async function createMessage(user, userInput, token, chatSettings, selectedChatId) {
+        const response = await addMessages(user, userInput, token, chatSettings, selectedChatId);
         messages.value.push(response);
     }
 
-    async function receiveAllMessages(id) {
-        const response = await getMessages(authState.user, id);
+    async function receiveAllMessages(user, id) {
+        const response = await getMessages(user, id);
         messages.value = response;
     }
 
@@ -82,17 +90,17 @@
        <ChatList 
        :chats="chats" 
        :selected-chat-id="selectedChatId" 
-       @select-chat="(id) => selectChat(id)"
+       @select-chat="(id) => {selectChat(id), receiveAllMessages(authState.user, id)}"
        @clear-selection="() => clearSelection()"
-       @create-chat="() => createChat()"
-       @delete-chat="(id) => deleteChat(id)"
-       @rename-chat="(id, title) => renameChat(id, title)"
+       @create-chat="() => createChat(authState.user)"
+       @delete-chat="(id) => deleteChat(authState.user, id)"
+       @rename-chat="(id, title) => renameChat(authState.user, id, title)"
        />
 
        <ChatMessages
        :selected-id="selectedChatId"
        :messages="messages"
-       @create-message="(userInputValue) => createMessage(userInputValue)"
+       @create-message="(userInput) => createMessage(authState.user, userInput, authState.token, authState.chatSettings, authState.selectedChatId)"
        />
 
         <div class="content-main__settings">
