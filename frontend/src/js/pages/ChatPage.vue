@@ -1,13 +1,15 @@
 <script setup>
     import ChatList from '../components/ChatList.vue';
+    import ChatMessages from '../components/ChatMessage.vue';
     import { onMounted, ref } from 'vue';
     import { authState } from '../state/authState';
-    import { addMessages } from '../services/messageService';
+    import { addMessages, getMessages } from '../services/messageService';
     import { saveChatSettings } from '../services/chatSettingsService';
     import { addChat, getChat, modifyChat, removeChat } from '../services/chatService';
 
     const chats = ref([]);
     const selectedChatId = ref(null);
+    const messages = ref([]);
 
     onMounted(async () => {
         await receiveAllChats();
@@ -45,36 +47,23 @@
         }
     }
 
-    function selectChat(id) {
+    async function selectChat(id) {
         selectedChatId.value = id;
+        await receiveAllMessages(id);
     }
 
     function clearSelection() {
         selectedChatId.value = null;
     }
 
-    async function sendChat() {
-        const userInput = document.getElementById("prompt-input");
-        
-        // Collect localStorage values
-        const response = await addMessages(authState.user, userInput.value, authState.token, authState.chatSettings, authState.selectedChatId);
+    async function createMessage(userInputValue) {
+        const response = await addMessages(authState.user, userInputValue, authState.token, authState.chatSettings, authState.selectedChatId);
+        messages.value.push(response);
+    }
 
-        // Display user's message
-        const userParameter = document.createElement("p");
-        userParameter.textContent = `${authState.user.email}: ${userInput.value}`;
-        const aiParameter = document.createElement("p");
-
-        if (!response.error) {
-            // Display AI's message
-            aiParameter.innerText = response;
-            
-            // Clear user's input
-            userInput.value = "";
-        } else {
-            aiParameter.innerText = response;
-        }
-        const mainOutput = document.getElementById("content-main__output");
-        mainOutput.append(userParameter, aiParameter);
+    async function receiveAllMessages(id) {
+        const response = await getMessages(authState.user, id);
+        messages.value = response;
     }
 
     function sendChatSettings(event) {
@@ -100,14 +89,12 @@
        @rename-chat="(id, title) => renameChat(id, title)"
        />
 
-        <div class="content-main__chat">
-            <h2>Chat</h2>
-            <div id="content-main__output"></div>
-            <div class="content-main__button">
-                <input id="prompt-input" type="text" placeholder="Type here">
-                <button id="send-button" @click="sendChat()">Send</button>
-            </div>
-        </div>
+       <ChatMessages
+       :selected-id="selectedChatId"
+       :messages="messages"
+       @create-message="(userInputValue) => createMessage(userInputValue)"
+       />
+
         <div class="content-main__settings">
             <h2>Settings</h2>
             <form id="chat-form__settings">
@@ -189,46 +176,6 @@
         display: flex;
         justify-content: space-between;
         height: 100%;
-    }
-
-    .content-main__chat {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        align-items: center;
-        width: 100%;
-    }
-
-    #content-main__output {
-        background-color: aliceblue;
-        width: 100%;
-        height: 100%;
-        box-sizing: border-box;
-        padding: 1rem;
-    }
-
-    .content-main__button {
-        background-color: aquamarine;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 100%;
-        box-sizing: border-box;
-        padding: 1%;
-        gap: 1em;
-    }
-
-    .content-main__button > input {
-        border: none;
-        border-radius: 20px;
-        padding: 10px;
-        width: 50%;
-    }
-
-    .content-main__button > button {
-        border: none;
-        border-radius: 20px;
-        padding: 10px;
     }
 
     .content-main__settings {
