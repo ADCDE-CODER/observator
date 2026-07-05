@@ -92,10 +92,22 @@
 	.primary-button {
 		background-color: var(--color-primary);
 		color: var(--color-on-primary);
+		transition: background-color 1s, color 1s;
 	}
+
+	.primary-button:hover {
+        background-color: var(--color-primary-container);
+        color: var(--color-on-primary-container);
+    }
 
 	.secondary-button {
 		background-color: var(--color-secondary);
 		color: var(--color-on-secondary);
+		transition: background-color 1s, color 1s;
 	}
+
+	.secondary-button:hover {
+        background-color: var(--color-secondary-container);
+		color: var(--color-on-secondary-container);
+    }
 </style>
