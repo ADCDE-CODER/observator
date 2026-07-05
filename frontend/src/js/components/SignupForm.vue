@@ -51,5 +51,11 @@
 		color: var(--color-on-secondary);
         border: none;
         cursor: pointer;
+		transition: background-color 1s, color 1s;
 	}
+
+	.secondary-button:hover {
+        background-color: var(--color-secondary-container);
+		color: var(--color-on-secondary-container);
+    }
 </style>
