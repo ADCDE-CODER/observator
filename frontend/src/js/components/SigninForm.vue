@@ -27,7 +27,7 @@
         <form @submit.prevent="doSignin()">
             <input class="email-input" type="email" placeholder="Email" v-model="email"/>
             <input class="password-input" type="password" placeholder="Password" v-model="password"/>
-            <button class="primary-button" type="submit">Sign up</button>
+            <button class="primary-button" type="submit">Sign in</button>
         </form>
     </section>
 </template>
@@ -58,5 +58,11 @@
 		color: var(--color-on-primary);
         border: none;
         cursor: pointer;
+		transition: background-color 1s, color 1s;
 	}
+
+	.primary-button:hover {
+        background-color: var(--color-primary-container);
+        color: var(--color-on-primary-container);
+    }
 </style>
