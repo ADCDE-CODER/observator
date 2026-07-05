@@ -16,7 +16,7 @@
 
 <template>
     <div class="chatMessages" v-show="!selectedId">
-        <h2>Chat</h2>
+        <h2>Message</h2>
         <div class="output-container">
             <p>
                 <span>
@@ -27,7 +27,7 @@
     </div>
 
     <div class="chatMessages" v-show="selectedId">
-        <h2>Chat</h2>
+        <h2>Message</h2>
         <div class="output-container">
             <p v-for="message in messages">
                 <span v-if="typeof message === 'string'">
