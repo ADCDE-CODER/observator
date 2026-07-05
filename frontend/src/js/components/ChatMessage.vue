@@ -1,7 +1,7 @@
 <script setup>
     import { ref } from 'vue';
 
-    const userInputValue = ref('');
+    const userInput = ref('');
     const emit = defineEmits(["create-message"]);
     const {selectedId, messages} = defineProps({
         selectedId: Number,
@@ -9,8 +9,8 @@
     });
 
     function sendMessage() {
-        emit('create-message', userInputValue);
-        userInputValue.value = '';
+        emit('create-message', userInput.value);
+        userInput.value = '';
     }
 </script>
 
@@ -39,7 +39,7 @@
             </p>
         </div>
         <form class="input-container" @submit.prevent="sendMessage()">
-            <input class="prompt-input" type="text" placeholder="Type here" v-model="userInputValue">
+            <input class="prompt-input" type="text" placeholder="Type here" v-model="userInput">
             <button class="primary-button" type="submit">Send</button>
         </form>
     </div>
