@@ -1,7 +1,7 @@
 <script setup>
     import ChatItem from './ChatItem.vue';
 
-    const emit = defineEmits(["select-chat", "create-chat", "rename-chat", "delete-chat"]);
+    const emit = defineEmits(["select-chat", "clear-selection", "create-chat", "rename-chat", "delete-chat"]);
     const {chats, selectedChatId} = defineProps({
         chats: Array,
         selectedChatId: Number
@@ -9,7 +9,7 @@
 </script>
 
 <template>
-    <div class="list-chat">
+    <div class="list-chat" @click="emit('clear-selection')">
         <h2>Chats</h2>
         <button class="new-chat-button" @click="emit('create-chat')">New chat</button>
         <aside class="list">
@@ -20,6 +20,7 @@
             @select-chat="(id) => emit('select-chat', id)" 
             @delete-chat="(id) => emit('delete-chat', id)"
             @rename-chat="(id, title) => emit('rename-chat', id, title)"
+            @click.stop
             />
         </aside>
     </div>

@@ -49,6 +49,10 @@
         selectedChatId.value = id;
     }
 
+    function clearSelection() {
+        selectedChatId.value = null;
+    }
+
     async function sendChat() {
         const userInput = document.getElementById("prompt-input");
         
@@ -90,6 +94,7 @@
        :chats="chats" 
        :selected-chat-id="selectedChatId" 
        @select-chat="(id) => selectChat(id)"
+       @clear-selection="() => clearSelection()"
        @create-chat="() => createChat()"
        @delete-chat="(id) => deleteChat(id)"
        @rename-chat="(id, title) => renameChat(id, title)"
