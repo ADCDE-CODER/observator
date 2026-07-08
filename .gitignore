@@ -2,3 +2,41 @@
 node_modules/
 database.sqlite
 images/
+
+# Logs
+frontend/logs/
+frontend/*.log
+frontend/*-debug.log*
+frontend/*-error.log*
+frontend/*.local
+
+# Dependencies / OS
+frontend/node_modules/
+frontend/.DS_Store
+
+# Builds / coverage
+frontend/dist/
+frontend/dist-ssr/
+frontend/coverage/
+frontend/*.tsbuildinfo
+frontend/.eslintcache
+
+# Editor
+frontend/.vscode/*
+frontend/!.vscode/extensions.json
+frontend/.idea/
+frontend/*.suo
+frontend/*.ntvs*
+frontend/*.njsproj
+frontend/*.sln
+frontend/*.sw?
+
+# Cypress
+frontend/cypress/videos/
+frontend/cypress/screenshots/
+
+# Vitest
+frontend/__screenshots__/
+
+# Vite
+frontend/*.timestamp-*-*.mjs
