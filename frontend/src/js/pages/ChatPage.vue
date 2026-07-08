@@ -1,15 +1,121 @@
 <script setup>
     import ChatList from '../components/ChatList.vue';
     import ChatMessages from '../components/ChatMessage.vue';
+    import ChatSettings from '../components/chatSettings.vue';
     import { onMounted, ref } from 'vue';
     import { authState } from '../state/authState';
     import { addMessages, getMessages } from '../services/messageService';
-    import { saveChatSettings } from '../services/chatSettingsService';
     import { addChat, getChat, modifyChat, removeChat } from '../services/chatService';
 
-    const chats = ref([]);
     const selectedChatId = ref(null);
+    const chats = ref([]);
     const messages = ref([]);
+    const settings = ref([
+        {
+            title: "Reasoning",
+            inputs: [
+                {
+                    name: "effort",
+                    label: "Reasoning Effort",
+                    type: "select",
+                    value: "medium",
+                    options: ["low", "medium", "high"]
+                },
+                {
+                    name: "maxTokens",
+                    label: "Max Tokens",
+                    type: "number",
+                    value: 1000,
+                    min: 1,
+                    max: 8000
+                },
+                {
+                    name: "exclude",
+                    label: "Exclude",
+                    type: "checkbox",
+                    value: false
+                },
+            ]
+        },
+        {
+            title: "Usage",
+            inputs: [
+                {
+                    name: "include",
+                    label: "Include",
+                    type: "checkbox",
+                    value: false
+                }
+            ]
+        },
+        {
+            title: "Generally",
+            inputs: [
+                {
+                    name: "stream",
+                    label: "Stream",
+                    type: "checkbox",
+                    value: false
+                },
+                {
+                    name: "maxTokens",
+                    label: "Max Tokens",
+                    type: "number",
+                    value: 1000,
+                    min: 1,
+                    max: 8000
+                },
+                {
+                    name: "temperature",
+                    label: "Temperature",
+                    type: "number",
+                    value: 0
+                },
+                {
+                    name: "seed",
+                    label: "Seed",
+                    type: "number",
+                    value: 0
+                },
+                {
+                    name: "topP",
+                    label: "Top P",
+                    type: "number",
+                    value: 0
+                },
+                {
+                    name: "topK",
+                    label: "Top K",
+                    type: "number",
+                    value: 0
+                },
+                {
+                    name: "frequency-penalty",
+                    label: "Frequency penalty",
+                    type: "number",
+                    value: 0
+                },
+                {
+                    name: "presence-penalty",
+                    label: "Presence penalty",
+                    type: "number",
+                    value: 0
+                },
+                {
+                    name: "repetition-penalty",
+                    label: "Repetition penalty",
+                    type: "number",
+                    value: 0
+                },
+                {
+                    name: "logit-bias",
+                    label: "Logit bias",
+                    type: "text",
+                    value: 0
+                }
+            ]
+        }
+    ]);
 
     onMounted(async () => {
         if (authState.user != null) {
@@ -74,10 +180,8 @@
         messages.value = response;
     }
 
-    function sendChatSettings(event) {
-        event.preventDefault();
-        const form = document.getElementById("chat-form__settings");
-        saveChatSettings(form);
+    function applySettings(result) {
+        authState.setChatSettings(result);
     }
 </script>
 
@@ -103,69 +207,10 @@
        @create-message="(userInput) => createMessage(authState.user, userInput, authState.token, authState.chatSettings, authState.selectedChatId)"
        />
 
-        <div class="content-main__settings">
-            <h2>Settings</h2>
-            <form id="chat-form__settings">
-                <div class="content-main__label">
-                    <h3>Reasoning</h3>
-                    <label for="effort">Effort:</label>
-                    <input id="effort" name="effort" type="text" placeholder="Effort">
-
-                    <label for="reasoning-max-tokens">Max tokens:</label>
-                    <input id="reasoning-max-tokens" name="reasoning_max_tokens" type="number" placeholder="Max tokens">
-
-                    <label for="exclude">Exclude:</label>
-                    <input id="exclude" name="exclude" type="checkbox" placeholder="Exclude">
-                </div>
-                <div class="content-main__label">
-                    <h3>Usage</h3>
-                    <label for="include">Include:</label>
-                    <input id="include" name="include" type="checkbox" placeholder="Include">
-                </div>
-                <h3>Generally</h3>
-                <div class="content-main__label">
-                    <label for="stream">Stream:</label>
-                    <input id="stream" name="stream" type="checkbox" placeholder="Stream">
-                </div>
-                <div class="content-main__label">
-                    <label for="max-tokens">Max tokens:</label>
-                    <input id="max-tokens" name="max_tokens" type="number" placeholder="Max tokens">
-                </div>
-                <div class="content-main__label">
-                    <label for="temperature">Temperature:</label>
-                    <input id="temperature" name="temperature" type="number" placeholder="Temperature">
-                </div>
-                <div class="content-main__label">
-                    <label for="seed">Seed:</label>
-                    <input id="seed" name="seed" type="number" placeholder="Seed">
-                </div>
-                <div class="content-main__label">
-                    <label for="top-p">Top-p:</label>
-                    <input id="top-p" name="top_p" type="number" placeholder="Top-p">
-                </div>
-                <div class="content-main__label">
-                    <label for="top-k">Top-k:</label>
-                    <input id="top-k" name="top_k" type="number" placeholder="Top-k">
-                </div>
-                <div class="content-main__label">
-                    <label for="frequency-penalty">Frequency penalty:</label>
-                    <input id="frequency-penalty" name="frequency_penalty" type="number" placeholder="Frequency penalty">
-                </div>
-                <div class="content-main__label">
-                    <label for="presence-penalty">Presence penalty:</label>
-                    <input id="presence-penalty" name="presence_penalty" type="number" placeholder="Presence penalty">
-                </div>
-                <div class="content-main__label">
-                    <label for="repetition-penalty">Repetition penalty:</label>
-                    <input id="repetition-penalty" name="repetition_penalty" type="number" placeholder="Repetition penalty">
-                </div>
-                <div class="content-main__label">
-                    <label for="logit-bias">Logit bias:</label>
-                    <input id="logit-bias" name="logit_bias" type="text" placeholder="Logit bias">
-                </div>
-                <button type="submit" @click="sendChatSettings($event)">Apply</button>
-            </form>
-        </div>
+       <ChatSettings
+       :settings="settings"
+       @apply-settings="(result) => applySettings(result)"
+       />
     </section>
 </template>
 
@@ -184,34 +229,5 @@
         display: flex;
         justify-content: space-between;
         height: 100%;
-    }
-
-    .content-main__settings {
-        background-color: azure;
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start;
-        align-items: center;
-        width: 100%;
-        height: 100%;
-        max-width: 20%;
-    }
-
-    #chat-form__settings{
-        background-color: chocolate;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 1em;
-        width: 100%;
-        overflow-y: scroll;
-    }
-
-    .content-main__label{
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        width: 100%;
     }
 </style>
