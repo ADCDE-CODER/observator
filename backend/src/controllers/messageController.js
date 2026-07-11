@@ -78,11 +78,11 @@ const createChatMessagePost = async (req, res) => {
     }
 
     if (!settings) {
-        return res.status(400).json({success: false, error: "Missing chat ID."});
+        return res.status(400).json({success: false, error: "Missing settings."});
     }
 
     if (!chatId) {
-        return res.status(400).json({success: false, error: "Missing settings."});
+        return res.status(400).json({success: false, error: "Missing chat ID."});
     }
 
     try {
@@ -107,19 +107,17 @@ const createChatMessagePost = async (req, res) => {
             }
 
             fullAiMessageContent += chunk.message.content;
-            res.write(`data: ${JSON.stringify({ chunk: chunk.message.content })}\r\n\r\n`);
+            const dataToSend = { chunk: chunk.message.content };
+            res.write(`data: ${JSON.stringify(dataToSend)}\r\n\r\n`); 
         }
         
         res.end();
 
         console.log("Streaming complete. Saving data...");
         
-        try {
-            const userMessage = `${user.email}: ${userInput}`;
-            const aiMessage = `assistant: ${fullAiMessageContent}`;
-            
-            createChatMessage(chatId, "user", userMessage); 
-            createChatMessage(chatId, "ai", aiMessage);
+        try {            
+            createChatMessage(chatId, "user", userInput); 
+            createChatMessage(chatId, "ai", fullAiMessageContent);
             
             console.log("AI message saved successfully.");
         } catch (dbError) {
