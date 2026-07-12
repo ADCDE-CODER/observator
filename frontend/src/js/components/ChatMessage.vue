@@ -1,16 +1,49 @@
 <script setup>
     import { ref } from 'vue';
-
-    const userInput = ref('');
+    
+    const userInput = ref(null);
+    const userInputContext = ref('');
     const emit = defineEmits(["create-message"]);
     const {selectedId, messages} = defineProps({
         selectedId: Number,
         messages: Array
     });
 
+    const MAX_ROWS = 5;
+
+    const autoHeight = () => {
+        const styles = getComputedStyle(userInput.value);
+
+        // Reset height so shrinking works when deleting text
+        userInput.value.style.height = 'auto';
+
+        const lineHeight = parseFloat(styles.lineHeight);
+        
+        // Fallback if line-height is "normal"
+        let actualLineHeight;
+        if (isNaN(lineHeight)) {
+            actualLineHeight = parseFloat(styles.fontSize) * 1.2;
+        } else {
+            actualLineHeight = lineHeight;
+        }
+        
+        const padding = parseFloat(styles.paddingTop) + parseFloat(styles.paddingBottom);
+        const maxHeight = actualLineHeight * MAX_ROWS + padding;
+        const newHeight = Math.min(userInput.value.scrollHeight, maxHeight);
+
+        userInput.value.style.height = `${newHeight}px`;
+        
+        if (userInput.value.scrollHeight > maxHeight) {
+            userInput.value.style.overflowY = 'auto';
+        } else {
+            userInput.value.style.overflowY = 'hidden';
+        }
+    };
+
     function sendMessage() {
-        emit('create-message', userInput.value);
-        userInput.value = '';
+        emit('create-message', userInputContext.value);
+        userInputContext.value = '';
+        userInput.value.style.height = 'auto';
     }
 </script>
 
@@ -34,7 +67,7 @@
             </section>
         </div>
         <form class="input-container" @submit.prevent="sendMessage()">
-            <input class="prompt-input" type="text" placeholder="Type here" v-model="userInput">
+            <textarea class="prompt-input" type="text" placeholder="Type here" rows="1" ref="userInput" v-model="userInputContext" @input="autoHeight()"></textarea>
             <button class="primary-button" type="submit">Send</button>
         </form>
     </div>
@@ -75,13 +108,16 @@
     }
 
     .prompt-input {
-        background-color: var(--color-surface-container-highest);
+        background-color: var(--color-surface-container-high);
         color: var(--color-on-surface);
         width: 100%;
         padding: 1rem;
         box-sizing: border-box;
         border-radius: 20px;
-        border: 1px var(--color-outline) solid;
+        border: none;
+        resize: none;
+        overflow-y: hidden;
+        line-height: normal;
     }
 
     .primary-button {
