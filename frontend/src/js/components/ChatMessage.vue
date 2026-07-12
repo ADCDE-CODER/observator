@@ -62,7 +62,8 @@
     <div class="chatMessages" v-show="selectedId">
         <h2>Message</h2>
         <div class="output-container">
-            <section v-for="message in messages" :key="message.id">
+            <section v-for="message in messages" :key="message.id" :class="message.sender">
+                <strong>{{ message.sender }}:</strong>
                 <div class="html-output" v-html="message.message"></div>
             </section>
         </div>
@@ -92,6 +93,24 @@
         box-sizing: border-box;
         border-radius: 15px;
         overflow: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .user, .ai {
+        background-color: var(--color-surface-container-highest);
+        padding: 1rem;
+        border-radius: 20px;
+        max-width: 80%;
+    }
+
+    .user {
+        margin-left: auto;
+    }
+
+    .html-output {
+        overflow-x: auto;
     }
     
     .input-container {
