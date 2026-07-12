@@ -6,6 +6,7 @@
     import { authState } from '../state/authState';
     import { addMessages, getMessages } from '../services/messageService';
     import { addChat, getChat, modifyChat, removeChat } from '../services/chatService';
+    import { renderMarkdown } from '../utils/markdownUtils.js';
 
     const selectedChatId = ref(null);
     const chats = ref([]);
@@ -171,13 +172,50 @@
     }
 
     async function createMessage(user, userInput, token, chatSettings, selectedChatId) {
-        const response = await addMessages(user, userInput, token, chatSettings, selectedChatId);
-        messages.value.push(response);
+        const userObj = {
+            sender: "user",
+            message: userInput
+        };
+
+        messages.value.push(userObj);
+        
+        let chunkBuffer = ""
+        let messageContainerIndex = null;
+
+        await addMessages(user, userInput, token, chatSettings, selectedChatId, (chunk) => {
+            if (!messageContainerIndex) {
+                chunkBuffer = chunk;
+                const html = renderMarkdown(chunkBuffer);
+                const aiObj = {
+                    sender: "ai",
+                    message: html
+                };
+                
+                messages.value.push(aiObj);
+                messageContainerIndex = messages.value.length - 1;
+            } else {
+                chunkBuffer += chunk;
+                const html = renderMarkdown(chunkBuffer);
+                
+                messages.value[messageContainerIndex].message = html;
+            }
+        });
     }
 
     async function receiveAllMessages(user, id) {
         const response = await getMessages(user, id);
-        messages.value = response;
+
+        const processedResponse = response.map(item => {
+            const message = item.message;
+            const html = renderMarkdown(message);
+
+            return {
+                ...item,
+                message: html
+            }
+        });
+
+        messages.value = processedResponse;
     }
 
     function applySettings(result) {
