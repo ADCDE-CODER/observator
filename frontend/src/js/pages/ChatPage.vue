@@ -172,9 +172,10 @@
     }
 
     async function createMessage(user, userInput, token, chatSettings, selectedChatId) {
+        const userInputHtml = renderMarkdown(userInput);
         const userObj = {
             sender: "user",
-            message: userInput
+            message: userInputHtml
         };
 
         messages.value.push(userObj);
