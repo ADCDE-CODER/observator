@@ -17,7 +17,7 @@ const ollama = new Ollama({
     }
 });
 
-async function createChatResponder(client, model, input, settings) {
+async function createChatResponder(client, model, chatHistory, settings) {
     if (client === "openai") {
         const openAICompletion = await client.chat.completions.create({
             model: model,
@@ -39,19 +39,14 @@ async function createChatResponder(client, model, input, settings) {
             presence_penalty: settings.presence_penalty,
             repetition_penalty: settings.repetition_penalty,
             logit_bias: settings.logit_bias,
-            messages: [
-                {
-                    role: "user",
-                    content: input
-                }
-            ]
+            messages: chatHistory
         })
         
         return openAICompletion.choices[0];
     } else if (client === "ollama") {
         const ollamaCompletion = await ollama.chat({
             model: model,
-            messages: [{ role: "user", content: input }],
+            messages: chatHistory,
             stream: true
         });
         
@@ -65,6 +60,7 @@ const createChatMessagePost = async (req, res) => {
     const user = req.user;
     const client = "ollama"
     const model = "gemma4:latest";
+    let conversationContext = [];
     let fullAiMessageContent = "";
 
     if (!user || !req.body || !req.body.data) {
@@ -85,6 +81,31 @@ const createChatMessagePost = async (req, res) => {
         return res.status(400).json({success: false, error: "Missing chat ID."});
     }
 
+    let chatMessages;
+
+    try {
+        chatMessages = readChatMessage(chatId);
+    } catch (dbError) {
+        const errorMessage = `[ERROR] Failed to read user or AI message in database: ${dbError.message}`;
+        console.error(errorMessage);
+    }
+
+    if (chatMessages.length !== 0) {
+        const messages = chatMessages.map(item => {
+            item.sender = "assistant";
+
+            return item;
+        });
+
+        messages.forEach(message => {
+            conversationContext.push({role: message.sender, content: message.message})
+        });
+    }
+
+    conversationContext.push({role: "user", content: userInput})
+
+    console.log(conversationContext);
+
     try {
         // Set headers for SSE streaming
         res.setHeader('Content-Type', 'text/event-stream');
@@ -94,7 +115,7 @@ const createChatMessagePost = async (req, res) => {
         let stream;
 
         try {
-            stream = await createChatResponder(client, model, userInput, settings);
+            stream = await createChatResponder(client, model, conversationContext, settings);
         } catch (error) {
             console.error("Streaming setup error:", error);
             return res.status(500).json({ success: false, error: `Failed to initiate AI chat response: ${error.message}` });
@@ -119,7 +140,7 @@ const createChatMessagePost = async (req, res) => {
             createChatMessage(chatId, "user", userInput); 
             createChatMessage(chatId, "ai", fullAiMessageContent);
             
-            console.log("AI message saved successfully.");
+            console.log("User and AI message saved successfully.");
         } catch (dbError) {
             const errorMessage = `[ERROR] Failed to create user or AI message in database: ${dbError.message}`;
             console.error(errorMessage);
