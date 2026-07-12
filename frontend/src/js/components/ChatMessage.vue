@@ -58,6 +58,7 @@
         padding: 0.5rem;
         box-sizing: border-box;
         border-radius: 15px;
+        overflow: auto;
     }
     
     .input-container {
