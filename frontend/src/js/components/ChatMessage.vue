@@ -29,14 +29,9 @@
     <div class="chatMessages" v-show="selectedId">
         <h2>Message</h2>
         <div class="output-container">
-            <p v-for="message in messages">
-                <span v-if="typeof message === 'string'">
-                    {{ message }}
-                </span>
-                <span v-else>
-                    {{ message.sender }}: {{ message.message }}
-                </span>
-            </p>
+            <section v-for="message in messages" :key="message.id">
+                <div class="html-output" v-html="message.message"></div>
+            </section>
         </div>
         <form class="input-container" @submit.prevent="sendMessage()">
             <input class="prompt-input" type="text" placeholder="Type here" v-model="userInput">
@@ -102,5 +97,19 @@
     .primary-button:hover {
         background-color: var(--color-primary-container);
         color: var(--color-on-primary-container);
+    }
+
+    .html-output:deep(table) {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    .html-output:deep(th) {
+        background-color: var(--color-primary-container);
+    }
+
+    .html-output:deep(th), .html-output:deep(td) {
+        border: 1px var(--color-outline) solid;
+        padding: 1rem;
     }
 </style>
