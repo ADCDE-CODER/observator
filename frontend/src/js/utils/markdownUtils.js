@@ -1,5 +1,6 @@
 import markdownit from 'markdown-it'
 import hljs from 'highlight.js';
+import DOMPurify from 'dompurify'
 
 const md = markdownit({
     html: true,
@@ -32,5 +33,6 @@ export function renderMarkdown(markdownText) {
         return '';
     }
 
-    return md.render(markdownText);
+    const dirtyHtmlString = md.render(markdownText);
+    return DOMPurify.sanitize(dirtyHtmlString)
 }
