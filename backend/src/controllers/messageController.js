@@ -17,7 +17,7 @@ const ollama = new Ollama({
     }
 });
 
-async function createChatResponder(client, model, chatHistory, settings) {
+async function generateResponse(client, model, chatHistory, settings) {
     if (client === "openai") {
         const openAICompletion = await client.chat.completions.create({
             model: model,
@@ -47,67 +47,77 @@ async function createChatResponder(client, model, chatHistory, settings) {
         const ollamaCompletion = await ollama.chat({
             model: model,
             messages: chatHistory,
-            stream: true
+            stream: true,
+            options: {
+                num_ctx: 8192,     // Sets the total memory available for the chat (History + Output)
+                num_predict: 8192  // Sets how many tokens can be written
+            }
         });
         
         return ollamaCompletion;
     } else {
         throw new Error(`Unsupported client: ${client}. Must be 'openai' or 'ollama'.`);
     }
-}
+};
 
-const createChatMessagePost = async (req, res) => {
-    const user = req.user;
-    const client = "ollama"
-    const model = "gemma4:latest";
-    let conversationContext = [];
-    let fullAiMessageContent = "";
-
-    if (!user || !req.body || !req.body.data) {
-        return res.status(400).json({success: false, error: "Missing user or request data."});
+function validateRequest(req) {    
+    if (!req.user || !req.body || !req.body.data) {
+        return { isValid: false, message: "Missing user or request data." };
     }
 
     const { userInput, settings, chatId } = req.body.data;
 
-    if (!userInput) {
-        return res.status(400).json({success: false, error: "Missing user input."});
+    if (!userInput) { return { isValid: false, message: "Missing user input." }; }
+    if (!settings) { return { isValid: false, message: "Missing settings." }; }
+    if (!chatId) { return { isValid: false, message: "Missing chat ID." }; }
+
+    return { isValid: true };
+};
+
+const createChatMessagePost = async (req, res) => {
+    const validateResult = validateRequest(req);
+
+    if (!validateResult.isValid) {
+        return res.status(400).json({ success: false, error: validationResult.message });
     }
 
-    if (!settings) {
-        return res.status(400).json({success: false, error: "Missing settings."});
-    }
+    const { userInput, settings, chatId } = req.body.data;
+    let conversationContext = [];
+    let fullAiMessageContent = "";
+    const client = "ollama"
+    const model = "gemma4:latest";
 
-    if (!chatId) {
-        return res.status(400).json({success: false, error: "Missing chat ID."});
-    }
-
-    let chatMessages;
-
+    // Reads chat history and builds the context array.
     try {
-        chatMessages = readChatMessage(chatId);
-    } catch (dbError) {
-        const errorMessage = `[ERROR] Failed to read user or AI message in database: ${dbError.message}`;
-        console.error(errorMessage);
+        let chatMessages;
+
+        try {
+            chatMessages = readChatMessage(chatId);
+        } catch (dbError) {
+            console.error(`[WARNING] Failed to read chat history for ID ${chatId}. Proceeding with empty context. Error:`, dbError);
+            // If failure occurs, then continue with empty array and log the warning.
+            chatMessages = []; 
+        }
+
+        if (chatMessages && chatMessages.length > 0) {
+            const messages = chatMessages.map(item => ({
+                role: "assistant",
+                content: item.message,
+            }));
+
+            messages.forEach(message => {
+                conversationContext.push({ role: message.role, content: message.content });
+            });
+        }
+
+        conversationContext.push({role: "user", content: userInput})
+    } catch (setupError) {
+        console.error("Critical error during chat context setup:", setupError);
+        return res.status(500).json({ success: false, error: "Internal system error during chat context setup." });
     }
 
-    if (chatMessages.length !== 0) {
-        const messages = chatMessages.map(item => {
-            item.sender = "assistant";
-
-            return item;
-        });
-
-        messages.forEach(message => {
-            conversationContext.push({role: message.sender, content: message.message})
-        });
-    }
-
-    conversationContext.push({role: "user", content: userInput})
-
-    console.log(conversationContext);
-
+    // Streaming phase
     try {
-        // Set headers for SSE streaming
         res.setHeader('Content-Type', 'text/event-stream');
         res.setHeader('Cache-Control', 'no-cache');
         res.setHeader('Connection', 'keep-alive');
@@ -115,7 +125,7 @@ const createChatMessagePost = async (req, res) => {
         let stream;
 
         try {
-            stream = await createChatResponder(client, model, conversationContext, settings);
+            stream = await generateResponse(client, model, conversationContext, settings);
         } catch (error) {
             console.error("Streaming setup error:", error);
             return res.status(500).json({ success: false, error: `Failed to initiate AI chat response: ${error.message}` });
@@ -132,27 +142,24 @@ const createChatMessagePost = async (req, res) => {
             res.write(`data: ${JSON.stringify(dataToSend)}\r\n\r\n`); 
         }
         
+        // End response when streaming is complete. 
         res.end();
-
-        console.log("Streaming complete. Saving data...");
+    } catch (streamingError) {
+        console.error("Streaming process failure:", streamingError);
+        
+        if (!res.headersSent) { 
+            return res.status(500).json({ success: false, error: `Failed to handle stream or response: ${streamingError.message}` });
+        }
+    } finally {
+        console.log("Streaming complete. Attempting to save data...");
         
         try {            
             createChatMessage(chatId, "user", userInput); 
             createChatMessage(chatId, "ai", fullAiMessageContent);
-            
             console.log("User and AI message saved successfully.");
         } catch (dbError) {
-            const errorMessage = `[ERROR] Failed to create user or AI message in database: ${dbError.message}`;
+            const errorMessage = `[ERROR] Failed to persist chat history for ID ${chatId}: ${dbError.message}`;
             console.error(errorMessage);
-        }
-    } catch (streamingError) {
-        // Catch any errors that happen before streaming starts 
-        const errorMessage = `Failed to process request: ${streamingError.message}`;
-        console.error(errorMessage);
-        
-        // If we failed before writing headers/streaming, we can respond normally.
-        if (!res.headersSent) { 
-            return res.status(500).json({ success: false, error: errorMessage });
         }
     }
 };
