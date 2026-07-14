@@ -13,59 +13,32 @@
     const messages = ref([]);
     const settings = ref([
         {
-            title: "Reasoning",
+            title: "Body",
             inputs: [
                 {
-                    name: "effort",
-                    label: "Reasoning Effort",
+                    name: "model",
+                    label: "Model",
+                    type: "text",
+                    value: ""
+                },
+                {
+                    name: "system_content",
+                    label: "System Content",
+                    type: "text",
+                    value: "",
+                },
+                {
+                    name: "think",
+                    label: "Think",
                     type: "select",
                     value: "medium",
-                    options: ["low", "medium", "high"]
-                },
-                {
-                    name: "maxTokens",
-                    label: "Max Tokens",
-                    type: "number",
-                    value: 1000,
-                    min: 1,
-                    max: 8000
-                },
-                {
-                    name: "exclude",
-                    label: "Exclude",
-                    type: "checkbox",
-                    value: false
-                },
-            ]
-        },
-        {
-            title: "Usage",
-            inputs: [
-                {
-                    name: "include",
-                    label: "Include",
-                    type: "checkbox",
-                    value: false
+                    options: ["low", "medium", "high", "max"]
                 }
             ]
         },
         {
-            title: "Generally",
+            title: "Options",
             inputs: [
-                {
-                    name: "stream",
-                    label: "Stream",
-                    type: "checkbox",
-                    value: false
-                },
-                {
-                    name: "maxTokens",
-                    label: "Max Tokens",
-                    type: "number",
-                    value: 1000,
-                    min: 1,
-                    max: 8000
-                },
                 {
                     name: "temperature",
                     label: "Temperature",
@@ -73,45 +46,33 @@
                     value: 0
                 },
                 {
-                    name: "seed",
-                    label: "Seed",
-                    type: "number",
-                    value: 0
-                },
-                {
-                    name: "topP",
-                    label: "Top P",
-                    type: "number",
-                    value: 0
-                },
-                {
-                    name: "topK",
+                    name: "top_k",
                     label: "Top K",
                     type: "number",
                     value: 0
                 },
                 {
-                    name: "frequency-penalty",
-                    label: "Frequency penalty",
+                    name: "top_p",
+                    label: "Top P",
                     type: "number",
                     value: 0
                 },
                 {
-                    name: "presence-penalty",
-                    label: "Presence penalty",
+                    name: "min_p",
+                    label: "Min P",
                     type: "number",
                     value: 0
                 },
                 {
-                    name: "repetition-penalty",
-                    label: "Repetition penalty",
+                    name: "num_ctx",
+                    label: "Num ctx",
                     type: "number",
                     value: 0
                 },
                 {
-                    name: "logit-bias",
-                    label: "Logit bias",
-                    type: "text",
+                    name: "num_predict",
+                    label: "Num predict",
+                    type: "number",
                     value: 0
                 }
             ]
@@ -219,8 +180,8 @@
         messages.value = processedResponse;
     }
 
-    function applySettings(result) {
-        authState.setChatSettings(result);
+    function applySettings(settings) {
+        authState.setChatSettings(settings);
     }
 </script>
 
@@ -248,7 +209,7 @@
 
        <ChatSettings
        :settings="settings"
-       @apply-settings="(result) => applySettings(result)"
+       @apply-settings="(settings) => applySettings(settings)"
        />
     </section>
 </template>
