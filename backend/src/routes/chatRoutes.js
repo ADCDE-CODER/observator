@@ -1,16 +1,10 @@
 import express from "express";
-import { createChatPost, readAllChatsGet, readChatPost, updateChatPost, deleteChatPost } from "../controllers/chatController.js";
 
-const chatRouter = express.Router();
+export const setupChatRoutes = (chatController) => {
+    const router = express.Router();
 
-chatRouter.post("/new", createChatPost);
-
-chatRouter.get("/all", readAllChatsGet);
-
-chatRouter.post("/one", readChatPost);
-
-chatRouter.post("/update", updateChatPost);
-
-chatRouter.post("/delete", deleteChatPost);
-
-export { chatRouter };
+    router.post("/create", chatController.create);
+    router.get("/read:id", chatController.read);
+    router.put("/update:id", chatController.update);
+    router.delete("/delete:id", chatController.delete);
+};

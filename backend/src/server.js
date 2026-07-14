@@ -6,11 +6,15 @@ import { messageRouter } from "./routes/messageRoutes.js";
 
 const app = express();
 
+const userRouter = setupUserRoutes();
+const chatRouter = setupChatRoutes():
+const chatMessageRouter = setupChatMessageRoutes();
+
 app.use(cors());
 app.use(express.json());
-app.use("/user", userRouter);
-app.use("/chat", chatRouter);
-app.use("/message", messageRouter);
+app.use("/users", userRouter);
+app.use("/chats", chatRouter);
+app.use("/chatmessages", chatMessageRouter);
 
 const PORT = 3000;
 app.listen(PORT, () => {

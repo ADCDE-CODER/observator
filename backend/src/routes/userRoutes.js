@@ -1,12 +1,10 @@
 import express from "express";
-import { signUpUserPost, signUpUsersGet, signInUserPost } from "../controllers/userController.js"
 
-const userRouter = express.Router();
+export const setupUserRoutes = (userController) => {
+    const router = express.Router();
 
-userRouter.post("/signup", signUpUserPost);
-
-userRouter.get("/signup", signUpUsersGet);
-
-userRouter.post("/signin", signInUserPost);
-
-export { userRouter };
+    router.post("/create", userController.create);
+    router.get("/read:id", userController.read);
+    router.put("/update:id", userController.update);
+    router.delete("/delete:id", userController.delete);
+};
