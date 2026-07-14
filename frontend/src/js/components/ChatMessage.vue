@@ -99,14 +99,20 @@
     }
 
     .user, .ai {
-        background-color: var(--color-surface-container-highest);
         padding: 1rem;
         border-radius: 20px;
         max-width: 80%;
     }
 
     .user {
+        background-color: var(--color-primary-container);
+        color: var(--color-on-primary-container);
         margin-left: auto;
+    }
+
+    .ai {
+        background-color: var(--color-surface-container-highest);
+        color: var(--color-on-surface);
     }
 
     .html-output {
