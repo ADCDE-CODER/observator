@@ -17,13 +17,13 @@ export class ChatService {
         this.db.exec(chatTable);
     };
 
-    create({ userID, title } = {}) {    
-        if (!userID || !title) {
-            throw new Error("User ID and title are required to create a chat.");
+    create({ title,  userID } = {}) {    
+        if (!title || !userID) {
+            throw new Error("Title and user ID are required to create a chat.");
         }
     
         try {
-            return this.db.prepare("INSERT INTO chat(user_id, title) VALUES (?, ?)").run(userID, title);
+            return this.db.prepare("INSERT INTO chat(title, user_id) VALUES (?, ?)").run(title, userID);
         } catch (error) {
             throw error;
         }
