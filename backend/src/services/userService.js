@@ -58,25 +58,25 @@ export class UserService {
         }
     };
     
-    update({ email, password, id } = {}) {        
-        if (!email || !password || !id) {
+    update({ email, password, userID } = {}) {        
+        if (!email || !password || !userID) {
             throw new Error("Email, password, and ID are required to update a user.");
         }
 
         try {
-            return db.prepare("UPDATE user SET email = ?, password = ?, WHERE id = ?").run(email, password, id);
+            return db.prepare("UPDATE user SET email = ?, password = ?, WHERE id = ?").run(email, password, userID);
         } catch (error) {
             throw error;
         }
     };
     
-    delete(id) {
-        if (!id) {
+    delete(userID) {
+        if (!userID) {
             throw new Error("ID is required to delete a user.")
         }
 
         try {
-            return db.prepare("DELETE FROM user WHERE id = ?").run(id);
+            return db.prepare("DELETE FROM user WHERE id = ?").run(userID);
         } catch (error) {
             throw error;
         }
