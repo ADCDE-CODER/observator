@@ -1,39 +1,67 @@
-import { db } from "../config/database.js";
+export class ChatService {
+    constructor(db) {
+        this.db = db;
+        this.initializeDatabase();
+    }
 
-const chatTable = `
-    CREATE TABLE IF NOT EXISTS chat (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        title TEXT NOT NULL,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        user_id INTEGER NOT NULL,
-        FOREIGN KEY (user_id) REFERENCES user(id)
-    );
-`;
+    initializeDatabase() {
+        const chatTable = `
+            CREATE TABLE IF NOT EXISTS chat (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                title TEXT NOT NULL,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                user_id INTEGER NOT NULL,
+                FOREIGN KEY (user_id) REFERENCES user(id)
+            );
+        `;
+        this.db.exec(chatTable);
+    };
 
-db.exec(chatTable);
+    create({ userID, title } = {}) {    
+        if (!userID || !title) {
+            throw new Error("User ID and title are required to create a chat.");
+        }
+    
+        try {
+            return this.db.prepare("INSERT INTO chat(user_id, title) VALUES (?, ?)").run(userID, title);
+        } catch (error) {
+            throw error;
+        }
+    };
+    
+    read(userID) {
+        if (!userID) {
+            throw new Error("User ID is required to read chat(s).");
+        }
 
-// CREATE 
-function createChat(userId, title) {
-    return db.prepare("INSERT INTO chat(user_id, title) VALUES (?, ?)").run(userId, title);
-};
+        try {
+            return this.db.prepare("SELECT * FROM chat WHERE user_id = ? ORDER BY created_at ASC").all(userID);
+        } catch (error) {
+            throw error;
+        }
+    };
+    
+    update({ title, chatID, userID } = {}) {        
+        if (!title || !chatID || !userID) {
+            throw new Error("Title, chat ID, and user ID are required to update a chat.");
+        }
 
-// READ
-function readAllChats() {
-    return db.prepare("SELECT * FROM chat ORDER BY created_at ASC").all();
-};
+        try {
+            return this.db.prepare("UPDATE chat SET title = ? WHERE id = ? AND user_id = ?").run(title, chatID, userID);
+        } catch (error) {
+            throw error;
+        }
+    };
+    
+    delete({ chatID, userID } = {}) {
+        if (!chatID && !userID) {
+            throw new Error("chat ID and user ID are required to delete a chat.")
+        }
 
-function readChat(userId) {
-    return db.prepare("SELECT * FROM chat WHERE user_id = ? ORDER BY created_at ASC").all(userId);
-};
-
-// UPDATE
-function updateChat(title, userId, id) {
-    return db.prepare("UPDATE chat SET title = ? WHERE user_id = ? AND id = ?").run(title, userId, id);
-};
-
-// DELETE
-function deleteChat(userId, id) {
-    return db.prepare("DELETE FROM chat WHERE user_id = ? AND id = ?").run(userId, id);
-};
-
-export { createChat, readAllChats, readChat, updateChat, deleteChat };
+        try {
+            return this.db.prepare("DELETE FROM chat WHERE id = ? AND user_id = ?").run(chatID, userID);
+        } catch (error) {
+            throw error;
+        }
+    };
+}
