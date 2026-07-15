@@ -39,7 +39,7 @@ export class UserService {
                 return userData[key];
             });
 
-            return db.prepare(`INSERT INTO user(${columns}) VALUES (${questionMarks})`).run(...values);
+            return this.db.prepare(`INSERT INTO user(${columns}) VALUES (${questionMarks})`).run(...values);
         } catch (error) {
             throw error;
         }
@@ -52,7 +52,7 @@ export class UserService {
 
         try {
             const indentifier = email || username;
-            return db.prepare("SELECT id, email FROM user WHERE (email = ? OR username = ?) AND password = ?").get(indentifier, indentifier, password);
+            return this.db.prepare("SELECT id, email FROM user WHERE (email = ? OR username = ?) AND password = ?").get(indentifier, indentifier, password);
         } catch (error) {
             throw error;
         }
@@ -64,7 +64,7 @@ export class UserService {
         }
 
         try {
-            return db.prepare("UPDATE user SET email = ?, password = ?, WHERE id = ?").run(email, password, userID);
+            return this.db.prepare("UPDATE user SET email = ?, password = ?, WHERE id = ?").run(email, password, userID);
         } catch (error) {
             throw error;
         }
@@ -76,7 +76,7 @@ export class UserService {
         }
 
         try {
-            return db.prepare("DELETE FROM user WHERE id = ?").run(userID);
+            return this.db.prepare("DELETE FROM user WHERE id = ?").run(userID);
         } catch (error) {
             throw error;
         }
