@@ -4,7 +4,13 @@ import jwt from "jsonwebtoken";
 config();
 
 const generateToken = (email) => {
-    return jwt.sign({email: email}, process.env.ACCESS_TOKEN_SECRET);
+    if (!email) {
+        const error = new Error("Email is required to generate a token.");
+        error.status = 400;
+        throw error;
+    }
+
+    return jwt.sign({email}, process.env.ACCESS_TOKEN_SECRET);
 };
 
 function verifyToken(req, res, next) {
