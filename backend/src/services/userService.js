@@ -69,8 +69,8 @@ export class UserService {
         }
     };
     
-    update(userData, id) {
-        const { email, password, username } = userData;
+    update(userData) {
+        const { email, password, username, id } = userData;
 
         if ((!email && !username) || !password) {
             const error = new Error("Email or username, and password are required to update a user.");

@@ -47,7 +47,7 @@ export class ChatService {
         }
     };
     
-    update({ title } = {}, id, user_id ) {        
+    update({ title, id, user_id } = {}) {        
         if (!title) {
             const error = new Error("Title is required to update a chat.");
             error.status = 400;

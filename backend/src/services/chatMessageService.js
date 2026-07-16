@@ -26,7 +26,7 @@ export class ChatMessageService {
             throw error;
         }
         
-        if (!role || !chat_id ) {
+        if (!role || !chat_id) {
             throw new Error("Role and chat ID are required to create a chat message.");
         }
     
@@ -49,7 +49,7 @@ export class ChatMessageService {
         }
     };
     
-    update({ role, content, images } = {}, id, chat_id) {        
+    update({ role, content, images, id, chat_id } = {}) {        
         if (!content && !images) {
             const error = new Error("Content and images are required to update a chat message.");
             error.status = 400;
