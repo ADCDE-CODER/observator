@@ -1,45 +1,51 @@
 export class UserService {
     constructor(db) {
         this.db = db;
+        this.keys = ['email', 'password', 'username', 'first_name', 'last_name', 'street_address', 'postal_address', 'phone_number', 'date_of_birth'];
         this.initializeDatabase();
     }
 
     initializeDatabase() {
-        const userTable = `
+        const table = `
             CREATE TABLE IF NOT EXISTS user (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 email TEXT NOT NULL UNIQUE,
                 password TEXT NOT NULL,
+                username TEXT NOT NULL UNIQUE,
                 first_name TEXT,
                 last_name TEXT,
-                username TEXT UNIQUE,
                 street_address TEXT,
                 postal_address TEXT,
                 phone_number INTEGER UNIQUE,
                 date_of_birth INTEGER
             );
         `;
-        this.db.exec(userTable);
+        this.db.exec(table);
     };
 
-    create({ email, password } = {}) {    
-        if (!email || !password) {
-            throw new Error("Email and password are required to create a user.");
+    create(userData) {
+        const { email, password, username } = userData;
+        
+        if (!email || !password || !username) {
+            throw new Error("Email, password, and username are required to create a user.");
         }
+        
+        let validKeys = [];
+        let validValues = [];
     
-        const keys = Object.keys(userData);
-    
-        // Filter out null and undefined values 
-        const validKeys = keys.filter(key => userData[key] !== undefined && userData[key] !== null);
-    
-        try {
-            const columns = validKeys.join(', ');
-            const questionMarks = Array(validKeys.length).fill('?').join(', ');
-            const values = validKeys.map(key => {
-                return userData[key];
-            });
+        this.keys.forEach(key => {
+            const value = userData[key];
+            if (!value || value !== undefined) return;
 
-            return this.db.prepare(`INSERT INTO user(${columns}) VALUES (${questionMarks})`).run(...values);
+            validKeys.push(key);
+            validValues.push(value);
+        });
+
+        const columns = validKeys.join(', ');
+        const questionMarks = Array(validKeys.length).fill('?').join(', ');
+
+        try {
+            return this.db.prepare(`INSERT INTO user(${columns}) VALUES (${questionMarks})`).run(...validValues);
         } catch (error) {
             throw error;
         }
@@ -58,13 +64,25 @@ export class UserService {
         }
     };
     
-    update({ email, password, userID } = {}) {        
-        if (!email || !password || !userID) {
-            throw new Error("Email, password, and ID are required to update a user.");
+    update(userData, userID) {
+        if (!userID) {
+            throw new Error("User ID is required to update a user information.");
         }
 
+        let columns = "";
+        let validValues = [];
+        
+        // Ensure casing matches DB schema strictly (snake_case)
+        this.keys.forEach(key => {
+            const value = userData[key];
+            if (!value || value !== undefined) return;
+
+            columns += `${key} = ?, `;
+            validValues.push(value);
+        });
+
         try {
-            return this.db.prepare("UPDATE user SET email = ?, password = ?, WHERE id = ?").run(email, password, userID);
+            return this.db.prepare(`UPDATE user SET ${columns.splice(0, -1)} WHERE id = ?`).run(...validValues, userID);
         } catch (error) {
             throw error;
         }
@@ -72,7 +90,7 @@ export class UserService {
     
     delete(userID) {
         if (!userID) {
-            throw new Error("ID is required to delete a user.")
+            throw new Error("User ID is required to delete a user.")
         }
 
         try {
