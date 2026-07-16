@@ -64,8 +64,8 @@ export class UserService {
         }
     };
     
-    update(userData, userID) {
-        if (!userID) {
+    update(userData, id) {
+        if (!id) {
             throw new Error("User ID is required to update a user information.");
         }
 
@@ -82,19 +82,19 @@ export class UserService {
         });
 
         try {
-            return this.db.prepare(`UPDATE user SET ${columns.splice(0, -1)} WHERE id = ?`).run(...validValues, userID);
+            return this.db.prepare(`UPDATE user SET ${columns.splice(0, -1)} WHERE id = ?`).run(...validValues, id);
         } catch (error) {
             throw error;
         }
     };
     
-    delete(userID) {
-        if (!userID) {
+    delete(id) {
+        if (!id) {
             throw new Error("User ID is required to delete a user.")
         }
 
         try {
-            return this.db.prepare("DELETE FROM user WHERE id = ?").run(userID);
+            return this.db.prepare("DELETE FROM user WHERE id = ?").run(id);
         } catch (error) {
             throw error;
         }
