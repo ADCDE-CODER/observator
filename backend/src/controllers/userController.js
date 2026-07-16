@@ -1,72 +1,56 @@
-import { createUser, readAllUsers, readUser, updateUser, deleteUser } from "../models/userModel.js";
 import { generateToken } from "../middleware/auth.js";
 
-const signUpUserPost = (req, res) => {
-    const {email, password} = req.body.data;
+export class UserController {
+    constructor(UserServiceInstance) {
+        this.UserService = UserServiceInstance;
+    }
 
-    if (email && password) {      
+    create(req, res) {
+        const userData = req.body;
+
         try {
-            const usersCreated = createUser(email, password);
-            res.status(201).json({success: true, message: "Your account is successfully created!"});
+            this.UserService.create(userData);
+            res.status(201).json({message: "User created successfully"});
         } catch (error) {
-            const errorMessage = `User creation failed: ${error.message}`;
-            console.error(errorMessage);
-            res.status(500).json({success: false, error: errorMessage});
+            console.error(error);
+            res.status(error.status || 500).json({message: error.message})
         }
-    } else {
-        res.status(400).json({success: false, error: "Email and password are required"});
-    }
-};
-
-const signUpUsersGet = (req, res) => {
-    try {
-        const users = readAllUsers();
-
-        if (users) {
-            res.status(200).json({success: true, users: users, message: "Successful to get all users"});   
-        } else {
-            res.status(400).json({success: false, error: "Failed to read all users"});
-        }
-
-    } catch (error) {
-        const errorMessage = `Failed to read users: ${error.message}`;
-        console.error(errorMessage);
-        res.status(500).json({success: false, error: errorMessage});
-    }
-};
-
-const signInUserPost = (req, res) => {
-    const {email, password} = req.body.data;
+    };
     
-    if (email && password) {
+    read(req, res) {
+        const { email, username, password } = req.body;
+        
         try {
-            const user = readUser(email, password);
-
-            if (user) {
-                try {
-                    const token = generateToken(email);
-                    
-                    if (token) {
-                        res.status(200).json({success: true, user: user, token: token, message: "Signed in successfully"});   
-                    } else {
-                        res.status(400).json({success: false, error: "Failed to generate token"});
-                    }   
-                } catch (error) {
-                    const errorMessage = `Token generation failed: ${error.message}`;
-                    console.error(errorMessage);
-                    res.status(500).json({success: false, error: errorMessage});
-                }
-            } else {
-                res.status(401).json({success: false, error: "Invalid credentials"});   
-            }
+            const user = this.UserService.read({email, username, password});
+            user.token = generateToken(email);
+            res.status(200).json({message: "User read successfully", user}); 
         } catch (error) {
-            const errorMessage = `Failed to sign in: ${error.message}`;
-            console.error(errorMessage);
-            res.status(500).json({success: false, error: errorMessage});
+            console.error(error);
+            res.status(error.status || 500).json({message: error.message})
         }
-    } else {
-        res.status(400).json({success: false, error: "Email and password are required"});
-    }
-};
+    };
 
-export { signUpUserPost, signUpUsersGet, signInUserPost };
+    update(req, res) {
+        const userData = req.body;
+        
+        try {
+            const user = this.UserService.update(userData);
+            res.status(200).json({message: "User updated successfully", user});
+        } catch (error) {
+            console.error(error);
+            res.status(error.status || 500).json({message: error.message})
+        }
+    };
+
+    delete(req, res) {
+        const { id } = req.body;
+        
+        try {
+            this.UserService.delete(id);
+            res.status(200).json({message: "User deleted successfully"});
+        } catch (error) {
+            console.error(error);
+            res.status(error.status || 500).json({message: error.message})
+        }
+    };
+}
