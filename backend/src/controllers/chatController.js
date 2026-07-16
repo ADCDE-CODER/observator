@@ -1,124 +1,70 @@
-import { createChat, readAllChats, readChat, updateChat, deleteChat } from "../models/chatModel.js";
+export class ChatController {
+    constructor(ChatServiceInstance) {
+        this.ChatService = ChatServiceInstance;
+    }
 
-const createChatPost = (req, res) => {
-    const { user } = req.body.data;
+    create(req, res) {
+        const { title, user_id } = req.body;
+        let chats;
 
-    if (user) {
         try {
-            let chats = readChat(user.id);
-
-            if (chats) {
-                let chatIndex = chats.length + 1;
-
-                try {
-                    const chatCreated = createChat(user.id, "New Chat " + chatIndex);
-                    chats = readChat(user.id); // List of chats is uppdated
-                    const lastChatItem = chats[chats.length - 1];
-
-                    res.status(201).json({success: true, lastChatItem: lastChatItem, message: "Your chat is successfully created!"});
-                } catch (error) {
-                    const errorMessage = `Failed to create a new chat: ${error.message}`;
-                    console.error(errorMessage);
-                    res.status(500).json({success: false, error: errorMessage});
-                }
-      
-            } else {
-                res.status(400).json({success: false, error: "No chat found"});
-            }
-  
+            chats = this.ChatService.read(user_id);
         } catch (error) {
-            const errorMessage = `Failed to read chat: ${error.message}`;
-            console.error(errorMessage);
-            res.status(500).json({success: false, error: errorMessage});
+            console.error(error);
+            res.status(error.status || 500).json({message: error.message});
         }
-    } else {
-        res.status(400).json({success: false, error: "No user found"});
-    }
-};
 
-const readAllChatsGet = (req, res) => {
-    try {
-        const chats = readAllChats();
-
-        if (chats) {
-            res.status(200).json({success: true, chats: chats, message: "Successful to get all chats"});
-        } else {
-            res.status(400).json({success: false, error: "Could not find all chats"});
+        if(!title) {
+            let chatIndex = chats.length + 1;
+            title = "New Chat " + chatIndex;
         }
-    } catch (error) {
-        const errorMessage = `Failed to read all chats: ${error.message}`;
-        console.error(errorMessage);
-        res.status(500).json({ success: false, error: errorMessage});
-    }
-};
 
-const readChatPost = (req, res) => {
-    const { user } = req.body.data;
-
-    if (user) {
         try {
-            const chats = readChat(user.id);
+            this.ChatService.create({title, user_id});
+            chats = this.ChatService.read(user_id); // List of chats is uppdated
+            const lastChatItem = chats[chats.length - 1];
+            const chat = {lastChatItem};
 
-            if (chats) {
-                res.status(200).json({success: true, chats: chats, message: "Successful to get chat"});
-            } else {
-                res.status(400).json({success: false, error: "Could not find all chats"});
-            }
-
+            res.status(201).json({message: "Chat created successfully", chat});
         } catch (error) {
-            const errorMessage = `Failed to read chat: ${error.message}`;
-            console.error(errorMessage);
-            res.status(500).json({success: false, error: errorMessage});
+            console.error(error);
+            res.status(error.status || 500).json({message: error.message});
         }
-    } else {
-        res.status(400).json({success: false, error: "No user found"});
-    }
-};
-
-const updateChatPost = (req, res) => {
-    const { user, chatId, title } = req.body.data;
-
-    if (user) {
+    };
+    
+    read(req, res) {
+        const { user_id } = req.body;
+        
         try {
-            const chat = updateChat(title, user.id, chatId);
-
-            if (chat.changes != 0 || chat.lastInsertRowid != 0) {
-                res.status(200).json({success: true, updateChat: chat, message: "Successful to update chat"});
-            } else {
-                res.status(400).json({success: false, error: "Could not update chat"});
-            }
-
+            const chats = this.ChatService.read(user_id);
+            res.status(200).json({message: "Chat read successfully", chats}); 
         } catch (error) {
-            const errorMessage = `Failed to update chat: ${error.message}`;
-            console.error(errorMessage);
-            res.status(500).json({success: false, error: errorMessage});
+            console.error(error);
+            res.status(error.status || 500).json({message: error.message})
         }
-    } else {
-        res.status(400).json({success: false, error: "No user found"});
-    }
-};
+    };
 
-const deleteChatPost = (req, res) => {
-    const { user, chatId } = req.body.data;
-
-    if (user) {
+    update(req, res) {
+        const { title, id, user_id } = req.body;
+        
         try {
-            const chat = deleteChat(user.id, chatId);
-
-            if (chat.changes != 0 || chat.lastInsertRowid != 0) {
-                res.status(200).json({success: true, deleteChat: chat, message: "Successful to delete chat"});
-            } else {
-                res.status(400).json({success: false, error: "Could not delete chat"});
-            }
-
+            const chat = this.ChatService.update({ title, id, user_id });
+            res.status(200).json({message: "Chat updated successfully", chat});
         } catch (error) {
-            const errorMessage = `Failed to delete chat: ${error.message}`;
-            console.error(errorMessage);
-            res.status(500).json({success: false, error: errorMessage});
+            console.error(error);
+            res.status(error.status || 500).json({message: error.message})
         }
-    } else {
-        res.status(400).json({success: false, error: "No user found"});
-    }
-};
+    };
 
-export { createChatPost, readAllChatsGet, readChatPost, updateChatPost, deleteChatPost };
+    delete(req, res) {
+        const { id, user_id } = req.body;
+        
+        try {
+            this.ChatService.delete(id, user_id);
+            res.status(200).json({message: "Chat deleted successfully"});
+        } catch (error) {
+            console.error(error);
+            res.status(error.status || 500).json({message: error.message})
+        }
+    };
+}
