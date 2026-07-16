@@ -43,7 +43,7 @@ export class ChatMessageService {
         }
 
         try {
-            return this.db.prepare("SELECT role, content, created_at FROM chatmessage WHERE chat_id = ? ORDER BY created_at ASC").all(chat_id);
+            return this.db.prepare("SELECT role, content, images created_at FROM chatmessage WHERE chat_id = ? ORDER BY created_at ASC").all(chat_id);
         } catch (error) {
             throw error;
         }
