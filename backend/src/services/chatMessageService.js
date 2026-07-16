@@ -20,12 +20,18 @@ export class ChatMessageService {
     };
 
     create({ role, content, images, chat_id } = {}) {    
-        if (!role || (!content && !images) || !chat_id ) {
-            throw new Error("Role, content/images, and chat ID are required to create a chat message.");
+        if (!content && !images) {
+            const error = new Error("Content and images are required to create a chat message.");
+            error.status = 400;
+            throw error;
+        }
+        
+        if (!role || !chat_id ) {
+            throw new Error("Role and chat ID are required to create a chat message.");
         }
     
         try {
-            return this.db.prepare("INSERT INTO chatmessage(role, content, images, chat_id) VALUES (?, ?, ?, ?)").run(role, content, images, chat_id);
+            this.db.prepare("INSERT INTO chatmessage(role, content, images, chat_id) VALUES (?, ?, ?, ?)").run(role, content, images, chat_id);
         } catch (error) {
             throw error;
         }
@@ -44,8 +50,14 @@ export class ChatMessageService {
     };
     
     update({ role, content, images } = {}, id, chat_id) {        
-        if (!role || (!content && !images) || !id || !chat_id ) {
-            throw new Error("Role, content/images, chat message ID, and chat ID are required to update a chat message.");
+        if (!content && !images) {
+            const error = new Error("Content and images are required to update a chat message.");
+            error.status = 400;
+            throw error;
+        }
+        
+        if (!role || !id || !chat_id ) {
+            throw new Error("Role, chat message ID, and chat ID are required to update a chat message.");
         }
 
         try {
@@ -61,7 +73,7 @@ export class ChatMessageService {
         }
 
         try {
-            return this.db.prepare("DELETE FROM chatmessage WHERE id = ? AND chat_id = ?").run(id, chat_id);
+            this.db.prepare("DELETE FROM chatmessage WHERE id = ? AND chat_id = ?").run(id, chat_id);
         } catch (error) {
             throw error;
         }

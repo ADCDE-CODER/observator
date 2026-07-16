@@ -27,7 +27,9 @@ export class UserService {
         const { email, password, username } = userData;
         
         if (!email || !password || !username) {
-            throw new Error("Email, password, and username are required to create a user.");
+            const error = new Error("Email, password, and username are required to create a user.");
+            error.status = 400;
+            throw error;
         }
         
         let validKeys = [];
@@ -46,7 +48,7 @@ export class UserService {
         const questionMarks = Array(validKeys.length).fill('?').join(', ');
 
         try {
-            return this.db.prepare(`INSERT INTO user(${columns}) VALUES (${questionMarks})`).run(...validValues);
+            this.db.prepare(`INSERT INTO user(${columns}) VALUES (${questionMarks})`).run(...validValues);
         } catch (error) {
             throw error;
         }
@@ -54,7 +56,9 @@ export class UserService {
     
     read({ email, username, password } = {}) {
         if ((!email && !username) || !password) {
-            throw new Error("Email or username, and password are required to read a user.");
+            const error = new Error("Email or username, and password are required to read a user.");
+            error.status = 400;
+            throw error;
         }
 
         try {
@@ -66,6 +70,14 @@ export class UserService {
     };
     
     update(userData, id) {
+        const { email, password, username } = userData;
+
+        if ((!email && !username) || !password) {
+            const error = new Error("Email or username, and password are required to update a user.");
+            error.status = 400;
+            throw error;
+        }
+        
         if (!id) {
             throw new Error("User ID is required to update a user information.");
         }
@@ -95,7 +107,7 @@ export class UserService {
         }
 
         try {
-            return this.db.prepare("DELETE FROM user WHERE id = ?").run(id);
+            this.db.prepare("DELETE FROM user WHERE id = ?").run(id);
         } catch (error) {
             throw error;
         }

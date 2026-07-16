@@ -28,8 +28,14 @@ export class ChatMetadataService {
     create(chatMetadata) {
         const { provider, model, chat_id } = chatMetadata; 
 
-        if (!provider || !model || !chat_id) {
-            throw new Error("Provider, model, and chat ID are required to apply chat metadata.");
+        if (!provider || !model) {
+            const error = new Error("Provider and model are required to create a chat metadata.");
+            error.status = 400;
+            throw error;
+        }
+
+        if (!chat_id) {
+            throw new Error("Chat ID is required to create a chat metadata.");
         }
 
         let validKeys = [];
@@ -48,7 +54,7 @@ export class ChatMetadataService {
         const questionMarks = Array(validKeys.length).fill('?').join(', ');
         
         try {
-            return this.db.prepare(`INSERT INTO chatmetadata(${columns}) VALUES (${questionMarks})`).run(...validValues);
+            this.db.prepare(`INSERT INTO chatmetadata(${columns}) VALUES (${questionMarks})`).run(...validValues);
         } catch (error) {
             throw error;
         }
@@ -67,8 +73,16 @@ export class ChatMetadataService {
     };
     
     update(chatMetadata, chat_id) {
+        const { provider, model } = chatMetadata; 
+        
+        if (!provider || !model) {
+            const error = new Error("Provider and model are required to update a chat metadata.");
+            error.status = 400;
+            throw error;
+        }
+        
         if (!chat_id) {
-            throw new Error("Chat ID is required to apply chat metadata.");
+            throw new Error("Chat ID is required to update a chat metadata.");
         }
 
         let columns = "";

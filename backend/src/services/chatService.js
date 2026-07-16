@@ -18,12 +18,18 @@ export class ChatService {
     };
 
     create({ title,  user_id } = {}) {    
-        if (!title || !user_id) {
-            throw new Error("Title and user ID are required to create a chat.");
+        if (!title) {
+            const error = new Error("Title is required to create a chat.");
+            error.status = 400;
+            throw error;
+        }
+        
+        if (!user_id) {
+            throw new Error("User ID is required to create a chat.");
         }
     
         try {
-            return this.db.prepare("INSERT INTO chat(title, user_id) VALUES (?, ?)").run(title, user_id);
+            this.db.prepare("INSERT INTO chat(title, user_id) VALUES (?, ?)").run(title, user_id);
         } catch (error) {
             throw error;
         }
@@ -42,8 +48,14 @@ export class ChatService {
     };
     
     update({ title } = {}, id, user_id ) {        
-        if (!title || !id || !user_id) {
-            throw new Error("Title, chat ID, and user ID are required to update a chat.");
+        if (!title) {
+            const error = new Error("Title is required to update a chat.");
+            error.status = 400;
+            throw error;
+        }
+        
+        if (!id || !user_id) {
+            throw new Error("Chat ID, and user ID are required to update a chat.");
         }
 
         try {
@@ -59,7 +71,7 @@ export class ChatService {
         }
 
         try {
-            return this.db.prepare("DELETE FROM chat WHERE id = ? AND user_id = ?").run(id, user_id);
+            this.db.prepare("DELETE FROM chat WHERE id = ? AND user_id = ?").run(id, user_id);
         } catch (error) {
             throw error;
         }
