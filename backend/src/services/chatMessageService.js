@@ -5,7 +5,7 @@ export class ChatMessageService {
     }
 
     initializeDatabase() {
-        const chatMessageTable = ` 
+        const table = ` 
             CREATE TABLE IF NOT EXISTS chatmessage (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 role TEXT CHECK(role IN ('user', 'assistant', 'system')) NOT NULL,
@@ -16,7 +16,7 @@ export class ChatMessageService {
                 FOREIGN KEY (chat_id) REFERENCES chat(id) ON DELETE CASCADE
             );
         `;
-        this.db.exec(chatMessageTable);
+        this.db.exec(table);
     };
 
     create({ role, content, images, chat_id } = {}) {    
@@ -43,7 +43,7 @@ export class ChatMessageService {
         }
     };
     
-    update({ role, content, images, id, chat_id } = {}) {        
+    update({ role, content, images } = {}, id, chat_id) {        
         if (!role || (!content && !images) || !id || !chat_id ) {
             throw new Error("Role, content/images, chat message ID, and chat ID are required to update a chat message.");
         }
@@ -55,7 +55,7 @@ export class ChatMessageService {
         }
     };
     
-    delete({ id, chat_id } = {}) {
+    delete(id, chat_id) {
         if (!id && !chat_id) {
             throw new Error("chat message ID and chat ID are required to delete a chat message.")
         }

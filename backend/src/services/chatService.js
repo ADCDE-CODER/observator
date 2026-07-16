@@ -5,7 +5,7 @@ export class ChatService {
     }
 
     initializeDatabase() {
-        const chatTable = `
+        const table = `
             CREATE TABLE IF NOT EXISTS chat (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 title TEXT NOT NULL,
@@ -14,7 +14,7 @@ export class ChatService {
                 FOREIGN KEY (user_id) REFERENCES user(id)
             );
         `;
-        this.db.exec(chatTable);
+        this.db.exec(table);
     };
 
     create({ title,  user_id } = {}) {    
@@ -41,7 +41,7 @@ export class ChatService {
         }
     };
     
-    update({ title, id, user_id } = {}) {        
+    update({ title } = {}, id, user_id ) {        
         if (!title || !id || !user_id) {
             throw new Error("Title, chat ID, and user ID are required to update a chat.");
         }
@@ -53,7 +53,7 @@ export class ChatService {
         }
     };
     
-    delete({ id, user_id } = {}) {
+    delete(id, user_id) {
         if (!id && !user_id) {
             throw new Error("chat ID and user ID are required to delete a chat.")
         }

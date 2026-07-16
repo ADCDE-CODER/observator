@@ -33,6 +33,7 @@ export class UserService {
         let validKeys = [];
         let validValues = [];
     
+        // Ensure casing matches DB schema strictly (snake_case)
         this.keys.forEach(key => {
             const value = userData[key];
             if (!value || value !== undefined) return;
