@@ -17,49 +17,49 @@ export class ChatService {
         this.db.exec(chatTable);
     };
 
-    create({ title,  userID } = {}) {    
-        if (!title || !userID) {
+    create({ title,  user_id } = {}) {    
+        if (!title || !user_id) {
             throw new Error("Title and user ID are required to create a chat.");
         }
     
         try {
-            return this.db.prepare("INSERT INTO chat(title, user_id) VALUES (?, ?)").run(title, userID);
+            return this.db.prepare("INSERT INTO chat(title, user_id) VALUES (?, ?)").run(title, user_id);
         } catch (error) {
             throw error;
         }
     };
     
-    read(userID) {
-        if (!userID) {
+    read(user_id) {
+        if (!user_id) {
             throw new Error("User ID is required to read chat(s).");
         }
 
         try {
-            return this.db.prepare("SELECT * FROM chat WHERE user_id = ? ORDER BY created_at ASC").all(userID);
+            return this.db.prepare("SELECT * FROM chat WHERE user_id = ? ORDER BY created_at ASC").all(user_id);
         } catch (error) {
             throw error;
         }
     };
     
-    update({ title, chatID, userID } = {}) {        
-        if (!title || !chatID || !userID) {
+    update({ title, id, user_id } = {}) {        
+        if (!title || !id || !user_id) {
             throw new Error("Title, chat ID, and user ID are required to update a chat.");
         }
 
         try {
-            return this.db.prepare("UPDATE chat SET title = ? WHERE id = ? AND user_id = ?").run(title, chatID, userID);
+            return this.db.prepare("UPDATE chat SET title = ? WHERE id = ? AND user_id = ?").run(title, id, user_id);
         } catch (error) {
             throw error;
         }
     };
     
-    delete({ chatID, userID } = {}) {
-        if (!chatID && !userID) {
+    delete({ id, user_id } = {}) {
+        if (!id && !user_id) {
             throw new Error("chat ID and user ID are required to delete a chat.")
         }
 
         try {
-            return this.db.prepare("DELETE FROM chat WHERE id = ? AND user_id = ?").run(chatID, userID);
+            return this.db.prepare("DELETE FROM chat WHERE id = ? AND user_id = ?").run(id, user_id);
         } catch (error) {
             throw error;
         }
