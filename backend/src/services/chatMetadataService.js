@@ -72,8 +72,8 @@ export class ChatMetadataService {
         }
     };
     
-    update(chatMetadata, chat_id) {
-        const { provider, model } = chatMetadata; 
+    update(chatMetadata) {
+        const { provider, model, chat_id } = chatMetadata; 
         
         if (!provider || !model) {
             const error = new Error("Provider and model are required to update a chat metadata.");
