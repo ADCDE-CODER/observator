@@ -6,7 +6,7 @@ export default class ChatMessageController {
         this.AIGenerationService = AIGenerationServiceInstance;
     }
 
-    create(req, res) {
+    async create(req, res) {
         const { content, images, chat_id } = req.body;
         const userRole = "user";
         const assistantRole = "assistant";
@@ -92,7 +92,7 @@ export default class ChatMessageController {
             let fullAssistantContent = "";
 
             try {
-                stream = await this.AIGenerationService.streamResponse(conversationContext, chatMetadata);
+                stream = await this.AIGenerationService.generateResponse(conversationContext, chatMetadata);
             } catch (error) {
                 console.error(error);
                 res.status(error.status || 500).json({message: error.message});
