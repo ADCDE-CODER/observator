@@ -1,4 +1,4 @@
-export class ChatMessageService {
+export class UserChatMessageService {
     constructor(db) {
         this.db = db;
         this.initializeDatabase();
@@ -8,7 +8,7 @@ export class ChatMessageService {
         const table = ` 
             CREATE TABLE IF NOT EXISTS chatmessage (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                role TEXT CHECK(role IN ('user', 'assistant', 'system')) NOT NULL,
+                role TEXT CHECK(role IN ('user')) NOT NULL,
                 content TEXT NOT NULL,
                 images TEXT,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
