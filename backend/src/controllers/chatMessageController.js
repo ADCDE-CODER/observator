@@ -42,6 +42,7 @@ export class ChatMessageController {
                 throw error;
             }
             
+            // New user content
             if(typeof images !== null) {
                 conversationContext.push({role: userRole, content: content, images: images});
             } else {
@@ -60,13 +61,16 @@ export class ChatMessageController {
             res.status(error.status || 500).json({message: error.message});
         }
 
-        // Streaming phase
+        // Get streaming from AI
         try {
             res.setHeader('Content-Type', 'text/event-stream');
             res.setHeader('Cache-Control', 'no-cache');
             res.setHeader('Connection', 'keep-alive');
 
-            let stream;
+            let stream = null;
+            let inThinking = false
+            let fullAssistantThinking = "";
+            let fullAssistantContent = "";
 
             try {
                 stream = await this.AIGenerationService.streamResponse(conversationContext, chatMetadata);
@@ -77,13 +81,31 @@ export class ChatMessageController {
 
             // Stream the content chunk by chunk
             for await (const chunk of stream) {
-                if (!chunk || !chunk.message || !chunk.message.content) {
+                if (!chunk || !chunk.message) {
                     continue;
                 }
 
-                fullAssistantMessageContent += chunk.message.content;
-                const dataToSend = { chunk: chunk.message.content };
-                res.write(`data: ${JSON.stringify(dataToSend)}\r\n\r\n`); 
+                let payload = {};
+
+                if(chunk.message.thinking) {
+                    if(!inThinking) {
+                        inThinking = true;
+                    }
+
+                    payload = { type: "thinking", text: chunk.message.thinking };
+                    fullAssistantThinking += chunk.message.thinking;
+                } else if (chunk.message.content) {
+                    if(inThinking) {
+                        inThinking = false;
+                    }
+
+                    payload = { type: "content", text: chunk.message.content };
+                    fullAssistantContent += chunk.message.content;
+                }
+
+                if (payload.type) {
+                    res.write(`data: ${JSON.stringify(payload)}\n\n`)
+                }
             }
             
             // End response when streaming is complete. 
