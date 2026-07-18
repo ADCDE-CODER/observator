@@ -1,75 +1,8 @@
-import { config } from "dotenv";
-import OpenAI from "openai";
-import { Ollama } from "ollama";
-
-config({ path: "./app/.env" });
-
-const openai = new OpenAI({ 
-    baseURL: "https://openrouter.ai/api/v1",
-    apiKey: process.env.API_KEY 
-});
-
-const ollama = new Ollama({
-    host: 'http://127.0.0.1:11434',
-    headers: {
-        Authorization: `Bearer ${process.env.API_KEY}`
-    }
-});
-
-const generateResponse = async (chatHistory, metadata)  => {
-    if (metadata.client === "openai") {
-        const openAICompletion = await client.chat.completions.create({
-            model: metadata.model,
-            reasoning: {
-                effort: metadata.effort,
-                max_tokens: metadata.reasoning_max_tokens,
-                exclude: metadata.exclude
-            },  
-            usage: {
-                include: metadata.include
-            },
-            stream: true,
-            max_tokens: metadata.max_tokens,
-            temperature: metadata.temperature,
-            seed: metadata.seed,
-            top_p: metadata.top_p,
-            top_k: metadata.top_k,
-            frequency_penalty: metadata.frequency_penalty,
-            presence_penalty: metadata.presence_penalty,
-            repetition_penalty: metadata.repetition_penalty,
-            logit_bias: metadata.logit_bias,
-            messages: chatHistory
-        })
-        
-        return openAICompletion.choices[0];
-    } else if (metadata.client === "ollama") {
-        const ollamaCompletion = await ollama.chat({
-            model: metadata.model,
-            messages: chatHistory,
-            options: {
-                //seed: 0,
-                //temperature: 0,
-                //top_k: 0,
-                //top_p: 0,
-                //min_p: 0,
-                //stop: "stop",
-                num_ctx: 16384,
-                num_predict: 16384
-            },
-            stream: true,
-            think: 'high'
-        });
-        
-        return ollamaCompletion;
-    } else {
-        throw new Error(`Unsupported client: ${client}. Must be 'openai' or 'ollama'.`);
-    }
-};
-
 export class ChatMessageController {
-    constructor(ChatMessageServiceInstance, chatMetadataServiceInstance) {
+    constructor(ChatMessageServiceInstance, chatMetadataServiceInstance, AIGenerationServiceInstance) {
         this.ChatMessageService = ChatMessageServiceInstance;
         this.chatMetadataService = chatMetadataServiceInstance;
+        this.AIGenerationService = AIGenerationServiceInstance;
     }
 
     create(req, res) {
@@ -136,7 +69,7 @@ export class ChatMessageController {
             let stream;
 
             try {
-                stream = await generateResponse(conversationContext, chatMetadata);
+                stream = await this.AIGenerationService.streamResponse(conversationContext, chatMetadata);
             } catch (error) {
                 console.error(error);
                 res.status(error.status || 500).json({message: error.message});
