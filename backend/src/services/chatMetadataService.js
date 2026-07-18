@@ -1,4 +1,4 @@
-export class ChatMetadataService {
+export default class ChatMetadataService {
     constructor(db) {
         this.db = db;
         this.keys = ['provider', 'model', 'system_content', 'think', 'temperature', 'top_k', 'top_p', 'min_p', 'context', 'predict'];

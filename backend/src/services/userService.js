@@ -1,4 +1,4 @@
-export class UserService {
+export default class UserService {
     constructor(db) {
         this.db = db;
         this.keys = ['email', 'password', 'username', 'first_name', 'last_name', 'street_address', 'postal_address', 'phone_number', 'date_of_birth'];

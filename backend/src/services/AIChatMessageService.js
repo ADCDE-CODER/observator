@@ -1,4 +1,4 @@
-export class AIChatMessageService {
+export default class AIChatMessageService {
     constructor(db) {
         this.db = db;
         this.initializeDatabase();

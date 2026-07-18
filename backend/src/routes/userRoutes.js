@@ -1,6 +1,6 @@
 import express from "express";
 
-export const setupUserRoutes = (userController) => {
+export default setupUserRoutes = (userController) => {
     const router = express.Router();
 
     router.post("/create", userController.create);

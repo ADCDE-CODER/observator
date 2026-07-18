@@ -4,7 +4,7 @@ import { config } from "dotenv";
 
 config({ path: "./app/.env" });
 
-class AIGenerationService {
+export default class AIGenerationService {
     constructor() {
         this.openai = new OpenAI({ 
             baseURL: "https://openrouter.ai/api/v1",

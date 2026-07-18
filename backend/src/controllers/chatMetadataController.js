@@ -1,4 +1,4 @@
-export class ChatMetadataController {
+export default class ChatMetadataController {
     constructor(ChatMetadataServiceInstance) {
         this.ChatMetadataService = ChatMetadataServiceInstance;
     }

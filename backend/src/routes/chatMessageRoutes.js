@@ -1,6 +1,6 @@
 import express from "express";
 
-export const setupChatMessageRoutes = (chatMessageController, verifyToken) => {
+export default setupChatMessageRoutes = (chatMessageController, verifyToken) => {
     const router = express.Router();
 
     router.post("/create", verifyToken, chatMessageController.create);

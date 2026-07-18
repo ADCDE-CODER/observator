@@ -1,6 +1,6 @@
 import { generateToken } from "../middleware/auth.js";
 
-export class UserController {
+export default class UserController {
     constructor(UserServiceInstance) {
         this.UserService = UserServiceInstance;
     }

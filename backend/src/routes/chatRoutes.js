@@ -1,6 +1,6 @@
 import express from "express";
 
-export const setupChatRoutes = (chatController) => {
+export default setupChatRoutes = (chatController) => {
     const router = express.Router();
 
     router.post("/create", chatController.create);

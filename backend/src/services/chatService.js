@@ -1,4 +1,4 @@
-export class ChatService {
+export default class ChatService {
     constructor(db) {
         this.db = db;
         this.initializeDatabase();

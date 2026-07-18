@@ -1,4 +1,4 @@
-export class ChatController {
+export default class ChatController {
     constructor(ChatServiceInstance) {
         this.ChatService = ChatServiceInstance;
     }

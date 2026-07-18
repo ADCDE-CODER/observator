@@ -1,4 +1,4 @@
-export class ChatMessageController {
+export default class ChatMessageController {
     constructor(UserChatMessageServiceInstance, AIChatMessageServiceInstance, chatMetadataServiceInstance, AIGenerationServiceInstance) {
         this.UserChatMessageService = UserChatMessageServiceInstance;
         this.AIChatMessageService = AIChatMessageServiceInstance;

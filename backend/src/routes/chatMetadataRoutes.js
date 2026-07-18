@@ -1,6 +1,6 @@
 import express from "express";
 
-export const setupChatMetadataRoutes = (chatMetadataController) => {
+export default setupChatMetadataRoutes = (chatMetadataController) => {
     const router = express.Router();
 
     router.post("/create", chatMetadataController.create);
