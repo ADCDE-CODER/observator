@@ -38,7 +38,7 @@ export default class UserService {
         // Ensure casing matches DB schema strictly (snake_case)
         this.keys.forEach(key => {
             const value = userData[key];
-            if (!value || value !== undefined) return;
+            if (!value || value === undefined) return;
 
             validKeys.push(key);
             validValues.push(value);
@@ -88,7 +88,7 @@ export default class UserService {
         // Ensure casing matches DB schema strictly (snake_case)
         this.keys.forEach(key => {
             const value = userData[key];
-            if (!value || value !== undefined) return;
+            if (!value || value === undefined) return;
 
             columns += `${key} = ?, `;
             validValues.push(value);

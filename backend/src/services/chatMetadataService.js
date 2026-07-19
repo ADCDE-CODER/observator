@@ -44,7 +44,7 @@ export default class ChatMetadataService {
         // Ensure casing matches DB schema strictly (snake_case)
         this.keys.forEach(key => {
             const value = chatMetadata[key];
-            if (!value || value !== undefined) return;
+            if (!value || value === undefined) return;
 
             validKeys.push(key);
             validValues.push(value);
@@ -91,7 +91,7 @@ export default class ChatMetadataService {
         // Ensure casing matches DB schema strictly (snake_case)
         this.keys.forEach(key => {
             const value = chatMetadata[key];
-            if (!value || value !== undefined) return;
+            if (!value || value === undefined) return;
 
             columns += `${key} = ?, `;
             validValues.push(value);
