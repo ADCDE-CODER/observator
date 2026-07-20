@@ -59,7 +59,13 @@ export default class ChatService {
         }
 
         try {
-            return this.db.prepare("UPDATE chat SET title = ? WHERE id = ? AND user_id = ?").run(title, id, user_id);
+            const chat = this.db.prepare("UPDATE chat SET title = ? WHERE id = ? AND user_id = ?").run(title, id, user_id);
+
+            if (!chat) {
+                throw new Error("Failed to update chat title");
+            }
+
+            return chat;
         } catch (error) {
             throw error;
         }
