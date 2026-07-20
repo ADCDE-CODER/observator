@@ -3,33 +3,32 @@ import jwt from "jsonwebtoken";
 
 config();
 
-const generateToken = (email) => {
-    if (!email) {
-        const error = new Error("Email is required to generate a token.");
+export const generateToken = (userData) => {
+    const { id, email } = userData; 
+    
+    if (!id || !email) {
+        const error = new Error("ID and Email are required to generate a token.");
         error.status = 400;
         throw error;
     }
 
-    return jwt.sign({email}, process.env.ACCESS_TOKEN_SECRET);
+    return jwt.sign({id, email}, process.env.ACCESS_TOKEN_SECRET);
 };
 
-function verifyToken(req, res, next) {
+export function verifyToken(req, res, next) {
     const authHeaders = req.headers['authorization'];
     const token = authHeaders && authHeaders.split(" ")[1];
     
-    if (token) {
-        try {
-            const decodedUserFromToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-            req.user = decodedUserFromToken;
-            next();
-        } catch (error) {
-            const errorMessage = `Invalid or expired token: ${error.message}`;
-            console.error(errorMessage);
-            res.status(403).json({success: false, error: errorMessage});
-        }  
-    } else {
-        return res.status(401).json({success: false, error: "Access denied: No token"});
+    if (!token) {
+        return res.status(401).json({message: "Access denied: No token"});
     }
-};
 
-export { generateToken, verifyToken };
+    try {
+        const decodedUserFromToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+        req.user = decodedUserFromToken;
+        next();
+    } catch (error) {
+        console.error(error);
+        res.status(401).json({message: "Invalid or expired token"});
+    }  
+};
