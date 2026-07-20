@@ -4,10 +4,10 @@ import { verifyToken } from "./../middleware/auth.js";
 const setupChatMessageRoutes = (chatMessageController) => {
     const router = express.Router();
 
-    router.post("/create", verifyToken, chatMessageController.create);
-    router.get("/read:id", chatMessageController.read);
-    router.put("/update:id", verifyToken, chatMessageController.update);
-    router.delete("/delete:id", chatMessageController.delete);
+    router.post("/", verifyToken, (req, res) => chatMessageController.create(req, res));
+    router.get("/", verifyToken, (req, res) => chatMessageController.read(req, res));
+    router.put("/", verifyToken, (req, res) => chatMessageController.update(req, res));
+    router.delete("/", verifyToken, (req, res) => chatMessageController.delete(req, res));
 
     return router;
 };
