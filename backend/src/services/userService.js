@@ -50,6 +50,12 @@ export default class UserService {
         try {
             this.db.prepare(`INSERT INTO user(${columns}) VALUES (${questionMarks})`).run(...validValues);
         } catch (error) {
+            if (error.code === "SQLITE_CONSTRAINT_UNIQUE") {
+                const err = new Error("User already exists.");
+                err.status = 400;
+                throw err;
+            }
+            
             throw error;
         }
     };
@@ -63,7 +69,19 @@ export default class UserService {
 
         try {
             const indentifier = email || username;
-            return this.db.prepare("SELECT id, email FROM user WHERE (email = ? OR username = ?) AND password = ?").get(indentifier, indentifier, password);
+            return this.db.prepare("SELECT id, email, username FROM user WHERE (email = ? OR username = ?) AND password = ?").get(indentifier, indentifier, password);
+        } catch (error) {
+            throw error;
+        }
+    };
+
+    get(id) {
+        if (!id) {
+            throw new Error("User ID is required to get a user.")
+        }
+
+        try {
+            return this.db.prepare("SELECT * FROM user WHERE id = ?").get(id);
         } catch (error) {
             throw error;
         }
