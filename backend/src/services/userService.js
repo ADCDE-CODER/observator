@@ -38,7 +38,7 @@ export default class UserService {
         // Ensure casing matches DB schema strictly (snake_case)
         this.keys.forEach(key => {
             const value = userData[key];
-            if (!value || value === undefined) return;
+            if (!value) return;
 
             validKeys.push(key);
             validValues.push(value);
@@ -51,7 +51,7 @@ export default class UserService {
             this.db.prepare(`INSERT INTO user(${columns}) VALUES (${questionMarks})`).run(...validValues);
         } catch (error) {
             if (error.code === "SQLITE_CONSTRAINT_UNIQUE") {
-                const err = new Error("User already exists.");
+                const err = new Error("Email or username already exists.");
                 err.status = 400;
                 throw err;
             }
@@ -69,7 +69,13 @@ export default class UserService {
 
         try {
             const indentifier = email || username;
-            return this.db.prepare("SELECT id, email, username FROM user WHERE (email = ? OR username = ?) AND password = ?").get(indentifier, indentifier, password);
+            const user = this.db.prepare("SELECT id, email, username FROM user WHERE (email = ? OR username = ?) AND password = ?").get(indentifier, indentifier, password);
+            
+            if (!user) {
+                throw new Error("Login failed.")
+            }
+
+            return user;
         } catch (error) {
             throw error;
         }
@@ -81,7 +87,13 @@ export default class UserService {
         }
 
         try {
-            return this.db.prepare("SELECT * FROM user WHERE id = ?").get(id);
+            const user = this.db.prepare("SELECT * FROM user WHERE id = ?").get(id);
+
+            if (!user) {
+                throw new Error("User not found.");
+            }
+
+            return user;
         } catch (error) {
             throw error;
         }
@@ -106,14 +118,20 @@ export default class UserService {
         // Ensure casing matches DB schema strictly (snake_case)
         this.keys.forEach(key => {
             const value = userData[key];
-            if (!value || value === undefined) return;
+            if (!value) return;
 
             columns += `${key} = ?, `;
             validValues.push(value);
         });
 
         try {
-            return this.db.prepare(`UPDATE user SET ${columns.splice(0, -1)} WHERE id = ?`).run(...validValues, id);
+            const user = this.db.prepare(`UPDATE user SET ${columns.splice(0, -1)} WHERE id = ?`).run(...validValues, id);
+
+            if (!user) {
+                throw new Error("Update failed.");
+            }
+
+            return user;
         } catch (error) {
             throw error;
         }
