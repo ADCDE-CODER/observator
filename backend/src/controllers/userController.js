@@ -21,8 +21,8 @@ export default class UserController {
         const { email, username, password } = req.body;
         
         try {
-            const user = this.UserService.read({email, username, password});
-            user.token = generateToken(email);
+            const userData = this.UserService.read({email, username, password});
+            user.token = generateToken(userData);
             res.status(200).json({message: "User read successfully", user}); 
         } catch (error) {
             console.error(error);
