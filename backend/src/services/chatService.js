@@ -46,6 +46,26 @@ export default class ChatService {
             throw error;
         }
     };
+
+    findById(chat_id, user_id) {
+        if (!chat_id || !user_id) {
+            throw new Error("Chat ID and user ID are required to get a chat.");
+        }
+
+        try {
+            const chat = this.db.prepare("SELECT id, user_id FROM chat WHERE chat_id = ? AND user_id = ?").all(chat_id, user_id);
+
+            if (!chat) {
+                const error = new Error("Chat not found.");
+                error.status = 404;
+                throw error;
+            }
+
+            return chat;
+        } catch (error) {
+            throw error;
+        }
+    };
     
     update({ title, id, user_id } = {}) {        
         if (!title) {
