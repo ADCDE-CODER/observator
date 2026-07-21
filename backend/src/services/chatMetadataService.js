@@ -44,7 +44,7 @@ export default class ChatMetadataService {
         // Ensure casing matches DB schema strictly (snake_case)
         this.keys.forEach(key => {
             const value = chatMetadata[key];
-            if (!value || value === undefined) return;
+            if (!value) return;
 
             validKeys.push(key);
             validValues.push(value);
@@ -91,14 +91,20 @@ export default class ChatMetadataService {
         // Ensure casing matches DB schema strictly (snake_case)
         this.keys.forEach(key => {
             const value = chatMetadata[key];
-            if (!value || value === undefined) return;
+            if (!value) return;
 
             columns += `${key} = ?, `;
             validValues.push(value);
         });
 
         try {
-            return this.db.prepare(`UPDATE chatmetadata SET ${columns.slice(0, -1)} WHERE chat_id = ?`).run(...validValues, chat_id);
+            const metadata = this.db.prepare(`UPDATE chatmetadata SET ${columns.slice(0, -1)} WHERE chat_id = ?`).run(...validValues, chat_id);
+
+            if(!metadata) {
+                throw new Error("Update failed.");
+            }
+
+            return metadata;
         } catch (error) {
             throw error;
         }

@@ -61,7 +61,13 @@ export default class UserChatMessageService {
         }
 
         try {
-            return this.db.prepare("UPDATE chatmessage SET role = ?, content = ?, images = ? WHERE id = ? AND chat_id = ?").run(role, content, images, id, chat_id);
+            const userChatMessage = this.db.prepare("UPDATE chatmessage SET role = ?, content = ?, images = ? WHERE id = ? AND chat_id = ?").run(role, content, images, id, chat_id);
+
+            if(!userChatMessage) {
+                throw new Error("Update failed.");
+            }
+
+            return userChatMessage;
         } catch (error) {
             throw error;
         }

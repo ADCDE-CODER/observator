@@ -63,7 +63,13 @@ export default class AIChatMessageService {
         }
 
         try {
-            return this.db.prepare("UPDATE chatmessage SET role = ?, content = ?, images = ? WHERE id = ? AND chat_id = ?").run(role, content, images, id, chat_id);
+            const assistantChatMessage = this.db.prepare("UPDATE chatmessage SET role = ?, content = ?, images = ? WHERE id = ? AND chat_id = ?").run(role, content, images, id, chat_id);
+
+            if(!assistantChatMessage) {
+                throw new Error("Update failed.");
+            }
+
+            return assistantChatMessage;
         } catch (error) {
             throw error;
         }
