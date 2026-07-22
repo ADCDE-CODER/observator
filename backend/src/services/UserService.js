@@ -4,10 +4,9 @@ export default class UserService {
     constructor(userModel) {
         this.userModel = userModel;
         this.keys = ['email', 'password', 'username', 'first_name', 'last_name', 'street_address', 'postal_address', 'phone_number', 'date_of_birth'];
-        this.initializeDatabase();
     }
 
-    create(userData) {
+    async create(userData) {
         const { email, password, username } = userData;
         
         if (!email || !password || !username) {
@@ -47,7 +46,7 @@ export default class UserService {
         }
     };
     
-    authenticate(userData) {
+    async authenticate(userData) {
         const { email, username, password } = userData;
 
         if ((!email && !username) || !password) {

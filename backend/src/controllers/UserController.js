@@ -5,11 +5,11 @@ export default class UserController {
         this.UserService = UserServiceInstance;
     }
 
-    signup(req, res) {
+    async signup(req, res) {
         const userData = req.body;
 
         try {
-            this.UserService.create(userData);
+            await this.UserService.create(userData);
             res.status(201).json({message: "User created successfully"});
         } catch (error) {
             console.error(error);
@@ -17,11 +17,11 @@ export default class UserController {
         }
     };
     
-    signin(req, res) {
+    async signin(req, res) {
         const userData = req.body;
         
         try {
-            const user = this.UserService.authenticate(userData);
+            const user = await this.UserService.authenticate(userData);
             user.token = generateToken(user);
             res.status(200).json({message: "User read successfully", user}); 
         } catch (error) {
