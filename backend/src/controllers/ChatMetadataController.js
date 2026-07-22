@@ -16,11 +16,11 @@ export default class ChatMetadataController {
         }
     };
     
-    read(req, res) {
+    getById(req, res) {
         const chatId = req.chat.id;
         
         try {
-            const metadata = this.ChatMetadataService.read(chatId);
+            const metadata = this.ChatMetadataService.getById(chatId);
             res.status(200).json({message: "Chat metadata read successfully", metadata}); 
         } catch (error) {
             console.error(error);
