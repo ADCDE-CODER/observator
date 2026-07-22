@@ -9,7 +9,7 @@ export default class UserController {
         const userData = req.body;
 
         try {
-            this.UserService.createUser(userData);
+            this.UserService.create(userData);
             res.status(201).json({message: "User created successfully"});
         } catch (error) {
             console.error(error);
@@ -21,7 +21,7 @@ export default class UserController {
         const userData = req.body;
         
         try {
-            const user = this.UserService.authenticateUser(userData);
+            const user = this.UserService.authenticate(userData);
             user.token = generateToken(user);
             res.status(200).json({message: "User read successfully", user}); 
         } catch (error) {
@@ -34,7 +34,7 @@ export default class UserController {
         const userId = req.user.id;
 
         try {
-            const user = this.UserService.getUserProfile(userId);
+            const user = this.UserService.getProfile(userId);
             res.status(200).json({message: "Successfully retrieved user", user});
         } catch (error) {
             console.error(error);
@@ -47,7 +47,7 @@ export default class UserController {
         const userId = req.user.id;
         
         try {
-            const user = this.UserService.updateUserProfile(userData, userId);
+            const user = this.UserService.updateProfile(userData, userId);
             res.status(200).json({message: "User updated successfully", user});
         } catch (error) {
             console.error(error);
@@ -59,7 +59,7 @@ export default class UserController {
         const userId = req.user.id;
         
         try {
-            this.UserService.deleteUser(userId);
+            this.UserService.delete(userId);
             res.status(200).json({message: "User deleted successfully"});
         } catch (error) {
             console.error(error);
