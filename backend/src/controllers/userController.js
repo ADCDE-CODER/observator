@@ -18,10 +18,10 @@ export default class UserController {
     };
     
     read(req, res) {
-        const { email, username, password } = req.body;
+        const userData = req.body;
         
         try {
-            const user = this.UserService.read({email, username, password});
+            const user = this.UserService.read(userData);
             user.token = generateToken(user);
             res.status(200).json({message: "User read successfully", user}); 
         } catch (error) {
@@ -31,10 +31,10 @@ export default class UserController {
     };
 
     get(req, res) {
-        const { id } = req.body;
+        const userId = req.user.id;
 
         try {
-            const user = this.UserService.get(id);
+            const user = this.UserService.get(userId);
             res.status(200).json({message: "Successfully retrieved user", user});
         } catch (error) {
             console.error(error);
@@ -44,9 +44,10 @@ export default class UserController {
 
     update(req, res) {
         const userData = req.body;
+        const userId = req.user.id;
         
         try {
-            const user = this.UserService.update(userData);
+            const user = this.UserService.update(userData, userId);
             res.status(200).json({message: "User updated successfully", user});
         } catch (error) {
             console.error(error);
@@ -55,10 +56,10 @@ export default class UserController {
     };
 
     delete(req, res) {
-        const { id } = req.body;
+        const userId = req.user.id;
         
         try {
-            this.UserService.delete(id);
+            this.UserService.delete(userId);
             res.status(200).json({message: "User deleted successfully"});
         } catch (error) {
             console.error(error);

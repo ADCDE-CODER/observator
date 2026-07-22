@@ -7,7 +7,8 @@ export default class ChatMessageController {
     }
 
     async create(req, res) {
-        const { content, images, chat_id } = req.body;
+        const { content, images } = req.body;
+        const chatId = req.chat.id;
         const userRole = "user";
         const assistantRole = "assistant";
 
@@ -15,8 +16,8 @@ export default class ChatMessageController {
         let chatHistory = [];
 
         try {
-            const userMessages = this.UserChatMessageService.read(chat_id);
-            const assistantMessages = this.AIChatMessageService.read(chat_id);
+            const userMessages = this.UserChatMessageService.read(chatId);
+            const assistantMessages = this.AIChatMessageService.read(chatId);
 
             const allMessages = [
                 ...userMessages.map(message => ({
@@ -74,7 +75,7 @@ export default class ChatMessageController {
         let chatMetadata = [];
 
         try {
-            chatMetadata = this.chatMetadataService.read(chat_id);
+            chatMetadata = this.chatMetadataService.read(chatId);
         } catch (error) {
             console.error(error);
             res.status(error.status || 500).json({message: error.message});
@@ -139,8 +140,8 @@ export default class ChatMessageController {
             console.log("Attempting to save data...");
             
             try {
-                this.UserChatMessageService.create({ role: userRole, content, images, chat_id });
-                this.AIChatMessageService.create({ role: assistantRole, thinking: fullAssistantThinking, content: fullAssistantContent, chat_id });
+                this.UserChatMessageService.create({ role: userRole, content, images }, chatId);
+                this.AIChatMessageService.create({ role: assistantRole, thinking: fullAssistantThinking, content: fullAssistantContent }, chatId);
                 
                 console.log("User and assistant message saved successfully.");
             } catch (error) {
@@ -151,10 +152,10 @@ export default class ChatMessageController {
     };
     
     read(req, res) {
-        const { chat_id } = req.body;
+        const chatId = req.chat.id;
         
         try {
-            const chatMessages = this.UserChatMessageService.read(chat_id);
+            const chatMessages = this.UserChatMessageService.read(chatId);
             res.status(200).json({message: "Chat message read successfully", chatMessages}); 
         } catch (error) {
             console.error(error);
@@ -163,10 +164,12 @@ export default class ChatMessageController {
     };
 
     update(req, res) {
-        const { role, content, images, id, chat_id } = req.body;
+        const chatMessageData = req.body;
+        const chatId = req.chat.id;
+        const chatMessageId = req.chatMessage.id;
         
         try {
-            const chatMessage = this.UserChatMessageService.update({ role, content, images, id, chat_id });
+            const chatMessage = this.UserChatMessageService.update(chatMessageData, chatMessageId, chatId);
             res.status(200).json({message: "Chat message updated successfully", chatMessage});
         } catch (error) {
             console.error(error);
@@ -175,10 +178,11 @@ export default class ChatMessageController {
     };
 
     delete(req, res) {
-        const { id, chat_id } = req.body;
+        const chatId = req.chat.id;
+        const chatMessageId = req.chatMessage.id;
         
         try {
-            this.UserChatMessageService.delete(id, chat_id);
+            this.UserChatMessageService.delete(chatMessageId, chatId);
             res.status(200).json({message: "Chat message deleted successfully"});
         } catch (error) {
             console.error(error);

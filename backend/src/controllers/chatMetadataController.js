@@ -5,9 +5,10 @@ export default class ChatMetadataController {
 
     create(req, res) {
         const chatMetadata = req.body;
+        const chatId = req.chat.id;
 
         try {
-            this.ChatMetadataService.create(chatMetadata);
+            this.ChatMetadataService.create(chatMetadata, chatId);
             res.status(201).json({message: "Chat metadata created successfully"});
         } catch (error) {
             console.error(error);
@@ -16,10 +17,10 @@ export default class ChatMetadataController {
     };
     
     read(req, res) {
-        const { chat_id } = req.body;
+        const chatId = req.chat.id;
         
         try {
-            const metadata = this.ChatMetadataService.read(chat_id);
+            const metadata = this.ChatMetadataService.read(chatId);
             res.status(200).json({message: "Chat metadata read successfully", metadata}); 
         } catch (error) {
             console.error(error);
@@ -29,9 +30,10 @@ export default class ChatMetadataController {
 
     update(req, res) {
         const chatMetadata = req.body;
+        const chatId = req.chat.id;
         
         try {
-            const metadata = this.ChatMetadataService.update(chatMetadata);
+            const metadata = this.ChatMetadataService.update(chatMetadata, chatId);
             res.status(200).json({message: "Chat metadata updated successfully", metadata});
         } catch (error) {
             console.error(error);
