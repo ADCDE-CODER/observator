@@ -1,7 +1,6 @@
 export default class ChatService {
     constructor(chatModel) {
         this.chatModel = chatModel;
-        this.initializeDatabase();
     }
 
     create(chatData, userId) {    
