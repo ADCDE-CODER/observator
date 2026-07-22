@@ -1,27 +1,11 @@
+import bcrypt from "bcrypt"; 
+
 export default class UserService {
-    constructor(db) {
-        this.db = db;
+    constructor(userModel) {
+        this.userModel = userModel;
         this.keys = ['email', 'password', 'username', 'first_name', 'last_name', 'street_address', 'postal_address', 'phone_number', 'date_of_birth'];
         this.initializeDatabase();
     }
-
-    initializeDatabase() {
-        const table = `
-            CREATE TABLE IF NOT EXISTS user (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                email TEXT NOT NULL UNIQUE,
-                password TEXT NOT NULL,
-                username TEXT NOT NULL UNIQUE,
-                first_name TEXT,
-                last_name TEXT,
-                street_address TEXT,
-                postal_address TEXT,
-                phone_number INTEGER UNIQUE,
-                date_of_birth INTEGER
-            );
-        `;
-        this.db.exec(table);
-    };
 
     create(userData) {
         const { email, password, username } = userData;
@@ -31,6 +15,9 @@ export default class UserService {
             error.status = 400;
             throw error;
         }
+
+        const saltRounds = 12;
+        userData.password = await bcrypt.hash(password, saltRounds);
         
         let validKeys = [];
         let validValues = [];
@@ -48,7 +35,7 @@ export default class UserService {
         const questionMarks = Array(validKeys.length).fill('?').join(', ');
 
         try {
-            this.db.prepare(`INSERT INTO user(${columns}) VALUES (${questionMarks})`).run(...validValues);
+            this.userModel.create(columns, questionMarks, validValues)
         } catch (error) {
             if (error.code === "SQLITE_CONSTRAINT_UNIQUE") {
                 const err = new Error("Email or username already exists.");
@@ -71,10 +58,13 @@ export default class UserService {
 
         try {
             const indentifier = email || username;
-            const user = this.db.prepare("SELECT id, email, username FROM user WHERE (email = ? OR username = ?) AND password = ?").get(indentifier, indentifier, password);
-            
-            if (!user) {
-                throw new Error("Login failed.")
+            const user = this.userModel.findByIdentifier(indentifier);
+            const vaildPassword = await bcrypt.compare(password, user.password);
+
+            if (!user || !vaildPassword) {
+                const error = new Error("Invalid email or password.")
+                error.status = 400;
+                throw error;
             }
 
             return user;
@@ -89,7 +79,7 @@ export default class UserService {
         }
 
         try {
-            const user = this.db.prepare("SELECT * FROM user WHERE id = ?").get(userId);
+            const user = this.userModel.findById(userId);
 
             if (!user) {
                 throw new Error("User not found.");
@@ -127,7 +117,7 @@ export default class UserService {
         });
 
         try {
-            const user = this.db.prepare(`UPDATE user SET ${columns.splice(0, -1)} WHERE id = ?`).run(...validValues, userId);
+            const user = this.userModel.update(columns, validValues, userId);
 
             if (!user) {
                 throw new Error("Update failed.");
@@ -145,7 +135,7 @@ export default class UserService {
         }
 
         try {
-            this.db.prepare("DELETE FROM user WHERE id = ?").run(userId);
+            this.userModel.delete(userId);
         } catch (error) {
             throw error;
         }
