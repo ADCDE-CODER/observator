@@ -17,43 +17,45 @@ export default class ChatService {
         this.db.exec(table);
     };
 
-    create({ title,  user_id } = {}) {    
+    create(chatData, userId) {    
+        const { title } = chatData;
+
         if (!title) {
             const error = new Error("Title is required to create a chat.");
             error.status = 400;
             throw error;
         }
         
-        if (!user_id) {
+        if (!userId) {
             throw new Error("User ID is required to create a chat.");
         }
     
         try {
-            this.db.prepare("INSERT INTO chat(title, user_id) VALUES (?, ?)").run(title, user_id);
+            this.db.prepare("INSERT INTO chat(title, user_id) VALUES (?, ?)").run(title, userId);
         } catch (error) {
             throw error;
         }
     };
     
-    read(user_id) {
-        if (!user_id) {
+    read(userId) {
+        if (!userId) {
             throw new Error("User ID is required to read chat(s).");
         }
 
         try {
-            return this.db.prepare("SELECT * FROM chat WHERE user_id = ? ORDER BY created_at ASC").all(user_id);
+            return this.db.prepare("SELECT * FROM chat WHERE user_id = ? ORDER BY created_at ASC").all(userId);
         } catch (error) {
             throw error;
         }
     };
 
-    findById(chat_id, user_id) {
-        if (!chat_id || !user_id) {
+    findById(chatId, userId) {
+        if (!chatId || !userId) {
             throw new Error("Chat ID and user ID are required to get a chat.");
         }
 
         try {
-            const chat = this.db.prepare("SELECT id, user_id FROM chat WHERE chat_id = ? AND user_id = ?").all(chat_id, user_id);
+            const chat = this.db.prepare("SELECT id, user_id FROM chat WHERE chat_id = ? AND user_id = ?").all(chatId, userId);
 
             if (!chat) {
                 const error = new Error("Chat not found.");
@@ -67,19 +69,21 @@ export default class ChatService {
         }
     };
     
-    update({ title, id, user_id } = {}) {        
+    update(chatData, chatId, userId) {        
+        const { title } = chatData;
+
         if (!title) {
             const error = new Error("Title is required to update a chat.");
             error.status = 400;
             throw error;
         }
         
-        if (!id || !user_id) {
+        if (!chatId || !userId) {
             throw new Error("Chat ID, and user ID are required to update a chat.");
         }
 
         try {
-            const chat = this.db.prepare("UPDATE chat SET title = ? WHERE id = ? AND user_id = ?").run(title, id, user_id);
+            const chat = this.db.prepare("UPDATE chat SET title = ? WHERE id = ? AND user_id = ?").run(title, chatId, userId);
 
             if (!chat) {
                 throw new Error("Failed to update chat title");
@@ -91,13 +95,13 @@ export default class ChatService {
         }
     };
     
-    delete(id, user_id) {
-        if (!id && !user_id) {
+    delete(chatId, userId) {
+        if (!chatId && !userId) {
             throw new Error("chat ID and user ID are required to delete a chat.")
         }
 
         try {
-            this.db.prepare("DELETE FROM chat WHERE id = ? AND user_id = ?").run(id, user_id);
+            this.db.prepare("DELETE FROM chat WHERE id = ? AND user_id = ?").run(chatId, userId);
         } catch (error) {
             throw error;
         }

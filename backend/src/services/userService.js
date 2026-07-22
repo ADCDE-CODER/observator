@@ -60,7 +60,9 @@ export default class UserService {
         }
     };
     
-    read({ email, username, password } = {}) {
+    read(userData) {
+        const { email, username, password } = userData;
+
         if ((!email && !username) || !password) {
             const error = new Error("Email or username, and password are required to read a user.");
             error.status = 400;
@@ -81,13 +83,13 @@ export default class UserService {
         }
     };
 
-    get(id) {
-        if (!id) {
+    get(userId) {
+        if (!userId) {
             throw new Error("User ID is required to get a user.")
         }
 
         try {
-            const user = this.db.prepare("SELECT * FROM user WHERE id = ?").get(id);
+            const user = this.db.prepare("SELECT * FROM user WHERE id = ?").get(userId);
 
             if (!user) {
                 throw new Error("User not found.");
@@ -99,8 +101,8 @@ export default class UserService {
         }
     };
     
-    update(userData) {
-        const { email, password, username, id } = userData;
+    update(userData, userId) {
+        const { email, password, username } = userData;
 
         if ((!email && !username) || !password) {
             const error = new Error("Email or username, and password are required to update a user.");
@@ -108,7 +110,7 @@ export default class UserService {
             throw error;
         }
         
-        if (!id) {
+        if (!userId) {
             throw new Error("User ID is required to update a user information.");
         }
 
@@ -125,7 +127,7 @@ export default class UserService {
         });
 
         try {
-            const user = this.db.prepare(`UPDATE user SET ${columns.splice(0, -1)} WHERE id = ?`).run(...validValues, id);
+            const user = this.db.prepare(`UPDATE user SET ${columns.splice(0, -1)} WHERE id = ?`).run(...validValues, userId);
 
             if (!user) {
                 throw new Error("Update failed.");
@@ -137,13 +139,13 @@ export default class UserService {
         }
     };
     
-    delete(id) {
-        if (!id) {
+    delete(userId) {
+        if (!userId) {
             throw new Error("User ID is required to delete a user.")
         }
 
         try {
-            this.db.prepare("DELETE FROM user WHERE id = ?").run(id);
+            this.db.prepare("DELETE FROM user WHERE id = ?").run(userId);
         } catch (error) {
             throw error;
         }

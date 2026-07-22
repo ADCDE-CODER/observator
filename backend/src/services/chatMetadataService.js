@@ -25,8 +25,8 @@ export default class ChatMetadataService {
         this.db.exec(table);
     };
 
-    create(chatMetadata) {
-        const { provider, model, chat_id } = chatMetadata; 
+    create(chatMetadata, chatId) {
+        const { provider, model } = chatMetadata; 
 
         if (!provider || !model) {
             const error = new Error("Provider and model are required to create a chat metadata.");
@@ -34,7 +34,7 @@ export default class ChatMetadataService {
             throw error;
         }
 
-        if (!chat_id) {
+        if (!chatId) {
             throw new Error("Chat ID is required to create a chat metadata.");
         }
 
@@ -60,20 +60,20 @@ export default class ChatMetadataService {
         }
     };
     
-    read(chat_id) {
-        if (!chat_id) {
+    read(chatId) {
+        if (!chatId) {
             throw new Error("Chat ID is required to read chat metadata.");
         }
 
         try {            
-            return this.db.prepare("SELECT * FROM chatmetadata WHERE chat_id = ?").all(chat_id);
+            return this.db.prepare("SELECT * FROM chatmetadata WHERE chat_id = ?").all(chatId);
         } catch (error) {
             throw error;
         }
     };
     
-    update(chatMetadata) {
-        const { provider, model, chat_id } = chatMetadata; 
+    update(chatMetadata, chatId) {
+        const { provider, model } = chatMetadata; 
         
         if (!provider || !model) {
             const error = new Error("Provider and model are required to update a chat metadata.");
@@ -81,7 +81,7 @@ export default class ChatMetadataService {
             throw error;
         }
         
-        if (!chat_id) {
+        if (!chatId) {
             throw new Error("Chat ID is required to update a chat metadata.");
         }
 
@@ -98,7 +98,7 @@ export default class ChatMetadataService {
         });
 
         try {
-            const metadata = this.db.prepare(`UPDATE chatmetadata SET ${columns.slice(0, -1)} WHERE chat_id = ?`).run(...validValues, chat_id);
+            const metadata = this.db.prepare(`UPDATE chatmetadata SET ${columns.slice(0, -1)} WHERE chat_id = ?`).run(...validValues, chatId);
 
             if(!metadata) {
                 throw new Error("Update failed.");
