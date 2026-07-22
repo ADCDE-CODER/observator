@@ -9,7 +9,7 @@ export default class ChatController {
         let chats;
 
         try {
-            chats = this.ChatService.read(userId);
+            chats = this.ChatService.getAll(userId);
         } catch (error) {
             console.error(error);
             res.status(error.status || 500).json({message: error.message});
@@ -22,7 +22,7 @@ export default class ChatController {
 
         try {
             this.ChatService.create(chatData, userId);
-            chats = this.ChatService.read(userId); // List of chats is uppdated
+            chats = this.ChatService.getAll(userId); // List of chats is uppdated
             const lastChatItem = chats[chats.length - 1];
             const chat = {lastChatItem};
 
@@ -33,11 +33,11 @@ export default class ChatController {
         }
     };
     
-    read(req, res) {
+    getAll(req, res) {
         const userId = req.user.id;
         
         try {
-            const chats = this.ChatService.read(userId);
+            const chats = this.ChatService.getAll(userId);
             res.status(200).json({message: "Chat read successfully", chats}); 
         } catch (error) {
             console.error(error);
