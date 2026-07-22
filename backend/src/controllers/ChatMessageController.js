@@ -1,7 +1,7 @@
 export default class ChatMessageController {
-    constructor(UserChatMessageServiceInstance, AIChatMessageServiceInstance, chatMetadataServiceInstance, AIGenerationServiceInstance) {
+    constructor(UserChatMessageServiceInstance, AssistantChatMessageServiceInstance, chatMetadataServiceInstance, AIGenerationServiceInstance) {
         this.UserChatMessageService = UserChatMessageServiceInstance;
-        this.AIChatMessageService = AIChatMessageServiceInstance;
+        this.AssistantChatMessageService = AssistantChatMessageServiceInstance;
         this.chatMetadataService = chatMetadataServiceInstance;
         this.AIGenerationService = AIGenerationServiceInstance;
     }
@@ -17,7 +17,7 @@ export default class ChatMessageController {
 
         try {
             const userMessages = this.UserChatMessageService.read(chatId);
-            const assistantMessages = this.AIChatMessageService.read(chatId);
+            const assistantMessages = this.AssistantChatMessageService.read(chatId);
 
             const allMessages = [
                 ...userMessages.map(message => ({
@@ -141,7 +141,7 @@ export default class ChatMessageController {
             
             try {
                 this.UserChatMessageService.create({ role: userRole, content, images }, chatId);
-                this.AIChatMessageService.create({ role: assistantRole, thinking: fullAssistantThinking, content: fullAssistantContent }, chatId);
+                this.AssistantChatMessageService.create({ role: assistantRole, thinking: fullAssistantThinking, content: fullAssistantContent }, chatId);
                 
                 console.log("User and assistant message saved successfully.");
             } catch (error) {
