@@ -5,11 +5,11 @@ export default class UserController {
         this.UserService = UserServiceInstance;
     }
 
-    create(req, res) {
+    signup(req, res) {
         const userData = req.body;
 
         try {
-            this.UserService.create(userData);
+            this.UserService.createUser(userData);
             res.status(201).json({message: "User created successfully"});
         } catch (error) {
             console.error(error);
@@ -17,11 +17,11 @@ export default class UserController {
         }
     };
     
-    read(req, res) {
+    signin(req, res) {
         const userData = req.body;
         
         try {
-            const user = this.UserService.read(userData);
+            const user = this.UserService.authenticateUser(userData);
             user.token = generateToken(user);
             res.status(200).json({message: "User read successfully", user}); 
         } catch (error) {
@@ -30,11 +30,11 @@ export default class UserController {
         }
     };
 
-    get(req, res) {
+    getProfile(req, res) {
         const userId = req.user.id;
 
         try {
-            const user = this.UserService.get(userId);
+            const user = this.UserService.getUserProfile(userId);
             res.status(200).json({message: "Successfully retrieved user", user});
         } catch (error) {
             console.error(error);
@@ -42,12 +42,12 @@ export default class UserController {
         }
     };
 
-    update(req, res) {
+    updateProfile(req, res) {
         const userData = req.body;
         const userId = req.user.id;
         
         try {
-            const user = this.UserService.update(userData, userId);
+            const user = this.UserService.updateUserProfile(userData, userId);
             res.status(200).json({message: "User updated successfully", user});
         } catch (error) {
             console.error(error);
@@ -55,11 +55,11 @@ export default class UserController {
         }
     };
 
-    delete(req, res) {
+    deleteAccount(req, res) {
         const userId = req.user.id;
         
         try {
-            this.UserService.delete(userId);
+            this.UserService.deleteUser(userId);
             res.status(200).json({message: "User deleted successfully"});
         } catch (error) {
             console.error(error);

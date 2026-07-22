@@ -7,7 +7,7 @@ export default class UserService {
         this.initializeDatabase();
     }
 
-    create(userData) {
+    createUser(userData) {
         const { email, password, username } = userData;
         
         if (!email || !password || !username) {
@@ -47,7 +47,7 @@ export default class UserService {
         }
     };
     
-    read(userData) {
+    authenticateUser(userData) {
         const { email, username, password } = userData;
 
         if ((!email && !username) || !password) {
@@ -73,7 +73,7 @@ export default class UserService {
         }
     };
 
-    get(userId) {
+    getUserProfile(userId) {
         if (!userId) {
             throw new Error("User ID is required to get a user.")
         }
@@ -91,7 +91,7 @@ export default class UserService {
         }
     };
     
-    update(userData, userId) {
+    updateUserProfile(userData, userId) {
         const { email, password, username } = userData;
 
         if ((!email && !username) || !password) {
@@ -129,7 +129,7 @@ export default class UserService {
         }
     };
     
-    delete(userId) {
+    deleteUser(userId) {
         if (!userId) {
             throw new Error("User ID is required to delete a user.")
         }
