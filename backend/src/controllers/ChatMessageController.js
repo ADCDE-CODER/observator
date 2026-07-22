@@ -16,7 +16,7 @@ export default class ChatMessageController {
         let chatHistory = [];
 
         try {
-            const userMessages = this.UserChatMessageService.read(chatId);
+            const userMessages = this.UserChatMessageService.getAll(chatId);
             const assistantMessages = this.AssistantChatMessageService.read(chatId);
 
             const allMessages = [
@@ -151,11 +151,11 @@ export default class ChatMessageController {
         }
     };
     
-    read(req, res) {
+    getAll(req, res) {
         const chatId = req.chat.id;
         
         try {
-            const chatMessages = this.UserChatMessageService.read(chatId);
+            const chatMessages = this.UserChatMessageService.getAll(chatId);
             res.status(200).json({message: "Chat message read successfully", chatMessages}); 
         } catch (error) {
             console.error(error);

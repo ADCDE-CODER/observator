@@ -1,23 +1,7 @@
 export default class UserChatMessageService {
-    constructor(db) {
-        this.db = db;
-        this.initializeDatabase();
+    constructor(UserChatMessage) {
+        this.userChatMessage = UserChatMessage;
     }
-
-    initializeDatabase() {
-        const table = ` 
-            CREATE TABLE IF NOT EXISTS userchatmessage (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                role TEXT CHECK(role IN ('user')) NOT NULL,
-                content TEXT NOT NULL,
-                images TEXT,
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                chat_id INTEGER NOT NULL,
-                FOREIGN KEY (chat_id) REFERENCES chat(id) ON DELETE CASCADE
-            );
-        `;
-        this.db.exec(table);
-    };
 
     create(chatMessageData, chatId) {    
         const { role, content, images } = chatMessageData;
@@ -33,19 +17,19 @@ export default class UserChatMessageService {
         }
     
         try {
-            this.db.prepare("INSERT INTO chatmessage(role, content, images, chat_id) VALUES (?, ?, ?, ?)").run(role, content, images, chatId);
+            this.userChatMessage.create(role, content, images, chatId);
         } catch (error) {
             throw error;
         }
     };
     
-    read(chatId) {
+    getAll(chatId) {
         if (!chatId) {
             throw new Error("Chat ID is required to read chat message(s).");
         }
 
         try {
-            return this.db.prepare("SELECT role, content, images created_at FROM chatmessage WHERE chat_id = ? ORDER BY created_at ASC").all(chatId);
+            return this.getAll(chatId);
         } catch (error) {
             throw error;
         }
@@ -65,7 +49,7 @@ export default class UserChatMessageService {
         }
 
         try {
-            const userChatMessage = this.db.prepare("UPDATE chatmessage SET role = ?, content = ?, images = ? WHERE id = ? AND chat_id = ?").run(role, content, images, chatMessageId, chatId);
+            const userChatMessage = this.userChatMessage.update(role, content, images, chatMessageId, chatId);
 
             if(!userChatMessage) {
                 throw new Error("Update failed.");
@@ -83,7 +67,7 @@ export default class UserChatMessageService {
         }
 
         try {
-            this.db.prepare("DELETE FROM chatmessage WHERE id = ? AND chat_id = ?").run(chatMessageId, chatId);
+            this.userChatMessage.delete(chatMessageId, chatId);
         } catch (error) {
             throw error;
         }
