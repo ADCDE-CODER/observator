@@ -1,25 +1,7 @@
 export default class AssistantChatMessageService {
-    constructor(db) {
-        this.db = db;
-        this.initializeDatabase();
+    constructor(assistantChatMessage) {
+        this.assistantChatMessage = assistantChatMessage;
     }
-
-    initializeDatabase() {
-        const table = ` 
-            CREATE TABLE IF NOT EXISTS assistantchatmessage (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                role TEXT CHECK(role IN ('assistant')) NOT NULL,
-                model TEXT,
-                thinking TEXT,
-                content TEXT NOT NULL,
-                images TEXT,
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                chat_id INTEGER NOT NULL,
-                FOREIGN KEY (chat_id) REFERENCES chat(id) ON DELETE CASCADE
-            );
-        `;
-        this.db.exec(table);
-    };
 
     create(chatMessageData, chatId) {    
         const { role, model, thinking, content, images } = chatMessageData;
@@ -35,19 +17,19 @@ export default class AssistantChatMessageService {
         }
     
         try {
-            this.db.prepare("INSERT INTO chatmessage(role, model, thinking, content, images, chat_id) VALUES (?, ?, ?, ?, ?, ?)").run(role, model, thinking, content, images, chatId);
+            this.assistantChatMessage.create(role, model, thinking, content, images, chatId);
         } catch (error) {
             throw error;
         }
     };
     
-    read(chatId) {
+    getAll(chatId) {
         if (!chatId) {
             throw new Error("Chat ID is required to read chat message(s).");
         }
 
         try {
-            return this.db.prepare("SELECT role, model, thinking, content, images created_at FROM chatmessage WHERE chat_id = ? ORDER BY created_at ASC").all(chatId);
+            return this.assistantChatMessage.getAll(chatId);
         } catch (error) {
             throw error;
         }
@@ -67,7 +49,7 @@ export default class AssistantChatMessageService {
         }
 
         try {
-            const assistantChatMessage = this.db.prepare("UPDATE chatmessage SET role = ?, content = ?, images = ? WHERE id = ? AND chat_id = ?").run(role, content, images, chatMessageId, chatId);
+            const assistantChatMessage = this.assistantChatMessage.update(role, content, images, chatMessageId, chatId);
 
             if(!assistantChatMessage) {
                 throw new Error("Update failed.");
@@ -85,7 +67,7 @@ export default class AssistantChatMessageService {
         }
 
         try {
-            this.db.prepare("DELETE FROM chatmessage WHERE id = ? AND chat_id = ?").run(chatMessageId, chatId);
+            this.assistantChatMessage.delete(chatMessageId, chatId);
         } catch (error) {
             throw error;
         }

@@ -17,7 +17,7 @@ export default class ChatMessageController {
 
         try {
             const userMessages = this.UserChatMessageService.getAll(chatId);
-            const assistantMessages = this.AssistantChatMessageService.read(chatId);
+            const assistantMessages = this.AssistantChatMessageService.getAll(chatId);
 
             const allMessages = [
                 ...userMessages.map(message => ({
