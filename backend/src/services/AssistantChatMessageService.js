@@ -6,7 +6,7 @@ export default class AssistantChatMessageService {
 
     initializeDatabase() {
         const table = ` 
-            CREATE TABLE IF NOT EXISTS chatmessage (
+            CREATE TABLE IF NOT EXISTS assistantchatmessage (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 role TEXT CHECK(role IN ('assistant')) NOT NULL,
                 model TEXT,
