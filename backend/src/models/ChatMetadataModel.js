@@ -29,7 +29,8 @@ export default class ChatMetadataModel {
     }
 
     findById(chatId) {
-        return this.db.prepare("SELECT * FROM chatmetadata WHERE chat_id = ?").all(chatId);
+        const rows = this.db.prepare("SELECT * FROM chatmetadata WHERE chat_id = ?").all(chatId);
+        return rows[0];
     }
 
     update(columns, values, userId) {

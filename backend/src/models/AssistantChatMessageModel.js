@@ -30,7 +30,8 @@ export default class AssistantChatMessageModel {
     }
 
     findById(chatMessageId, chatId) {
-        return this.db.prepare("SELECT id, chat_id FROM assistantchatmessage WHERE id = ? AND chat_id = ?").all(chatMessageId, chatId);
+        const rows = this.db.prepare("SELECT id, chat_id FROM assistantchatmessage WHERE id = ? AND chat_id = ?").all(chatMessageId, chatId);
+        return rows[0];
     }
 
     update(role, content, images, chatMessageId, chatId) {

@@ -26,7 +26,8 @@ export default class ChatModel {
     }
 
     findById(chatId, userId) {
-        return this.db.prepare("SELECT id, user_id FROM chat WHERE chat_id = ? AND user_id = ?").all(chatId, userId);
+        const rows = this.db.prepare("SELECT id, user_id FROM chat WHERE id = ? AND user_id = ?").all(chatId, userId);
+        return rows[0];
     }
 
     update(title, chatId, userId) {

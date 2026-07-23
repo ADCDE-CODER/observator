@@ -31,7 +31,8 @@ export default class UserModel {
     }
 
     findById(userId) {
-        return this.db.prepare("SELECT * FROM user WHERE id = ?").get(userId);
+        const rows = this.db.prepare("SELECT * FROM user WHERE id = ?").get(userId);
+        return rows[0];
     }
 
     update(columns, values, userId) {
