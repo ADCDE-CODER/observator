@@ -27,6 +27,10 @@ export default class UserChatMessageModel {
         return this.db.prepare("SELECT role, content, images created_at FROM userchatmessage WHERE chat_id = ? ORDER BY created_at ASC").all(chatId);
     }
 
+    findById(chatMessageId, chatId) {
+        return this.db.prepare("SELECT id, chat_id FROM userchatmessage WHERE id = ? AND chat_id = ?").all(chatMessageId, chatId);
+    }
+
     update(role, content, images, chatMessageId, chatId) {
         return this.db.prepare("UPDATE userchatmessage SET role = ?, content = ?, images = ? WHERE id = ? AND chat_id = ?").run(role, content, images, chatMessageId, chatId);
     }
