@@ -24,16 +24,12 @@ export default class ChatMetadataModel {
         this.db.exec(table);
     }
 
-    create(columns, questionMarks, values) {
-        this.db.prepare(`INSERT INTO chatmetadata(${columns}) VALUES (${questionMarks})`).run(...values);
-    }
-
     findById(chatId) {
         const rows = this.db.prepare("SELECT * FROM chatmetadata WHERE chat_id = ?").all(chatId);
         return rows[0];
     }
 
-    update(columns, values, userId) {
-        return this.db.prepare(`UPDATE chatmetadata SET ${columns.slice(0, -1)} WHERE chat_id = ?`).run(...values, userId);
+    update(columns, values, chatId) {
+        return this.db.prepare(`UPDATE chatmetadata SET ${columns} WHERE chat_id = ?`).run(...values, chatId);
     }
 }
