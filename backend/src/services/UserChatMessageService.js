@@ -29,7 +29,7 @@ export default class UserChatMessageService {
         }
 
         try {
-            return this.getAll(chatId);
+            return this.userChatMessage.getAll(chatId);
         } catch (error) {
             throw error;
         }

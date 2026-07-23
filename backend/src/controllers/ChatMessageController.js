@@ -75,7 +75,7 @@ export default class ChatMessageController {
         let chatMetadata = [];
 
         try {
-            chatMetadata = this.chatMetadataService.read(chatId);
+            chatMetadata = this.chatMetadataService.getById(chatId);
         } catch (error) {
             console.error(error);
             res.status(error.status || 500).json({message: error.message});

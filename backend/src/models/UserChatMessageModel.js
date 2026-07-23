@@ -24,7 +24,7 @@ export default class UserChatMessageModel {
     }
 
     getAll(chatId) {
-        return this.db.prepare("SELECT role, content, images created_at FROM userchatmessage WHERE chat_id = ? ORDER BY created_at ASC").all(chatId);
+        return this.db.prepare("SELECT role, content, images, created_at FROM userchatmessage WHERE chat_id = ? ORDER BY created_at ASC").all(chatId);
     }
 
     findById(chatMessageId, chatId) {
