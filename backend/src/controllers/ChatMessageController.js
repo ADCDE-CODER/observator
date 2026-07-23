@@ -1,8 +1,8 @@
 export default class ChatMessageController {
-    constructor(UserChatMessageServiceInstance, AssistantChatMessageServiceInstance, chatMetadataServiceInstance, AIGenerationServiceInstance) {
+    constructor(UserChatMessageServiceInstance, AssistantChatMessageServiceInstance, ChatMetadataServiceInstance, AIGenerationServiceInstance) {
         this.UserChatMessageService = UserChatMessageServiceInstance;
         this.AssistantChatMessageService = AssistantChatMessageServiceInstance;
-        this.chatMetadataService = chatMetadataServiceInstance;
+        this.ChatMetadataService = ChatMetadataServiceInstance;
         this.AIGenerationService = AIGenerationServiceInstance;
     }
 
@@ -75,7 +75,7 @@ export default class ChatMessageController {
         let chatMetadata = [];
 
         try {
-            chatMetadata = this.chatMetadataService.read(chatId);
+            chatMetadata = this.ChatMetadataService.read(chatId);
         } catch (error) {
             console.error(error);
             res.status(error.status || 500).json({message: error.message});
@@ -166,10 +166,11 @@ export default class ChatMessageController {
     update(req, res) {
         const chatMessageData = req.body;
         const chatId = req.chat.id;
-        const chatMessageId = req.chatMessage.id;
+        const userChatMessageId = req.userChatMessage.id;
+        const assistantChatMessageId = req.assistantChatMessage.id;
         
         try {
-            const chatMessage = this.UserChatMessageService.update(chatMessageData, chatMessageId, chatId);
+            const chatMessage = this.UserChatMessageService.update(chatMessageData, userChatMessageId, chatId);
             res.status(200).json({message: "Chat message updated successfully", chatMessage});
         } catch (error) {
             console.error(error);
@@ -179,10 +180,11 @@ export default class ChatMessageController {
 
     delete(req, res) {
         const chatId = req.chat.id;
-        const chatMessageId = req.chatMessage.id;
+        const userChatMessageId = req.userChatMessage.id;
+        const assistantChatMessageId = req.assistantChatMessage.id;
         
         try {
-            this.UserChatMessageService.delete(chatMessageId, chatId);
+            this.UserChatMessageService.delete(userChatMessageId, chatId);
             res.status(200).json({message: "Chat message deleted successfully"});
         } catch (error) {
             console.error(error);
