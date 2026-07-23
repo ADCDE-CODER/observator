@@ -62,7 +62,7 @@ export default class UserChatMessageService {
     };
     
     delete(chatMessageId, chatId) {
-        if (!chatMessageId && !chatId) {
+        if (!chatMessageId || !chatId) {
             throw new Error("Chat message ID and chat ID are required to delete a chat message.")
         }
 

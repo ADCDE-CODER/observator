@@ -62,7 +62,7 @@ export default class AssistantChatMessageService {
     };
     
     delete(chatMessageId, chatId) {
-        if (!chatMessageId && !chatId) {
+        if (!chatMessageId || !chatId) {
             throw new Error("chat message ID and chat ID are required to delete a chat message.")
         }
 
