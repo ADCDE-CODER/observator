@@ -1,9 +1,9 @@
 export default class ChatMessageController {
-    constructor(UserChatMessageServiceInstance, AssistantChatMessageServiceInstance, ChatMetadataServiceInstance, AIGenerationServiceInstance) {
-        this.UserChatMessageService = UserChatMessageServiceInstance;
-        this.AssistantChatMessageService = AssistantChatMessageServiceInstance;
-        this.ChatMetadataService = ChatMetadataServiceInstance;
-        this.AIGenerationService = AIGenerationServiceInstance;
+    constructor(userChatMessageService, assistantChatMessageService, chatMetadataService, aiGenerationService) {
+        this.userChatMessageService = userChatMessageService;
+        this.assistantChatMessageService = assistantChatMessageService;
+        this.chatMetadataService = chatMetadataService;
+        this.aiGenerationService = aiGenerationService;
     }
 
     async create(req, res) {
@@ -16,8 +16,8 @@ export default class ChatMessageController {
         let chatHistory = [];
 
         try {
-            const userMessages = this.UserChatMessageService.getAll(chatId);
-            const assistantMessages = this.AssistantChatMessageService.getAll(chatId);
+            const userMessages = this.userChatMessageService.getAll(chatId);
+            const assistantMessages = this.assistantChatMessageService.getAll(chatId);
 
             const allMessages = [
                 ...userMessages.map(message => ({
@@ -75,7 +75,7 @@ export default class ChatMessageController {
         let chatMetadata = [];
 
         try {
-            chatMetadata = this.ChatMetadataService.read(chatId);
+            chatMetadata = this.chatMetadataService.read(chatId);
         } catch (error) {
             console.error(error);
             res.status(error.status || 500).json({message: error.message});
@@ -93,7 +93,7 @@ export default class ChatMessageController {
             let fullAssistantContent = "";
 
             try {
-                stream = await this.AIGenerationService.generateResponse(conversationContext, chatMetadata);
+                stream = await this.aiGenerationService.generateResponse(conversationContext, chatMetadata);
             } catch (error) {
                 console.error(error);
                 res.status(error.status || 500).json({message: error.message});
@@ -140,8 +140,8 @@ export default class ChatMessageController {
             console.log("Attempting to save data...");
             
             try {
-                this.UserChatMessageService.create({ role: userRole, content, images }, chatId);
-                this.AssistantChatMessageService.create({ role: assistantRole, thinking: fullAssistantThinking, content: fullAssistantContent }, chatId);
+                this.userChatMessageService.create({ role: userRole, content, images }, chatId);
+                this.assistantChatMessageService.create({ role: assistantRole, thinking: fullAssistantThinking, content: fullAssistantContent }, chatId);
                 
                 console.log("User and assistant message saved successfully.");
             } catch (error) {
@@ -155,7 +155,7 @@ export default class ChatMessageController {
         const chatId = req.chat.id;
         
         try {
-            const chatMessages = this.UserChatMessageService.getAll(chatId);
+            const chatMessages = this.userChatMessageService.getAll(chatId);
             res.status(200).json({message: "Chat message read successfully", chatMessages}); 
         } catch (error) {
             console.error(error);
@@ -170,7 +170,7 @@ export default class ChatMessageController {
         const assistantChatMessageId = req.assistantChatMessage.id;
         
         try {
-            const chatMessage = this.UserChatMessageService.update(chatMessageData, userChatMessageId, chatId);
+            const chatMessage = this.userChatMessageService.update(chatMessageData, userChatMessageId, chatId);
             res.status(200).json({message: "Chat message updated successfully", chatMessage});
         } catch (error) {
             console.error(error);
@@ -184,7 +184,7 @@ export default class ChatMessageController {
         const assistantChatMessageId = req.assistantChatMessage.id;
         
         try {
-            this.UserChatMessageService.delete(userChatMessageId, chatId);
+            this.userChatMessageService.delete(userChatMessageId, chatId);
             res.status(200).json({message: "Chat message deleted successfully"});
         } catch (error) {
             console.error(error);

@@ -1,6 +1,6 @@
 export default class ChatMetadataController {
-    constructor(ChatMetadataServiceInstance) {
-        this.ChatMetadataService = ChatMetadataServiceInstance;
+    constructor(chatMetadataService) {
+        this.chatMetadataService = chatMetadataService;
     }
 
     create(req, res) {
@@ -8,7 +8,7 @@ export default class ChatMetadataController {
         const chatId = req.chat.id;
 
         try {
-            this.ChatMetadataService.create(chatMetadata, chatId);
+            this.chatMetadataService.create(chatMetadata, chatId);
             res.status(201).json({message: "Chat metadata created successfully"});
         } catch (error) {
             console.error(error);
@@ -20,7 +20,7 @@ export default class ChatMetadataController {
         const chatId = req.chat.id;
         
         try {
-            const metadata = this.ChatMetadataService.getById(chatId);
+            const metadata = this.chatMetadataService.getById(chatId);
             res.status(200).json({message: "Chat metadata read successfully", metadata}); 
         } catch (error) {
             console.error(error);
@@ -33,7 +33,7 @@ export default class ChatMetadataController {
         const chatId = req.chat.id;
         
         try {
-            const metadata = this.ChatMetadataService.update(chatMetadata, chatId);
+            const metadata = this.chatMetadataService.update(chatMetadata, chatId);
             res.status(200).json({message: "Chat metadata updated successfully", metadata});
         } catch (error) {
             console.error(error);
