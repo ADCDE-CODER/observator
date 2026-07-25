@@ -7,16 +7,16 @@ export default class ChatMetadataModel {
     initializeDatabase() {
         const table = `
             CREATE TABLE IF NOT EXISTS chatmetadata (
-                provider TEXT NOT NULL UNIQUE,
-                model TEXT NOT NULL,
+                provider TEXT NOT NULL DEFAULT 'ollama',
+                model TEXT NOT NULL DEFAULT 'gemma4:latest',
                 system_content TEXT,
-                think TEXT,
-                temperature REAL,
-                top_k INTEGER,
-                top_p REAL,
-                min_p REAL,
-                context INTEGER,
-                predict INTEGER,
+                think TEXT DEFAULT medium,
+                temperature REAL DEFAULT 0.7,
+                top_k INTEGER DEFAULT 50,
+                top_p REAL DEFAULT 0.9,
+                min_p REAL DEFAULT 0.05,
+                context INTEGER DEFAULT 4096,
+                predict INTEGER DEFAULT 2048,
                 chat_id INTEGER PRIMARY KEY,
                 FOREIGN KEY (chat_id) REFERENCES chat(id) ON DELETE CASCADE
             );

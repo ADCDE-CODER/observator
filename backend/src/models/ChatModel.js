@@ -18,7 +18,11 @@ export default class ChatModel {
     }
 
     create(title, userId) {
-        this.db.prepare("INSERT INTO chat(title, user_id) VALUES (?, ?)").run(title, userId);
+        const chat = this.db.prepare("INSERT INTO chat(title, user_id) VALUES (?, ?)").run(title, userId);
+        const chatId = chat.lastInsertRowid;
+
+        // Create a chat metadata with default values
+        this.db.prepare("INSERT INTO chatmetadata(chat_id) VALUES (?)").run(chatId);
     }
 
     getAll(userId) {
