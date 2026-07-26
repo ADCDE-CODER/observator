@@ -4,7 +4,7 @@ export default class AssistantChatMessageService {
     }
 
     create(chatMessageData, chatId) {    
-        const { role, model, thinking, content, images } = chatMessageData;
+        const { role, model, thinking, content, images, createdAt } = chatMessageData;
 
         if (!role || !content && !images) {
             const error = new Error("Role, content, and images are required to create a chat message.");
@@ -17,7 +17,7 @@ export default class AssistantChatMessageService {
         }
     
         try {
-            this.assistantChatMessage.create(role, model, thinking, content, images, chatId);
+            this.assistantChatMessage.create(role, model, thinking, content, images, createdAt, chatId);
         } catch (error) {
             throw error;
         }

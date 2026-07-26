@@ -4,7 +4,7 @@ export default class UserChatMessageService {
     }
 
     create(chatMessageData, chatId) {    
-        const { role, content, images } = chatMessageData;
+        const { role, content, images, createdAt } = chatMessageData;
         
         if (!role || !content && !images) {
             const error = new Error("Role, content, and images are required to create a chat message.");
@@ -17,7 +17,7 @@ export default class UserChatMessageService {
         }
     
         try {
-            this.userChatMessage.create(role, content, images, chatId);
+            this.userChatMessage.create(role, content, images, createdAt, chatId);
         } catch (error) {
             throw error;
         }

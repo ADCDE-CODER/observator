@@ -11,7 +11,7 @@ export default class UserChatMessageModel {
                 role TEXT CHECK(role IN ('user')) NOT NULL,
                 content TEXT NOT NULL,
                 images TEXT,
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                created_at TEXT,
                 chat_id INTEGER NOT NULL,
                 FOREIGN KEY (chat_id) REFERENCES chat(id) ON DELETE CASCADE
             );
@@ -19,12 +19,12 @@ export default class UserChatMessageModel {
         this.db.exec(table);
     }
 
-    create(role, content, images, chatId) {
-        this.db.prepare("INSERT INTO userchatmessage(role, content, images, chat_id) VALUES (?, ?, ?, ?)").run(role, content, images, chatId);
+    create(role, content, images, createdAt, chatId) {
+        this.db.prepare("INSERT INTO userchatmessage(role, content, images, created_at, chat_id) VALUES (?, ?, ?, ?, ?)").run(role, content, images, createdAt, chatId);
     }
 
     getAll(chatId) {
-        return this.db.prepare("SELECT role, content, images, created_at FROM userchatmessage WHERE chat_id = ? ORDER BY created_at ASC").all(chatId);
+        return this.db.prepare("SELECT * FROM userchatmessage WHERE chat_id = ? ORDER BY created_at ASC").all(chatId);
     }
 
     findById(chatMessageId, chatId) {

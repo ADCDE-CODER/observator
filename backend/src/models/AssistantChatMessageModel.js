@@ -13,7 +13,7 @@ export default class AssistantChatMessageModel {
                 thinking TEXT,
                 content TEXT NOT NULL,
                 images TEXT,
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                created_at TEXT,
                 chat_id INTEGER NOT NULL,
                 FOREIGN KEY (chat_id) REFERENCES chat(id) ON DELETE CASCADE
             );
@@ -21,12 +21,12 @@ export default class AssistantChatMessageModel {
         this.db.exec(table);
     }
 
-    create(role, model, thinking, content, images, chatId) {
-        this.db.prepare("INSERT INTO assistantchatmessage(role, model, thinking, content, images, chat_id) VALUES (?, ?, ?, ?, ?, ?)").run(role, model, thinking, content, images, chatId);
+    create(role, model, thinking, content, images, createdAt, chatId) {
+        this.db.prepare("INSERT INTO assistantchatmessage(role, model, thinking, content, images, created_at, chat_id) VALUES (?, ?, ?, ?, ?, ?, ?)").run(role, model, thinking, content, images, createdAt, chatId);
     }
 
     getAll(chatId) {
-        return this.db.prepare("SELECT role, model, thinking, content, images created_at FROM assistantchatmessage WHERE chat_id = ? ORDER BY created_at ASC").all(chatId);
+        return this.db.prepare("SELECT * FROM assistantchatmessage WHERE chat_id = ? ORDER BY created_at ASC").all(chatId);
     }
 
     findById(chatMessageId, chatId) {
