@@ -6,6 +6,37 @@ export default class ChatMessageController {
         this.aiGenerationService = aiGenerationService;
     }
 
+    #sortChatMessagesByCreatedAt(userMessages, assistantMessages, direction = "asc") {
+        const chatMessages = [
+            ...userMessages,
+            ...assistantMessages
+        ];
+
+        // Sort by created at 
+        return chatMessages.sort((a, b) => {
+            if (direction === "asc") {
+                return a.created_at - b.created_at;
+            } else {
+                return b.created_at - a-created_at;
+            }
+        });
+    }
+
+    #getChatMessages(req, res) {
+        const chatId = req.chat.id;
+
+        try {
+            const userMessages = this.userChatMessageService.getAll(chatId);
+            const assistantMessages = this.assistantChatMessageService.getAll(chatId);
+            const chatMessages = this.#sortChatMessagesByCreatedAt(userMessages, assistantMessages);
+
+            return chatMessages;
+        } catch (error) {
+            console.error(error);
+            res.status(error.status || 500).json({message: error.message})
+        }
+    }
+
     async create(req, res) {
         const { content, images } = req.body;
         const chatId = req.chat.id;
@@ -13,31 +44,7 @@ export default class ChatMessageController {
         const assistantRole = "assistant";
 
         // Reads chat history and builds the context array.
-        let chatHistory = [];
-
-        try {
-            const userMessages = this.userChatMessageService.getAll(chatId);
-            const assistantMessages = this.assistantChatMessageService.getAll(chatId);
-
-            const allMessages = [
-                ...userMessages.map(message => ({
-                    ...message
-                })),
-    
-                ...assistantMessages.map(message => ({
-                    ...message
-                }))
-            ];
-
-            // Sort by created at 
-            allMessages.sort((a, b) => a.created_at - b.created_at);
-
-            // Push all messages to chatHistory
-            chatHistory.push(...allMessages);
-        } catch (error) {
-            console.error(error);
-            res.status(error.status || 500).json({message: error.message})
-        }
+        const chatHistory = this.#getChatMessages(req, res);
 
         // Load all chat history from database and store all in conversation contexts 
         let conversationContext = [];
@@ -82,6 +89,9 @@ export default class ChatMessageController {
         }
 
         // Get streaming from AI
+        let fullAssistantThinking = "";
+        let fullAssistantContent = "";
+
         try {
             res.setHeader('Content-Type', 'text/event-stream');
             res.setHeader('Cache-Control', 'no-cache');
@@ -89,8 +99,6 @@ export default class ChatMessageController {
 
             let stream = null;
             let inThinking = false
-            let fullAssistantThinking = "";
-            let fullAssistantContent = "";
 
             try {
                 stream = await this.aiGenerationService.generateResponse(conversationContext, chatMetadata);
@@ -152,15 +160,8 @@ export default class ChatMessageController {
     };
     
     getAll(req, res) {
-        const chatId = req.chat.id;
-        
-        try {
-            const chatMessages = this.userChatMessageService.getAll(chatId);
-            res.status(200).json({message: "Chat message read successfully", chatMessages}); 
-        } catch (error) {
-            console.error(error);
-            res.status(error.status || 500).json({message: error.message})
-        }
+        const chatMessages = this.#getChatMessages(req, res);
+        res.status(200).json({message: "Chat message read successfully", chatMessages}); 
     };
 
     update(req, res) {
