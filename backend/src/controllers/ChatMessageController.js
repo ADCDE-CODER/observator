@@ -14,10 +14,13 @@ export default class ChatMessageController {
 
         // Sort by created at 
         return chatMessages.sort((a, b) => {
+            const dateA = new Date(a.created_at);
+            const dateB = new Date(b.created_at);
+
             if (direction === "asc") {
-                return a.created_at - b.created_at;
+                return dateA - dateB;
             } else {
-                return b.created_at - a-created_at;
+                return dateB - dateA;
             }
         });
     }
