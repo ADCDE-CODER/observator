@@ -26,14 +26,14 @@ export default class AIGenerationService {
             throw error;
         }
         
-        if (!metadata.client || !metadata.model) {
+        if (!metadata.provider || !metadata.model) {
             const error = new Error("Invalid metadata configuration");
             error.status = 400;
             throw error;
         }
 
         try {
-            if (metadata.client.toLowerCase() === "openai") {
+            if (metadata.provider.toLowerCase() === "openai") {
                 const openAICompletion = await this.openai.chat.completions.create({
                     model: metadata.model,
                     reasoning: {
@@ -57,7 +57,7 @@ export default class AIGenerationService {
                 })
                 
                 return openAICompletion.choices[0];
-            } else if (metadata.client.toLowerCase() === "ollama") {
+            } else if (metadata.provider.toLowerCase() === "ollama") {
                 const ollamaCompletion = await this.ollama.chat({
                     model: metadata.model,
                     messages: chatMessages,
@@ -75,7 +75,7 @@ export default class AIGenerationService {
                 
                 return ollamaCompletion;
             } else {
-                const error = new Error(`Unsupported client: ${client}.`);
+                const error = new Error(`Unsupported provider: ${metadata.provider}.`);
                 error.status = 400;
                 throw error;
             }
