@@ -41,74 +41,40 @@ export default class ChatMessageController {
     }
 
     async create(req, res) {
-        const { content, images } = req.body;
+        const userChatMessage = req.body;
         const chatId = req.chat.id;
-        const userRole = "user";
-        const assistantRole = "assistant";
 
-        // Reads chat history and builds the context array.
-        const chatHistory = this.#getChatMessages(req, res);
+        const chatMessages = this.#getChatMessages(req, res);
 
-        // Load all chat history from database and store all in conversation contexts 
-        let conversationContext = [];
+        // Get only role, content, and images
+        const conversationContext = chatMessages.map(({role, content, images}) => {
+            return {role, content, images};
+        });
+        conversationContext.push({role: userChatMessage.role, content: userChatMessage.content, images: userChatMessage.images});
 
-        try {
-            if (chatHistory && chatHistory.length > 0) {
-                chatHistory.forEach(message => {
-                    if(typeof message.images !== null) {
-                        conversationContext.push({ role: message.role, thinking: message.thinking, content: message.content, images: message.images });
-                    } else {
-                        conversationContext.push({ role: message.role, thinking: message.thinking, content: message.content });
-                    }
-                });
-            }
-
-            // Store new user content in conversation context
-            if(typeof content === null) {
-                const error = new Error("Context is required");
-                error.status = 400;
-                throw error;
-            }
-            
-            // New user content
-            if(typeof images !== null) {
-                conversationContext.push({role: userRole, content: content, images: images});
-            } else {
-                conversationContext.push({role: userRole, content: content});
-            }
-        } catch (error) {
-            console.error(error);
-            res.status(error.status || 500).json({message: error.message});
-        }
-
-        // Get chat metadata
-        let chatMetadata = [];
-
-        try {
-            chatMetadata = this.chatMetadataService.getById(chatId);
-        } catch (error) {
-            console.error(error);
-            res.status(error.status || 500).json({message: error.message});
-        }
-
+        // Initialize the property as an empty string prevent undefined
+        let assistantChatMessage = {
+            thinking: "",
+            content: ""
+        };
+        
         // Get streaming from AI
-        let fullAssistantThinking = "";
-        let fullAssistantContent = "";
-
         try {
             res.setHeader('Content-Type', 'text/event-stream');
             res.setHeader('Cache-Control', 'no-cache');
             res.setHeader('Connection', 'keep-alive');
 
             let stream = null;
-            let inThinking = false
 
             try {
+                const chatMetadata = this.chatMetadataService.getById(chatId);
                 stream = await this.aiGenerationService.generateResponse(conversationContext, chatMetadata);
             } catch (error) {
                 console.error(error);
                 res.status(error.status || 500).json({message: error.message});
             }
+
+            let inThinking = false
 
             // Stream the content chunk by chunk
             for await (const chunk of stream) {
@@ -123,19 +89,25 @@ export default class ChatMessageController {
                         inThinking = true;
                     }
 
-                    payload = { type: "thinking", text: chunk.message.thinking };
-                    fullAssistantThinking += chunk.message.thinking;
+                    payload = { model: chunk.model, type: "thinking", text: chunk.message.thinking };
+                    assistantChatMessage.thinking += chunk.message.thinking;
                 } else if (chunk.message.content) {
                     if(inThinking) {
                         inThinking = false;
                     }
 
-                    payload = { type: "content", text: chunk.message.content };
-                    fullAssistantContent += chunk.message.content;
+                    payload = { model: chunk.model, type: "content", text: chunk.message.content };
+                    assistantChatMessage.content += chunk.message.content;
                 }
 
                 if (payload.type) {
-                    res.write(`data: ${JSON.stringify(payload)}\n\n`)
+                    res.write(`data: ${JSON.stringify(payload)}\n\n`);
+                }
+
+                if (chunk.done) {
+                    assistantChatMessage.role = chunk.message.role;
+                    assistantChatMessage.model = chunk.model;
+                    assistantChatMessage.createdAt = chunk.created_at
                 }
             }
             
@@ -151,8 +123,8 @@ export default class ChatMessageController {
             console.log("Attempting to save data...");
             
             try {
-                this.userChatMessageService.create({ role: userRole, content, images }, chatId);
-                this.assistantChatMessageService.create({ role: assistantRole, thinking: fullAssistantThinking, content: fullAssistantContent }, chatId);
+                this.userChatMessageService.create(userChatMessage, chatId);
+                this.assistantChatMessageService.create(assistantChatMessage, chatId);
                 
                 console.log("User and assistant message saved successfully.");
             } catch (error) {
