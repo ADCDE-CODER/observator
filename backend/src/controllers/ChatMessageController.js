@@ -44,12 +44,7 @@ export default class ChatMessageController {
         const userChatMessage = req.body;
         const chatId = req.chat.id;
 
-        const chatMessages = this.#getChatMessages(req, res);
-
-        // Get only role, content, and images
-        const conversationContext = chatMessages.map(({role, content, images}) => {
-            return {role, content, images};
-        });
+        const conversationContext = this.#getChatMessages(req, res);
         conversationContext.push({role: userChatMessage.role, content: userChatMessage.content, images: userChatMessage.images});
 
         // Initialize the property as an empty string prevent undefined
