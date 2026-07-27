@@ -25,12 +25,27 @@ export default class AIGenerationService {
             error.status = 400;
             throw error;
         }
-        
+
+        if (chatMessages.length !== 0) {
+            const lastIndex = chatMessages.length - 1;
+
+            if (!chatMessages[lastIndex].content) {
+                const error = new Error("Content is required");
+                error.status = 400;
+                throw error;
+            }
+        }
+   
         if (!metadata.provider || !metadata.model) {
             const error = new Error("Invalid metadata configuration");
             error.status = 400;
             throw error;
         }
+
+        // Get only role, content, and images
+        chatMessages = chatMessages.map(({role, content, images}) => {
+            return {role, content, images};
+        });
 
         try {
             if (metadata.provider.toLowerCase() === "openai") {
