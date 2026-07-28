@@ -19,7 +19,7 @@ export default class AIGenerationService {
         });
     }
     
-    async generateResponse(chatMessages, metadata) {
+    async *generateResponse(chatMessages, metadata) {
         if (!chatMessages) {
             const error = new Error("Chat messages are required");
             error.status = 400;
@@ -73,7 +73,7 @@ export default class AIGenerationService {
                 
                 return openAICompletion.choices[0];
             } else if (metadata.provider.toLowerCase() === "ollama") {
-                const ollamaCompletion = await this.ollama.chat({
+                const streamOllama = await this.ollama.chat({
                     model: metadata.model,
                     messages: chatMessages,
                     options: {
@@ -87,8 +87,35 @@ export default class AIGenerationService {
                     stream: true,
                     think: metadata.think
                 });
-                
-                return ollamaCompletion;
+
+                let inThinking = false
+
+                // Stream the content chunk by chunk
+                for await (const chunk of streamOllama) {
+                    if (!chunk || !chunk.message) {
+                        continue;
+                    }
+
+                    if(chunk.message.thinking) {
+                        if(!inThinking) {
+                            inThinking = true;
+                            yield { model: chunk.model, type: "thinking", text: "Thinking:\n" };
+                        }
+
+                        yield { model: chunk.model, type: "thinking", text: chunk.message.thinking };
+                    } else if (chunk.message.content) {
+                        if(inThinking) {
+                            inThinking = false;
+                            yield { model: chunk.model, type: "thinking", text: "\n\nAnswer:\n" };
+                        }
+                        
+                        yield { model: chunk.model, type: "content", text: chunk.message.content };
+                    }
+
+                    if (chunk.done) {
+                        yield { done: chunk.done, role: chunk.message.role, model: chunk.model, createdAt: chunk.created_at };
+                    }
+                }
             } else {
                 const error = new Error(`Unsupported provider: ${metadata.provider}.`);
                 error.status = 400;
@@ -97,5 +124,5 @@ export default class AIGenerationService {
         } catch (error) {
             throw error;
         }
-    };
+    }
 }

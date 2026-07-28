@@ -30,55 +30,32 @@ export default class ChatMessageController {
             res.setHeader('Cache-Control', 'no-cache');
             res.setHeader('Connection', 'keep-alive');
 
-            let stream = null;
-
             try {
                 const chatMetadata = this.chatMetadataService.getById(chatId);
-                stream = await this.aiGenerationService.generateResponse(conversationContext, chatMetadata);
+                const generator = await this.aiGenerationService.generateResponse(conversationContext, chatMetadata);
+
+                for await (const event of generator) {
+                    if (event.type === "thinking") {
+                        res.write(`data: ${JSON.stringify(event)}\n\n`);
+                        assistantChatMessage.thinking += event.text;
+                    } else if (event.type === "content") {
+                        res.write(`data: ${JSON.stringify(event)}\n\n`);
+                        assistantChatMessage.content += event.text;
+                    }
+
+                    if (event.done) {
+                        assistantChatMessage.role = event.role;
+                        assistantChatMessage.model = event.model;
+                        assistantChatMessage.createdAt = event.createdAt;
+                    }
+                }
+                
+                // End response when streaming is complete. 
+                res.end();
             } catch (error) {
                 console.error(error);
                 res.status(error.status || 500).json({message: error.message});
             }
-
-            let inThinking = false
-
-            // Stream the content chunk by chunk
-            for await (const chunk of stream) {
-                if (!chunk || !chunk.message) {
-                    continue;
-                }
-
-                let payload = {};
-
-                if(chunk.message.thinking) {
-                    if(!inThinking) {
-                        inThinking = true;
-                    }
-
-                    payload = { model: chunk.model, type: "thinking", text: chunk.message.thinking };
-                    assistantChatMessage.thinking += chunk.message.thinking;
-                } else if (chunk.message.content) {
-                    if(inThinking) {
-                        inThinking = false;
-                    }
-
-                    payload = { model: chunk.model, type: "content", text: chunk.message.content };
-                    assistantChatMessage.content += chunk.message.content;
-                }
-
-                if (payload.type) {
-                    res.write(`data: ${JSON.stringify(payload)}\n\n`);
-                }
-
-                if (chunk.done) {
-                    assistantChatMessage.role = chunk.message.role;
-                    assistantChatMessage.model = chunk.model;
-                    assistantChatMessage.createdAt = chunk.created_at
-                }
-            }
-            
-            // End response when streaming is complete. 
-            res.end();
         } catch (error) {
             console.error(error);
             
