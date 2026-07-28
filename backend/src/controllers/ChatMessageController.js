@@ -9,15 +9,6 @@ export default class ChatMessageController {
         const userChatMessage = req.body;
         const chatId = req.chat.id;
 
-        let conversationContext = [];
-        try {
-            conversationContext = this.chatMessageService.getChatMessages(chatId);
-            conversationContext.push({role: userChatMessage.role, content: userChatMessage.content, images: userChatMessage.images});
-        } catch (error) {
-            console.error(error);
-            res.status(error.status || 500).json({message: error.message})
-        }
-
         // Initialize the property as an empty string prevent undefined
         let assistantChatMessage = {
             thinking: "",
@@ -31,6 +22,8 @@ export default class ChatMessageController {
             res.setHeader('Connection', 'keep-alive');
 
             try {
+                const conversationContext = this.chatMessageService.getChatMessages(chatId);
+                conversationContext.push({role: userChatMessage.role, content: userChatMessage.content, images: userChatMessage.images});
                 const chatMetadata = this.chatMetadataService.getById(chatId);
                 const generator = await this.aiGenerationService.generateResponse(conversationContext, chatMetadata);
 
