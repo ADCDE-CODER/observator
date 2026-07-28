@@ -1,51 +1,22 @@
 export default class ChatMessageController {
-    constructor(userChatMessageService, assistantChatMessageService, chatMetadataService, aiGenerationService) {
-        this.userChatMessageService = userChatMessageService;
-        this.assistantChatMessageService = assistantChatMessageService;
+    constructor(chatMessageService, chatMetadataService, aiGenerationService) {
+        this.chatMessageService = chatMessageService;
         this.chatMetadataService = chatMetadataService;
         this.aiGenerationService = aiGenerationService;
-    }
-
-    #sortChatMessagesByCreatedAt(userMessages, assistantMessages, direction = "asc") {
-        const chatMessages = [
-            ...userMessages,
-            ...assistantMessages
-        ];
-
-        // Sort by created at 
-        return chatMessages.sort((a, b) => {
-            const dateA = new Date(a.created_at);
-            const dateB = new Date(b.created_at);
-
-            if (direction === "asc") {
-                return dateA - dateB;
-            } else {
-                return dateB - dateA;
-            }
-        });
-    }
-
-    #getChatMessages(req, res) {
-        const chatId = req.chat.id;
-
-        try {
-            const userMessages = this.userChatMessageService.getAll(chatId);
-            const assistantMessages = this.assistantChatMessageService.getAll(chatId);
-            const chatMessages = this.#sortChatMessagesByCreatedAt(userMessages, assistantMessages);
-
-            return chatMessages;
-        } catch (error) {
-            console.error(error);
-            res.status(error.status || 500).json({message: error.message})
-        }
     }
 
     async create(req, res) {
         const userChatMessage = req.body;
         const chatId = req.chat.id;
 
-        const conversationContext = this.#getChatMessages(req, res);
-        conversationContext.push({role: userChatMessage.role, content: userChatMessage.content, images: userChatMessage.images});
+        let conversationContext = [];
+        try {
+            conversationContext = this.chatMessageService.getChatMessages(chatId);
+            conversationContext.push({role: userChatMessage.role, content: userChatMessage.content, images: userChatMessage.images});
+        } catch (error) {
+            console.error(error);
+            res.status(error.status || 500).json({message: error.message})
+        }
 
         // Initialize the property as an empty string prevent undefined
         let assistantChatMessage = {
@@ -118,9 +89,7 @@ export default class ChatMessageController {
             console.log("Attempting to save data...");
             
             try {
-                this.userChatMessageService.create(userChatMessage, chatId);
-                this.assistantChatMessageService.create(assistantChatMessage, chatId);
-                
+                this.chatMessageService.create(userChatMessage, assistantChatMessage, chatId);
                 console.log("User and assistant message saved successfully.");
             } catch (error) {
                 console.error(error);
@@ -130,8 +99,15 @@ export default class ChatMessageController {
     };
     
     getAll(req, res) {
-        const chatMessages = this.#getChatMessages(req, res);
-        res.status(200).json({message: "Chat message read successfully", chatMessages}); 
+        const chatId = req.chat.id;
+
+        try {            
+            const chatMessages = this.chatMessageService.getChatMessages(chatId);
+            res.status(200).json({message: "Chat message read successfully", chatMessages});
+        } catch (error) {
+            console.error(error);
+            res.status(error.status || 500).json({message: error.message})
+        } 
     };
 
     update(req, res) {
@@ -141,7 +117,7 @@ export default class ChatMessageController {
         const assistantChatMessageId = req.assistantChatMessage.id;
         
         try {
-            const chatMessage = this.userChatMessageService.update(chatMessageData, userChatMessageId, chatId);
+            const chatMessage = this.chatMessageService.update(chatMessageData, userChatMessageId, assistantChatMessageId, chatId)
             res.status(200).json({message: "Chat message updated successfully", chatMessage});
         } catch (error) {
             console.error(error);
@@ -155,7 +131,7 @@ export default class ChatMessageController {
         const assistantChatMessageId = req.assistantChatMessage.id;
         
         try {
-            this.userChatMessageService.delete(userChatMessageId, chatId);
+            this.chatMessageService.delete(userChatMessageId, assistantChatMessageId, chatId);
             res.status(200).json({message: "Chat message deleted successfully"});
         } catch (error) {
             console.error(error);
