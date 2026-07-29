@@ -33,7 +33,17 @@ export default class ChatMessageService {
         const assistantMessages = this.assistantChatMessageService.getAll(chatId);
         const chatMessages = this.#sortChatMessagesByCreatedAt(userMessages, assistantMessages);
 
-        return chatMessages;
+        const cleanedChatMessages = chatMessages.map(chatMessage => {
+            const { created_at, chat_id, ...rest } = chatMessage;
+
+            return {
+                ...rest,
+                chatId: chat_id,
+                createdAt: created_at
+            };
+        });
+
+        return cleanedChatMessages;
     }
 
     // TODO: Update for user and assistant
