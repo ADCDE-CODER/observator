@@ -99,17 +99,17 @@ export default class AIGenerationService {
                     if(chunk.message.thinking) {
                         if(!inThinking) {
                             inThinking = true;
-                            yield { model: chunk.model, type: "thinking", text: "Thinking:\n" };
+                            yield { done: chunk.done, role: chunk.message.role, model: chunk.model, thinking: "Thinking:\n\n" };
                         }
 
-                        yield { model: chunk.model, type: "thinking", text: chunk.message.thinking };
+                        yield { done: chunk.done, role: chunk.message.role, model: chunk.model, thinking: chunk.message.thinking };
                     } else if (chunk.message.content) {
                         if(inThinking) {
                             inThinking = false;
-                            yield { model: chunk.model, type: "thinking", text: "\n\nAnswer:\n" };
+                            yield { done: chunk.done, role: chunk.message.role, model: chunk.model, thinking: "\n\nAnswer:\n" };
                         }
                         
-                        yield { model: chunk.model, type: "content", text: chunk.message.content };
+                        yield { done: chunk.done, role: chunk.message.role, model: chunk.model, content: chunk.message.content };
                     }
 
                     if (chunk.done) {

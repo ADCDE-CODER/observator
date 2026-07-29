@@ -28,15 +28,16 @@ export default class ChatMessageController {
                 const generator = await this.aiGenerationService.generateResponse(conversationContext, chatMetadata);
 
                 for await (const event of generator) {
-                    if (event.type === "thinking") {
+                    if (event.thinking) {
                         res.write(`data: ${JSON.stringify(event)}\n\n`);
-                        assistantChatMessage.thinking += event.text;
-                    } else if (event.type === "content") {
+                        assistantChatMessage.thinking += event.thinking;
+                    } else if (event.content) {
                         res.write(`data: ${JSON.stringify(event)}\n\n`);
-                        assistantChatMessage.content += event.text;
+                        assistantChatMessage.content += event.content;
                     }
 
                     if (event.done) {
+                        res.write(`data: ${JSON.stringify(event)}\n\n`);
                         assistantChatMessage.role = event.role;
                         assistantChatMessage.model = event.model;
                         assistantChatMessage.createdAt = event.createdAt;
