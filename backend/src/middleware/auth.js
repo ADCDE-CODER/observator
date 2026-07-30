@@ -1,9 +1,9 @@
 import { config } from "dotenv";
 import jwt from "jsonwebtoken";
 import { db } from "../config/database.js"; 
-import ChatModel from "../models/ChatModel.js";
-import UserChatMessageModel from "../models/UserChatMessageModel.js";
-import AssistantChatMessageModel from "../models/AssistantChatMessageModel.js";
+import ChatModel from "../modules/chat/ChatModel.js";
+import UserChatMessageModel from "../modules/chatMessage/UserChatMessageModel.js";
+import AssistantChatMessageModel from "../modules/chatMessage/AssistantChatMessageModel.js";
 
 config();
 
