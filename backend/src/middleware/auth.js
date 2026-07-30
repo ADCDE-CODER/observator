@@ -1,18 +1,22 @@
 import { config } from "dotenv";
 import jwt from "jsonwebtoken";
+import { db } from "../config/database.js"; 
+import ChatModel from "../models/ChatModel.js";
+import UserChatMessageModel from "../models/UserChatMessageModel.js";
+import AssistantChatMessageModel from "../models/AssistantChatMessageModel.js";
 
 config();
 
 export const generateToken = (userData) => {
-    const { id, email } = userData; 
+    const { id } = userData; 
     
-    if (!id || !email) {
-        const error = new Error("ID and Email are required to generate a token.");
+    if (!id) {
+        const error = new Error("ID is required to generate a token.");
         error.status = 400;
         throw error;
     }
 
-    return jwt.sign({id, email}, process.env.ACCESS_TOKEN_SECRET);
+    return jwt.sign({ id }, process.env.ACCESS_TOKEN_SECRET);
 };
 
 export function verifyToken(req, res, next) {
@@ -20,7 +24,9 @@ export function verifyToken(req, res, next) {
     const token = authHeaders && authHeaders.split(" ")[1];
     
     if (!token) {
-        return res.status(401).json({message: "Access denied: No token"});
+        const error = new Error("Access denied: No token");
+        error.status = 403;
+        throw error;
     }
 
     try {
@@ -31,4 +37,45 @@ export function verifyToken(req, res, next) {
         console.error(error);
         res.status(401).json({message: "Invalid or expired token"});
     }  
+};
+
+export function verifyChatOwner(req, res, next) {
+    const userId = req.user.id;
+    const chatId = Number(req.params.chatId);
+    
+    try {
+        const chatModel = new ChatModel(db);
+        const chat = chatModel.findById(chatId, userId);
+
+        if (!chat) {
+            throw new Error("Chat not found.");
+        }
+
+        req.chat = chat;
+        next();
+    } catch (error) {
+        next(error);
+    }
+};
+
+export function verifyChatMessageOwner(req, res, next) {
+    const chatId = req.chat.id;
+    const chatMessageId = Number(req.params.chatMessageId);
+    
+    try {
+        const userChatMessageModel = new UserChatMessageModel(db);
+        const assistantChatMessageModel = new AssistantChatMessageModel(db);
+        const userChatMessage = userChatMessageModel.findById(chatMessageId, chatId);
+        const assistantChatMessage = assistantChatMessageModel.findById(chatMessageId, chatId);
+
+        if (!userChatMessage || !assistantChatMessage) {
+            throw new Error("Chat message not found.");
+        }
+        
+        req.userChatMessage = userChatMessage;
+        req.assistantChatMessage = assistantChatMessage;
+        next();
+    } catch (error) {
+        next(error);
+    }
 };
