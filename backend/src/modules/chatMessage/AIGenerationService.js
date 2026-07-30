@@ -5,7 +5,9 @@ import { config } from "dotenv";
 config({ path: "./app/.env" });
 
 export default class AIGenerationService {
-    constructor() {
+    constructor(chatMetadataService) {
+        this.chatMetadataService = chatMetadataService;
+
         this.openai = new OpenAI({ 
             baseURL: "https://openrouter.ai/api/v1",
             apiKey: process.env.API_KEY 
@@ -19,7 +21,9 @@ export default class AIGenerationService {
         });
     }
     
-    async *generateResponse(chatMessages, metadata) {
+    async generateResponse(chatMessages, chatId) {
+        const metadata = this.chatMetadataService.getById(chatId);
+        
         if (!chatMessages) {
             const error = new Error("Chat messages are required");
             error.status = 400;
@@ -73,7 +77,7 @@ export default class AIGenerationService {
                 
                 return openAICompletion.choices[0];
             } else if (metadata.provider.toLowerCase() === "ollama") {
-                const streamOllama = await this.ollama.chat({
+                const ollamaCompletion = await this.ollama.chat({
                     model: metadata.model,
                     messages: chatMessages,
                     options: {
@@ -88,34 +92,7 @@ export default class AIGenerationService {
                     think: metadata.think
                 });
 
-                let inThinking = false
-
-                // Stream the content chunk by chunk
-                for await (const chunk of streamOllama) {
-                    if (!chunk || !chunk.message) {
-                        continue;
-                    }
-
-                    if(chunk.message.thinking) {
-                        if(!inThinking) {
-                            inThinking = true;
-                            yield { done: chunk.done, role: chunk.message.role, model: chunk.model, thinking: "Thinking:\n\n" };
-                        }
-
-                        yield { done: chunk.done, role: chunk.message.role, model: chunk.model, thinking: chunk.message.thinking };
-                    } else if (chunk.message.content) {
-                        if(inThinking) {
-                            inThinking = false;
-                            yield { done: chunk.done, role: chunk.message.role, model: chunk.model, thinking: "\n\nAnswer:\n" };
-                        }
-                        
-                        yield { done: chunk.done, role: chunk.message.role, model: chunk.model, content: chunk.message.content };
-                    }
-
-                    if (chunk.done) {
-                        yield { done: chunk.done, role: chunk.message.role, model: chunk.model, createdAt: chunk.created_at };
-                    }
-                }
+                return ollamaCompletion;
             } else {
                 const error = new Error(`Unsupported provider: ${metadata.provider}.`);
                 error.status = 400;

@@ -12,8 +12,8 @@ const userChatMessageModel = new UserChatMessageModel(db);
 const assistantChatMessageModel = new AssistantChatMessageModel(db);
 const userChatMessageService = new UserChatMessageService(userChatMessageModel);
 const assistantChatMessageService = new AssistantChatMessageService(assistantChatMessageModel);
-const chatMessageService = new ChatMessageService(userChatMessageService, assistantChatMessageService);
-const aiGenerationService = new AIGenerationService();
-const chatMessageController = new ChatMessageController(chatMessageService, chatMetadataService, aiGenerationService);
+const aiGenerationService = new AIGenerationService(chatMetadataService);
+const chatMessageService = new ChatMessageService(userChatMessageService, assistantChatMessageService, aiGenerationService);
+const chatMessageController = new ChatMessageController(chatMessageService);
 
 export { chatMessageController };

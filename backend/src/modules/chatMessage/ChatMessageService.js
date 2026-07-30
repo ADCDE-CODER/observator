@@ -1,7 +1,8 @@
 export default class ChatMessageService {
-    constructor(userChatMessageService, assistantChatMessageService) {
+    constructor(userChatMessageService, assistantChatMessageService, aiGenerationService) {
         this.userChatMessageService = userChatMessageService;
         this.assistantChatMessageService = assistantChatMessageService;
+        this.aiGenerationService = aiGenerationService;
     }
 
     #sortChatMessagesByCreatedAt(userMessages, assistantMessages, direction = "asc") {
@@ -21,6 +22,50 @@ export default class ChatMessageService {
                 return dateB - dateA;
             }
         });
+    }
+
+    async *generateResponse(userChatMessage, chatId) {
+        const conversationContext = this.getChatMessages(chatId);
+        conversationContext.push({role: userChatMessage.role, content: userChatMessage.content, images: userChatMessage.images});
+        const stream = await this.aiGenerationService.generateResponse(conversationContext, chatId);
+
+        // Stream the content chunk by chunk
+        let inThinking = false
+        let assistantChatMessage = {};
+        for await (const chunk of stream) {
+            if (!chunk || !chunk.message) {
+                continue;
+            }
+
+            if(chunk.message.thinking) {
+                if(!inThinking) {
+                    inThinking = true;
+                    assistantChatMessage.thinking = "Thinking:\n\n";
+                    yield { done: chunk.done, role: chunk.message.role, model: chunk.model, thinking: "Thinking:\n\n" };
+                }
+
+                assistantChatMessage.thinking += chunk.message.thinking;
+                yield { done: chunk.done, role: chunk.message.role, model: chunk.model, thinking: chunk.message.thinking };
+            } else if (chunk.message.content) {
+                if(inThinking) {
+                    inThinking = false;
+                    assistantChatMessage.content = "\n\nAnswer:\n\n";
+                    yield { done: chunk.done, role: chunk.message.role, model: chunk.model, content: "\n\nAnswer:\n" };
+                }
+
+                assistantChatMessage.content += chunk.message.content;
+                yield { done: chunk.done, role: chunk.message.role, model: chunk.model, content: chunk.message.content };
+            }
+
+            if (chunk.done) {
+                assistantChatMessage.role = chunk.message.role;
+                assistantChatMessage.model = chunk.model;
+                assistantChatMessage.createdAt = chunk.created_at;
+                yield { done: chunk.done, role: chunk.message.role, model: chunk.model, createdAt: chunk.created_at };
+            }
+        }
+
+        this.create(userChatMessage, assistantChatMessage, chatId)
     }
 
     create(userChatMessage, assistantChatMessage, chatId) {

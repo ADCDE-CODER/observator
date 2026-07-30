@@ -1,20 +1,12 @@
 export default class ChatMessageController {
-    constructor(chatMessageService, chatMetadataService, aiGenerationService) {
+    constructor(chatMessageService) {
         this.chatMessageService = chatMessageService;
-        this.chatMetadataService = chatMetadataService;
-        this.aiGenerationService = aiGenerationService;
     }
 
     async create(req, res) {
         const userChatMessage = req.body;
         const chatId = req.chat.id;
 
-        // Initialize the property as an empty string prevent undefined
-        let assistantChatMessage = {
-            thinking: "",
-            content: ""
-        };
-        
         // Get streaming from AI
         try {
             res.setHeader('Content-Type', 'text/event-stream');
@@ -22,25 +14,17 @@ export default class ChatMessageController {
             res.setHeader('Connection', 'keep-alive');
 
             try {
-                const conversationContext = this.chatMessageService.getChatMessages(chatId);
-                conversationContext.push({role: userChatMessage.role, content: userChatMessage.content, images: userChatMessage.images});
-                const chatMetadata = this.chatMetadataService.getById(chatId);
-                const generator = await this.aiGenerationService.generateResponse(conversationContext, chatMetadata);
-
+                const generator = this.chatMessageService.generateResponse(userChatMessage, chatId);
+                
                 for await (const event of generator) {
                     if (event.thinking) {
                         res.write(`data: ${JSON.stringify(event)}\n\n`);
-                        assistantChatMessage.thinking += event.thinking;
                     } else if (event.content) {
                         res.write(`data: ${JSON.stringify(event)}\n\n`);
-                        assistantChatMessage.content += event.content;
                     }
 
                     if (event.done) {
                         res.write(`data: ${JSON.stringify(event)}\n\n`);
-                        assistantChatMessage.role = event.role;
-                        assistantChatMessage.model = event.model;
-                        assistantChatMessage.createdAt = event.createdAt;
                     }
                 }
                 
@@ -55,16 +39,6 @@ export default class ChatMessageController {
             
             if (!res.headersSent) {                 
                 res.status(error.status || 500).json({message: error.message})
-            }
-        } finally {
-            console.log("Attempting to save data...");
-            
-            try {
-                this.chatMessageService.create(userChatMessage, assistantChatMessage, chatId);
-                console.log("User and assistant message saved successfully.");
-            } catch (error) {
-                console.error(error);
-                res.status(error.status || 500).json({message: error.message});
             }
         }
     };
