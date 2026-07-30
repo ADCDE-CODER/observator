@@ -1,4 +1,4 @@
-import { generateToken } from "../middleware/auth.js";
+import { generateToken } from "../../middleware/auth.js";
 
 export default class UserController {
     constructor(userService) {
