@@ -1,6 +1,6 @@
 import express from "express";
 import { chatMetadataController } from "./chatMetadataContainer.js";
-import { verifyToken, verifyChatOwner } from "./../../middleware/auth.js";
+import { verifyToken, verifyChatOwner } from "../../middleware/auth.js";
 
 const router = express.Router({
     mergeParams: true

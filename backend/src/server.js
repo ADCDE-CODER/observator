@@ -1,9 +1,9 @@
 import express from "express";
 import cors from "cors";
-import userRouter from "./modules/user/UserRoutes.js";
-import chatRouter from "./modules/chat/ChatRoutes.js";
-import chatMetadataRouter from "./modules/chatMetadata/ChatMetadataRoutes.js";
-import chatMessageRouter from "./modules/chatMessage/ChatMessageRoutes.js";
+import userRouter from "./modules/user/userRoutes.js";
+import chatRouter from "./modules/chat/chatRoutes.js";
+import chatMetadataRouter from "./modules/chatMetadata/chatMetadataRoutes.js";
+import chatMessageRouter from "./modules/chatMessage/chatMessageRoutes.js";
 
 const app = express();
 app.use(cors());
