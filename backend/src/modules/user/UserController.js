@@ -1,4 +1,4 @@
-import { generateToken } from "../../middleware/auth.js";
+import { generateToken } from "../../utils/jwtUtils.js";
 
 export default class UserController {
     constructor(userService) {
@@ -22,7 +22,7 @@ export default class UserController {
         
         try {
             const user = await this.userService.authenticate(userData);
-            user.token = generateToken(user);
+            user.token = generateToken({id: user.id});
             res.status(200).json({message: "User read successfully", user}); 
         } catch (error) {
             console.error(error);
