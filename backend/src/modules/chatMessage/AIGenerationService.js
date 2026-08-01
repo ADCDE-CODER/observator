@@ -1,8 +1,5 @@
 import OpenAI from "openai";
 import { Ollama } from "ollama";
-import { config } from "dotenv";
-
-config({ path: "./app/.env" });
 
 export default class AIGenerationService {
     constructor(chatMetadataService) {

@@ -20,8 +20,4 @@ app.use((error, req, res, next) => {
     res.status(error.status || 500).json({message: error.message})
 });
 
-const PORT = 3000;
-app.listen(PORT, () => {
-    console.log(`Server started at port http://localhost:${PORT}`);
-    console.log("System Ready: All service dependencies initialized.");
-});
+export default app;
