@@ -3,20 +3,24 @@ import { env } from "../config/env.js";
 
 export const generateToken = (payload) => {    
     if (!payload) {
-        const error = new Error("Payload is required to generate a token.");
-        error.status = 400;
-        throw error;
+        throw new Error("Payload object is required to generate a token.");
     }
 
-    return jwt.sign(payload, env.accessToken);
+    try {
+        return jwt.sign(payload, env.accessToken);
+    } catch (error) {
+        console.error("JWT Signing Error:", error);
+    }
 };
 
 export const verifyJwt = (token) => {
     if (!token) {
-        const error = new Error("Access denied: No token");
-        error.status = 403;
-        throw error;
+        throw new Error("Access denied: No token provided.");
     }
-    
-    return jwt.verify(token, env.accessToken);
+
+    try {
+        return jwt.verify(token, env.accessToken);
+    } catch (error) {
+        console.error("JWT Verification Failed:", error);
+    }
 };
