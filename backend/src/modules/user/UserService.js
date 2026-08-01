@@ -1,4 +1,5 @@
 import bcrypt from "bcrypt"; 
+import { generateToken } from "../../utils/jwtUtils.js";
 
 export default class UserService {
     constructor(userModel) {
@@ -65,6 +66,8 @@ export default class UserService {
                 error.status = 400;
                 throw error;
             }
+
+            user.token = generateToken({id: user.id});
 
             return user;
         } catch (error) {
