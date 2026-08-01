@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
-import { db } from "../config/database.js"; 
+import { db } from "../config/database.js";
+import { env } from "../config/env.js";
 import ChatModel from "../modules/chat/ChatModel.js";
 import UserChatMessageModel from "../modules/chatMessage/UserChatMessageModel.js";
 import AssistantChatMessageModel from "../modules/chatMessage/AssistantChatMessageModel.js";
@@ -13,7 +14,7 @@ export const generateToken = (userData) => {
         throw error;
     }
 
-    return jwt.sign({ id }, process.env.ACCESS_TOKEN_SECRET);
+    return jwt.sign({ id }, env.accessToken);
 };
 
 export function verifyToken(req, res, next) {
@@ -27,7 +28,7 @@ export function verifyToken(req, res, next) {
     }
 
     try {
-        const decodedUserFromToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+        const decodedUserFromToken = jwt.verify(token, env.accessToken);
         req.user = decodedUserFromToken;
         next();
     } catch (error) {

@@ -1,5 +1,6 @@
 import OpenAI from "openai";
 import { Ollama } from "ollama";
+import { env } from "../../config/env.js";
 
 export default class AIGenerationService {
     constructor(chatMetadataService) {
@@ -7,13 +8,13 @@ export default class AIGenerationService {
 
         this.openai = new OpenAI({ 
             baseURL: "https://openrouter.ai/api/v1",
-            apiKey: process.env.API_KEY 
+            apiKey: env.openAIApiKey 
         });
 
         this.ollama = new Ollama({
             host: 'http://127.0.0.1:11434',
             headers: {
-                Authorization: `Bearer ${process.env.API_KEY}`
+                Authorization: `Bearer ${env.openAIApiKey}`
             }
         });
     }
