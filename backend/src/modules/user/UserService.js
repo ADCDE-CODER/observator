@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt"; 
+import { generateHash, verifyPassword } from "../../utils/bcryptUtils.js";
 import { generateToken } from "../../utils/jwtUtils.js";
 
 export default class UserService {
@@ -16,8 +16,13 @@ export default class UserService {
             throw error;
         }
 
-        const saltRounds = 12;
-        userData.password = await bcrypt.hash(password, saltRounds);
+        try {
+            const saltRounds = 12;
+            userData.password = await generateHash(password, saltRounds);
+        } catch (error) {
+            error.status = 400;
+            throw error;
+        }
         
         let validKeys = [];
         let validValues = [];
@@ -59,7 +64,7 @@ export default class UserService {
         try {
             const indentifier = email || username;
             const user = this.userModel.findByIdentifier(indentifier);
-            const vaildPassword = await bcrypt.compare(password, user.password);
+            const vaildPassword = await verifyPassword(password, user.password);
 
             if (!user || !vaildPassword) {
                 const error = new Error("Invalid email or password.")
