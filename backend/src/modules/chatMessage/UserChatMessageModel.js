@@ -8,35 +8,33 @@ export default class UserChatMessageModel {
         const table = ` 
             CREATE TABLE IF NOT EXISTS userchatmessage (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                role TEXT CHECK(role IN ('user')) NOT NULL,
                 content TEXT NOT NULL,
                 images TEXT,
-                created_at TEXT,
-                chat_id INTEGER NOT NULL,
-                FOREIGN KEY (chat_id) REFERENCES chat(id) ON DELETE CASCADE
+                chatmessage_id INTEGER NOT NULL,
+                FOREIGN KEY (chatmessage_id) REFERENCES chatmessage(id) ON DELETE CASCADE
             );
         `;
         this.db.exec(table);
     }
 
-    create(role, content, images, createdAt, chatId) {
-        this.db.prepare("INSERT INTO userchatmessage(role, content, images, created_at, chat_id) VALUES (?, ?, ?, ?, ?)").run(role, content, images, createdAt, chatId);
+    create(content, images, chatMessageId) {
+        this.db.prepare("INSERT INTO userchatmessage(content, images, chatmessage_id) VALUES (?, ?, ?)").run(content, images, chatMessageId);
     }
 
-    getAll(chatId) {
-        return this.db.prepare("SELECT * FROM userchatmessage WHERE chat_id = ? ORDER BY created_at ASC").all(chatId);
+    getAll(chatMessageId) {
+        return this.db.prepare("SELECT * FROM userchatmessage WHERE chatmessage_id = ?").all(chatMessageId);
     }
 
-    findById(chatMessageId, chatId) {
-        const rows = this.db.prepare("SELECT id, chat_id FROM userchatmessage WHERE id = ? AND chat_id = ?").all(chatMessageId, chatId);
+    findById(id, chatMessageId) {
+        const rows = this.db.prepare("SELECT id, chatmessage_id FROM userchatmessage WHERE id = ? AND chatmessage_id = ?").all(id, chatMessageId);
         return rows[0];
     }
 
-    update(role, content, images, chatMessageId, chatId) {
-        return this.db.prepare("UPDATE userchatmessage SET role = ?, content = ?, images = ? WHERE id = ? AND chat_id = ?").run(role, content, images, chatMessageId, chatId);
+    update(content, images, id, chatMessageId) {
+        return this.db.prepare("UPDATE userchatmessage SET content = ?, images = ? WHERE id = ? AND chatmessage_id = ?").run(content, images, id, chatMessageId);
     }
 
-    delete(chatMessageId, chatId) {
-        this.db.prepare("DELETE FROM userchatmessage WHERE id = ? AND chat_id = ?").run(chatMessageId, chatId);
+    delete(id, chatMessageId) {
+        this.db.prepare("DELETE FROM userchatmessage WHERE id = ? AND chatmessage_id = ?").run(id, chatMessageId);
     }
 }
