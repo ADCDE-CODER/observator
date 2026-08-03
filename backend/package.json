@@ -1,14 +1,21 @@
 {
   "name": "Observator",
   "version": "0.0.0",
-  "main": "index.js",
-  "scripts": {
-    "test": "node --watch-path=./src/app.js ./src/server.js"
-  },
-  "keywords": [],
-  "author": "ADCDE",
-  "description": "",
+  "description": "A backend service using AI models (Ollama, OpenAI) and SQLite.",
+  "private": true,
+  "main": "server.js",
   "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch ./server.js"
+  },
+  "keywords": [
+    "ai", 
+    "ollama", 
+    "openai", 
+    "sqlite"
+  ],
+  "author": "ADCDE-CODER",
   "dependencies": {
     "bcrypt": "^6.0.0",
     "better-sqlite3": "^12.2.0",
