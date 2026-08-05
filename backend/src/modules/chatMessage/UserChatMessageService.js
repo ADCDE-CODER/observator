@@ -1,55 +1,55 @@
 export default class UserChatMessageService {
-    constructor(UserChatMessage) {
-        this.userChatMessage = UserChatMessage;
+    constructor(UserChatMessageModel) {
+        this.userChatMessageModel = UserChatMessageModel;
     }
 
-    create(chatMessageData, chatId) {    
-        const { role, content, images, createdAt } = chatMessageData;
+    create(chatMessageData, chatMessageId) {    
+        const { content, images } = chatMessageData;
         
-        if (!role || !content && !images) {
-            const error = new Error("Role, content, and images are required to create a chat message.");
+        if (!content && !images) {
+            const error = new Error("Content and images are required to create a chat message.");
             error.status = 400;
             throw error;
         }
         
-        if (!chatId) {
-            throw new Error("Chat ID is required to create a chat message.");
+        if (!chatMessageId) {
+            throw new Error("ChatMessageId is required to create a chat message.");
         }
     
         try {
-            this.userChatMessage.create(role, content, images, createdAt, chatId);
+            this.userChatMessageModel.create(content, images, chatMessageId);
         } catch (error) {
             throw error;
         }
-    };
+    }
     
-    getAll(chatId) {
-        if (!chatId) {
-            throw new Error("Chat ID is required to read chat message(s).");
+    findByIds(chatMessageIds) {
+        if (!chatMessageIds) {
+            throw new Error("ChatMessageIds are required to get all chat messages.");
         }
 
         try {
-            return this.userChatMessage.getAll(chatId);
+            return this.userChatMessageModel.findByIds(chatMessageIds);
         } catch (error) {
             throw error;
         }
-    };
+    }
     
-    update(chatMessageData, chatMessageId, chatId) {  
-        const { role, content, images } = chatMessageData;
+    update(chatMessageData, id, chatMessageId) {  
+        const {content, images } = chatMessageData;
         
-        if (!role || !content && !images) {
-            const error = new Error("Role, content, and images are required to update a chat message.");
+        if (!content && !images) {
+            const error = new Error("Content and images are required to update a chat message.");
             error.status = 400;
             throw error;
         }
         
-        if (!chatMessageId || !chatId ) {
-            throw new Error("Chat message ID and chat ID are required to update a chat message.");
+        if (!id || !chatMessageId ) {
+            throw new Error("UserChatMessageId and chatMessageId are required to update a chat message.");
         }
 
         try {
-            const userChatMessage = this.userChatMessage.update(role, content, images, chatMessageId, chatId);
+            const userChatMessage = this.userChatMessageModel.update(content, images, id, chatMessageId);
 
             if(!userChatMessage) {
                 throw new Error("Update failed.");
@@ -59,17 +59,17 @@ export default class UserChatMessageService {
         } catch (error) {
             throw error;
         }
-    };
+    }
     
-    delete(chatMessageId, chatId) {
-        if (!chatMessageId || !chatId) {
-            throw new Error("Chat message ID and chat ID are required to delete a chat message.")
+    delete(id, chatMessageId) {
+        if (!id || !chatMessageId) {
+            throw new Error("UserChatMessageId and chatMessageId are required to delete a chat message.")
         }
 
         try {
-            this.userChatMessage.delete(chatMessageId, chatId);
+            this.userChatMessageModel.delete(id, chatMessageId);
         } catch (error) {
             throw error;
         }
-    };
+    }
 }

@@ -21,8 +21,8 @@ export default class UserChatMessageModel {
         this.db.prepare("INSERT INTO userchatmessage(content, images, chatmessage_id) VALUES (?, ?, ?)").run(content, images, chatMessageId);
     }
 
-    getAll(chatMessageId) {
-        return this.db.prepare("SELECT * FROM userchatmessage WHERE chatmessage_id = ?").all(chatMessageId);
+    findByIds(chatMessageIds) {
+        return this.db.prepare(`SELECT * FROM userchatmessage WHERE chatmessage_id IN (${ chatMessageIds.map(() => "?").join(", ") })`).all(chatMessageIds);
     }
 
     findById(id, chatMessageId) {
