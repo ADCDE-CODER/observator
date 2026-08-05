@@ -9,7 +9,7 @@ export default class ChatMessageModel {
             CREATE TABLE IF NOT EXISTS chatmessage (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 role TEXT CHECK(role IN ('user', 'assistant')) NOT NULL,
-                created_at TEXT NOT NULL,
+                created_at TEXT,
                 chat_id INTEGER NOT NULL,
                 FOREIGN KEY (chat_id) REFERENCES chat(id) ON DELETE CASCADE
             );
@@ -18,7 +18,7 @@ export default class ChatMessageModel {
     }
 
     create(role, createdAt, chatId) {
-        this.db.prepare("INSERT INTO chatmessage(role, created_at, chat_id) VALUES (?, ?, ?)").run(role, createdAt, chatId);
+        return this.db.prepare("INSERT INTO chatmessage(role, created_at, chat_id) VALUES (?, ?, ?)").run(role, createdAt, chatId);
     }
 
     getAll(orderBy, chatId) {
