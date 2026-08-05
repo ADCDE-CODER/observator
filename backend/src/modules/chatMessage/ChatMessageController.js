@@ -47,7 +47,7 @@ export default class ChatMessageController {
         const chatId = req.chat.id;
 
         try {            
-            const chatMessages = this.chatMessageService.getChatMessages(chatId);
+            const chatMessages = this.chatMessageService.getChatMessages("ASC", chatId);
             res.status(200).json({message: "Chat message read successfully", chatMessages});
         } catch (error) {
             console.error(error);
