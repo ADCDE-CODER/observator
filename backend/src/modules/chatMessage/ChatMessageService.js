@@ -1,31 +1,13 @@
 export default class ChatMessageService {
-    constructor(userChatMessageService, assistantChatMessageService, aiGenerationService) {
+    constructor(chatMessageModel, userChatMessageService, assistantChatMessageService, aiGenerationService) {
+        this.chatMessageModel = chatMessageModel;
         this.userChatMessageService = userChatMessageService;
         this.assistantChatMessageService = assistantChatMessageService;
         this.aiGenerationService = aiGenerationService;
     }
 
-    #sortChatMessagesByCreatedAt(userMessages, assistantMessages, direction = "asc") {
-        const chatMessages = [
-            ...userMessages,
-            ...assistantMessages
-        ];
-
-        // Sort by created at 
-        return chatMessages.sort((a, b) => {
-            const dateA = new Date(a.created_at);
-            const dateB = new Date(b.created_at);
-
-            if (direction === "asc") {
-                return dateA - dateB;
-            } else {
-                return dateB - dateA;
-            }
-        });
-    }
-
     async *generateResponse(userChatMessage, chatId) {
-        const conversationContext = this.getChatMessages(chatId);
+        const conversationContext = this.getChatMessages("ASC", chatId);
         conversationContext.push({role: userChatMessage.role, content: userChatMessage.content, images: userChatMessage.images});
         const stream = await this.aiGenerationService.generateResponse(conversationContext, chatId);
 
@@ -69,26 +51,89 @@ export default class ChatMessageService {
     }
 
     create(userChatMessage, assistantChatMessage, chatId) {
-        this.userChatMessageService.create(userChatMessage, chatId);
-        this.assistantChatMessageService.create(assistantChatMessage, chatId);
+        if (!userChatMessage.role) {
+            const error = new Error("User role is required to create a chat message.");
+            error.status = 400;
+            throw error;
+        }
+
+        if (!assistantChatMessage.role) {
+            throw new Error("Assistant role is required to create a chat message.");
+        }
+
+        const userChatMessageId = this.chatMessageModel.create(userChatMessage.role, userChatMessage.createdAt, chatId).lastInsertRowid;
+        const assistantChatMessageId = this.chatMessageModel.create(assistantChatMessage.role, assistantChatMessage.createdAt, chatId).lastInsertRowid;
+
+        this.userChatMessageService.create(userChatMessage, userChatMessageId);
+        this.assistantChatMessageService.create(assistantChatMessage, assistantChatMessageId);
     }
 
-    getChatMessages(chatId) {
-        const userMessages = this.userChatMessageService.getAll(chatId);
-        const assistantMessages = this.assistantChatMessageService.getAll(chatId);
-        const chatMessages = this.#sortChatMessagesByCreatedAt(userMessages, assistantMessages);
+    getChatMessages(orderBy, chatId) {
+        if (!orderBy || !chatId) {
+            throw new Error("OrderBy and chat ID are required to get all chat messages.");
+        }
 
-        const cleanedChatMessages = chatMessages.map(chatMessage => {
-            const { created_at, chat_id, ...rest } = chatMessage;
+        // Get message order
+        const chatMessages = this.chatMessageModel.getAll(orderBy, chatId);
+        const userChatMessageIds = chatMessages.filter(message => message.role === "user").map(m => m.id);
+        const assistantChatMessageIds = chatMessages.filter(message => message.role === "assistant").map(m => m.id);
 
-            return {
-                ...rest,
-                chatId: chat_id,
-                createdAt: created_at
-            };
+        // Batch load children
+        const userChatMessages = this.userChatMessageService.findByIds(userChatMessageIds);
+        const assistantChatMessages = this.assistantChatMessageService.findByIds(assistantChatMessageIds);
+
+        // Create lookup maps
+        const userMap = new Map();
+        const assistantMap = new Map();
+
+        for (const user of userChatMessages) {
+            userMap.set(user.chatmessage_id, user);
+        }
+
+        for (const assistant of assistantChatMessages) {
+            assistantMap.set(assistant.chatmessage_id, assistant);
+        }
+
+        // Return chat messages with user and assistant
+        return chatMessages.flatMap(chatMessage => {
+            if (chatMessage.role === "user") {
+                const userChatMessage = userMap.get(chatMessage.id);
+
+                if (!userChatMessage) {
+                    return [];
+                }
+                
+                return {
+                    id: chatMessage.id,
+                    role: chatMessage.role,
+                    createdAt: chatMessage.created_at,
+                    content: userChatMessage.content,
+                    images: userChatMessage.images,
+                    chatId: chatMessage.chat_id
+                };
+            }
+            
+            if (chatMessage.role === "assistant") {
+                const assistantChatMessage = assistantMap.get(chatMessage.id);
+
+                if (!assistantChatMessage) {
+                    return [];
+                }
+
+                return {
+                    id: chatMessage.id,
+                    role: chatMessage.role,
+                    createdAt: chatMessage.created_at,
+                    model: assistantChatMessage.model,
+                    thinking: assistantChatMessage.thinking,
+                    content: assistantChatMessage.content,
+                    images: assistantChatMessage.images,
+                    chatId: chatMessage.chat_id
+                };
+            }
+
+            return [];
         });
-
-        return cleanedChatMessages;
     }
 
     // TODO: Update for user and assistant
