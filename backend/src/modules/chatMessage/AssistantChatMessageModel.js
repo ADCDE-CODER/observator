@@ -23,8 +23,8 @@ export default class AssistantChatMessageModel {
         this.db.prepare("INSERT INTO assistantchatmessage(model, thinking, content, images, chatmessage_id) VALUES (?, ?, ?, ?, ?)").run(model, thinking, content, images, chatMessageId);
     }
 
-    getAll(chatMessageId) {
-        return this.db.prepare("SELECT * FROM assistantchatmessage WHERE chatmessage_id = ?").all(chatMessageId);
+    findByIds(chatMessageIds) {
+        return this.db.prepare(`SELECT * FROM assistantchatmessage WHERE chatmessage_id IN (${ chatMessageIds.map(() => "?").join(", ") })`).all(chatMessageIds);
     }
 
     findById(id, chatMessageId) {
