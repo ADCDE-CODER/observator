@@ -61,11 +61,11 @@ export default class ChatMessageService {
             throw new Error("Assistant role is required to create a chat message.");
         }
 
-        const userChatMessageId = this.chatMessageModel.create(userChatMessage.role, userChatMessage.createdAt, chatId).lastInsertRowid;
-        const assistantChatMessageId = this.chatMessageModel.create(assistantChatMessage.role, assistantChatMessage.createdAt, chatId).lastInsertRowid;
+        const userConversationId = this.chatMessageModel.create(userChatMessage.role, userChatMessage.createdAt, chatId).lastInsertRowid;
+        const assistantConversationId = this.chatMessageModel.create(assistantChatMessage.role, assistantChatMessage.createdAt, chatId).lastInsertRowid;
 
-        this.userChatMessageService.create(userChatMessage, userChatMessageId);
-        this.assistantChatMessageService.create(assistantChatMessage, assistantChatMessageId);
+        const userChatMessageId = this.userChatMessageService.create(userChatMessage, userConversationId).lastInsertRowid;
+        this.assistantChatMessageService.create(assistantChatMessage, assistantConversationId, userChatMessageId);
     }
 
     getChatMessages(orderBy, chatId) {
