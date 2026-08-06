@@ -18,7 +18,7 @@ export default class UserChatMessageModel {
     }
 
     create(content, images, chatMessageId) {
-        this.db.prepare("INSERT INTO userchatmessage(content, images, chatmessage_id) VALUES (?, ?, ?)").run(content, images, chatMessageId);
+        return this.db.prepare("INSERT INTO userchatmessage(content, images, chatmessage_id) VALUES (?, ?, ?)").run(content, images, chatMessageId);
     }
 
     findByIds(chatMessageIds) {

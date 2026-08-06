@@ -17,7 +17,7 @@ export default class UserChatMessageService {
         }
     
         try {
-            this.userChatMessageModel.create(content, images, chatMessageId);
+            return this.userChatMessageModel.create(content, images, chatMessageId);
         } catch (error) {
             throw error;
         }

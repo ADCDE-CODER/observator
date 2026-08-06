@@ -13,14 +13,16 @@ export default class AssistantChatMessageModel {
                 content TEXT NOT NULL,
                 images TEXT,
                 chatmessage_id INTEGER NOT NULL,
-                FOREIGN KEY (chatmessage_id) REFERENCES chatmessage(id) ON DELETE CASCADE
+                userchatmessage_id INTEGER NOT NULL,
+                FOREIGN KEY (chatmessage_id) REFERENCES chatmessage(id) ON DELETE CASCADE,
+                FOREIGN KEY (userchatmessage_id) REFERENCES userchatmessage(id) ON DELETE CASCADE
             );
         `;
         this.db.exec(table);
     }
 
-    create(model, thinking, content, images, chatMessageId) {
-        this.db.prepare("INSERT INTO assistantchatmessage(model, thinking, content, images, chatmessage_id) VALUES (?, ?, ?, ?, ?)").run(model, thinking, content, images, chatMessageId);
+    create(model, thinking, content, images, chatMessageId, userChatMessageId) {
+        this.db.prepare("INSERT INTO assistantchatmessage(model, thinking, content, images, chatmessage_id, userchatmessage_id) VALUES (?, ?, ?, ?, ?, ?)").run(model, thinking, content, images, chatMessageId, userChatMessageId);
     }
 
     findByIds(chatMessageIds) {

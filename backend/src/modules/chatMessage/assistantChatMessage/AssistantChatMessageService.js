@@ -3,7 +3,7 @@ export default class AssistantChatMessageService {
         this.assistantChatMessageModel = assistantChatMessageModel;
     }
 
-    create(chatMessageData, chatMessageId) {    
+    create(chatMessageData, chatMessageId, userChatMessageId) {    
         const { model, thinking, content, images } = chatMessageData;
 
         if (!content && !images) {
@@ -12,12 +12,12 @@ export default class AssistantChatMessageService {
             throw error;
         }
         
-        if (!chatMessageId) {
-            throw new Error("ChatMessageId is required to create a chat message.");
+        if (!chatMessageId || !userChatMessageId) {
+            throw new Error("ChatMessageId and userChatMessageId are required to create a chat message.");
         }
     
         try {
-            this.assistantChatMessageModel.create(model, thinking, content, images, chatMessageId);
+            this.assistantChatMessageModel.create(model, thinking, content, images, chatMessageId, userChatMessageId);
         } catch (error) {
             throw error;
         }
