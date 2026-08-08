@@ -41,7 +41,7 @@ export default class ChatMessageController {
                 res.status(error.status || 500).json({message: error.message})
             }
         }
-    };
+    }
     
     getAll(req, res) {
         const chatId = req.chat.id;
@@ -53,7 +53,7 @@ export default class ChatMessageController {
             console.error(error);
             res.status(error.status || 500).json({message: error.message})
         } 
-    };
+    }
 
     update(req, res) {
         const chatMessageData = req.body;
@@ -68,19 +68,18 @@ export default class ChatMessageController {
             console.error(error);
             res.status(error.status || 500).json({message: error.message})
         }
-    };
+    }
 
     delete(req, res) {
         const chatId = req.chat.id;
-        const userChatMessageId = req.userChatMessage.id;
-        const assistantChatMessageId = req.assistantChatMessage.id;
+        const chatMessageId = req.chatMessage.id;
         
         try {
-            this.chatMessageService.delete(userChatMessageId, assistantChatMessageId, chatId);
+            this.chatMessageService.delete(chatMessageId, chatId);
             res.status(200).json({message: "Chat message deleted successfully"});
         } catch (error) {
             console.error(error);
             res.status(error.status || 500).json({message: error.message})
         }
-    };
+    }
 }

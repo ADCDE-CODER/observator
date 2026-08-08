@@ -142,8 +142,16 @@ export default class ChatMessageService {
         const assistantMessage = this.assistantChatMessageService.update(assistantChatMessage, assistantChatMessageId, chatId) */
     }
 
-    delete(userChatMessageId, assistantChatMessageId, chatId) {
-        this.userChatMessageService.delete(userChatMessageId, chatId);
-        this.assistantChatMessageService.delete(assistantChatMessageId, chatId);
+    delete(id, chatId) {
+        // Find all AI replies.
+        const assistantMessageIds = this.assistantChatMessageService.findMessageIdsByUserMessageId(id);
+
+        // Delete each AI parent Message.
+        for (const assistantMessageId of assistantMessageIds) {
+            this.chatMessageModel.delete(assistantMessageId, chatId);
+        }
+
+        // Delete the user parent Message.
+        this.chatMessageModel.delete(id, chatId);
     }
 }
