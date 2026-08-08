@@ -7,7 +7,7 @@ export default class ChatMessageModel {
     initializeDatabase() {
         const table = ` 
             CREATE TABLE IF NOT EXISTS chatmessage (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id INTEGER PRIMARY KEY,
                 role TEXT CHECK(role IN ('user', 'assistant')) NOT NULL,
                 created_at TEXT,
                 chat_id INTEGER NOT NULL,

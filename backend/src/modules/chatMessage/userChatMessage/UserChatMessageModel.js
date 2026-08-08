@@ -7,10 +7,9 @@ export default class UserChatMessageModel {
     initializeDatabase() {
         const table = ` 
             CREATE TABLE IF NOT EXISTS userchatmessage (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                chatmessage_id INTEGER PRIMARY KEY,
                 content TEXT NOT NULL,
                 images TEXT,
-                chatmessage_id INTEGER NOT NULL,
                 FOREIGN KEY (chatmessage_id) REFERENCES chatmessage(id) ON DELETE CASCADE
             );
         `;
@@ -25,16 +24,11 @@ export default class UserChatMessageModel {
         return this.db.prepare(`SELECT * FROM userchatmessage WHERE chatmessage_id IN (${ chatMessageIds.map(() => "?").join(", ") })`).all(chatMessageIds);
     }
 
-    findById(id, chatMessageId) {
-        const rows = this.db.prepare("SELECT id, chatmessage_id FROM userchatmessage WHERE id = ? AND chatmessage_id = ?").all(id, chatMessageId);
-        return rows[0];
+    update(content, images, chatMessageId) {
+        return this.db.prepare("UPDATE userchatmessage SET content = ?, images = ? WHERE chatmessage_id = ?").run(content, images, chatMessageId);
     }
 
-    update(content, images, id, chatMessageId) {
-        return this.db.prepare("UPDATE userchatmessage SET content = ?, images = ? WHERE id = ? AND chatmessage_id = ?").run(content, images, id, chatMessageId);
-    }
-
-    delete(id, chatMessageId) {
-        this.db.prepare("DELETE FROM userchatmessage WHERE id = ? AND chatmessage_id = ?").run(id, chatMessageId);
+    delete(chatMessageId) {
+        this.db.prepare("DELETE FROM userchatmessage WHERE chatmessage_id = ?").run(chatMessageId);
     }
 }

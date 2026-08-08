@@ -7,15 +7,14 @@ export default class AssistantChatMessageModel {
     initializeDatabase() {
         const table = ` 
             CREATE TABLE IF NOT EXISTS assistantchatmessage (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                chatmessage_id INTEGER PRIMARY KEY,
                 model TEXT,
                 thinking TEXT,
                 content TEXT NOT NULL,
                 images TEXT,
-                chatmessage_id INTEGER NOT NULL,
                 userchatmessage_id INTEGER NOT NULL,
                 FOREIGN KEY (chatmessage_id) REFERENCES chatmessage(id) ON DELETE CASCADE,
-                FOREIGN KEY (userchatmessage_id) REFERENCES userchatmessage(id) ON DELETE CASCADE
+                FOREIGN KEY (userchatmessage_id) REFERENCES userchatmessage(chatmessage_id) ON DELETE CASCADE
             );
         `;
         this.db.exec(table);
@@ -29,16 +28,15 @@ export default class AssistantChatMessageModel {
         return this.db.prepare(`SELECT * FROM assistantchatmessage WHERE chatmessage_id IN (${ chatMessageIds.map(() => "?").join(", ") })`).all(chatMessageIds);
     }
 
-    findById(id, chatMessageId) {
-        const rows = this.db.prepare("SELECT id, chatmessage_id FROM assistantchatmessage WHERE id = ? AND chatmessage_id = ?").all(id, chatMessageId);
-        return rows[0];
+    findMessageIdsByUserMessageId(userChatMessageId) {
+        return this.db.prepare("SELECT chatmessage_id FROM assistantchatmessage WHERE userchatmessage_id = ?").all(userChatMessageId).map(row => row.chatmessage_id);
     }
 
-    update(content, images, id, chatMessageId) {
-        return this.db.prepare("UPDATE assistantchatmessage SET content = ?, images = ? WHERE id = ? AND chatmessage_id = ?").run(content, images, id, chatMessageId);
+    update(content, images, chatMessageId) {
+        return this.db.prepare("UPDATE assistantchatmessage SET content = ?, images = ? WHERE chatmessage_id = ?").run(content, images, chatMessageId);
     }
 
-    delete(id, chatMessageId) {
-        this.db.prepare("DELETE FROM assistantchatmessage WHERE id = ? AND chatmessage_id = ?").run(id, chatMessageId);
+    delete(chatMessageId, userChatMessageId) {
+        this.db.prepare("DELETE FROM assistantchatmessage WHERE chatmessage_id = ? AND userchatmessage_id = ?").run(chatMessageId, userChatMessageId);
     }
 }
