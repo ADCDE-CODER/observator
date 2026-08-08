@@ -61,11 +61,15 @@ export default class ChatMessageService {
             throw new Error("Assistant role is required to create a chat message.");
         }
 
-        const userConversationId = this.chatMessageModel.create(userChatMessage.role, userChatMessage.createdAt, chatId).lastInsertRowid;
-        const assistantConversationId = this.chatMessageModel.create(assistantChatMessage.role, assistantChatMessage.createdAt, chatId).lastInsertRowid;
-
-        const userChatMessageId = this.userChatMessageService.create(userChatMessage, userConversationId).lastInsertRowid;
-        this.assistantChatMessageService.create(assistantChatMessage, assistantConversationId, userChatMessageId);
+        try {
+            const userConversationId = this.chatMessageModel.create(userChatMessage.role, userChatMessage.createdAt, chatId).lastInsertRowid;
+            const assistantConversationId = this.chatMessageModel.create(assistantChatMessage.role, assistantChatMessage.createdAt, chatId).lastInsertRowid;
+    
+            const userChatMessageId = this.userChatMessageService.create(userChatMessage, userConversationId).lastInsertRowid;
+            this.assistantChatMessageService.create(assistantChatMessage, assistantConversationId, userChatMessageId);   
+        } catch (error) {
+            throw error;
+        }
     }
 
     getChatMessages(orderBy, chatId) {
@@ -73,67 +77,71 @@ export default class ChatMessageService {
             throw new Error("OrderBy and chat ID are required to get all chat messages.");
         }
 
-        // Get message order
-        const chatMessages = this.chatMessageModel.getAll(orderBy, chatId);
-        const userChatMessageIds = chatMessages.filter(message => message.role === "user").map(m => m.id);
-        const assistantChatMessageIds = chatMessages.filter(message => message.role === "assistant").map(m => m.id);
-
-        // Batch load children
-        const userChatMessages = this.userChatMessageService.getByIds(userChatMessageIds);
-        const assistantChatMessages = this.assistantChatMessageService.getByIds(assistantChatMessageIds);
-
-        // Create lookup maps
-        const userMap = new Map();
-        const assistantMap = new Map();
-
-        for (const user of userChatMessages) {
-            userMap.set(user.chatmessage_id, user);
-        }
-
-        for (const assistant of assistantChatMessages) {
-            assistantMap.set(assistant.chatmessage_id, assistant);
-        }
-
-        // Return chat messages with user and assistant
-        return chatMessages.flatMap(chatMessage => {
-            if (chatMessage.role === "user") {
-                const userChatMessage = userMap.get(chatMessage.id);
-
-                if (!userChatMessage) {
-                    return [];
+        try {
+            // Get message order
+            const chatMessages = this.chatMessageModel.getAll(orderBy, chatId);
+            const userChatMessageIds = chatMessages.filter(message => message.role === "user").map(m => m.id);
+            const assistantChatMessageIds = chatMessages.filter(message => message.role === "assistant").map(m => m.id);
+    
+            // Batch load children
+            const userChatMessages = this.userChatMessageService.getByIds(userChatMessageIds);
+            const assistantChatMessages = this.assistantChatMessageService.getByIds(assistantChatMessageIds);
+    
+            // Create lookup maps
+            const userMap = new Map();
+            const assistantMap = new Map();
+    
+            for (const user of userChatMessages) {
+                userMap.set(user.chatmessage_id, user);
+            }
+    
+            for (const assistant of assistantChatMessages) {
+                assistantMap.set(assistant.chatmessage_id, assistant);
+            }
+    
+            // Return chat messages with user and assistant
+            return chatMessages.flatMap(chatMessage => {
+                if (chatMessage.role === "user") {
+                    const userChatMessage = userMap.get(chatMessage.id);
+    
+                    if (!userChatMessage) {
+                        return [];
+                    }
+                    
+                    return {
+                        id: chatMessage.id,
+                        role: chatMessage.role,
+                        createdAt: chatMessage.created_at,
+                        content: userChatMessage.content,
+                        images: userChatMessage.images,
+                        chatId: chatMessage.chat_id
+                    };
                 }
                 
-                return {
-                    id: chatMessage.id,
-                    role: chatMessage.role,
-                    createdAt: chatMessage.created_at,
-                    content: userChatMessage.content,
-                    images: userChatMessage.images,
-                    chatId: chatMessage.chat_id
-                };
-            }
-            
-            if (chatMessage.role === "assistant") {
-                const assistantChatMessage = assistantMap.get(chatMessage.id);
-
-                if (!assistantChatMessage) {
-                    return [];
+                if (chatMessage.role === "assistant") {
+                    const assistantChatMessage = assistantMap.get(chatMessage.id);
+    
+                    if (!assistantChatMessage) {
+                        return [];
+                    }
+    
+                    return {
+                        id: chatMessage.id,
+                        role: chatMessage.role,
+                        createdAt: chatMessage.created_at,
+                        model: assistantChatMessage.model,
+                        thinking: assistantChatMessage.thinking,
+                        content: assistantChatMessage.content,
+                        images: assistantChatMessage.images,
+                        chatId: chatMessage.chat_id
+                    };
                 }
-
-                return {
-                    id: chatMessage.id,
-                    role: chatMessage.role,
-                    createdAt: chatMessage.created_at,
-                    model: assistantChatMessage.model,
-                    thinking: assistantChatMessage.thinking,
-                    content: assistantChatMessage.content,
-                    images: assistantChatMessage.images,
-                    chatId: chatMessage.chat_id
-                };
-            }
-
-            return [];
-        });
+    
+                return [];
+            });
+        } catch (error) {
+            throw error;
+        }
     }
 
     // TODO: Update for user and assistant
@@ -143,15 +151,23 @@ export default class ChatMessageService {
     }
 
     delete(id, chatId) {
-        // Find all AI replies.
-        const assistantMessageIds = this.assistantChatMessageService.getMessageIdsByUserMessageId(id);
-
-        // Delete each AI parent Message.
-        for (const assistantMessageId of assistantMessageIds) {
-            this.chatMessageModel.delete(assistantMessageId, chatId);
+        if (!id || !chatId) {
+            throw new Error("Chat message ID and chat ID are required to delete a chat.");
         }
 
-        // Delete the user parent Message.
-        this.chatMessageModel.delete(id, chatId);
+        try {
+            // Find all AI replies.
+            const assistantMessageIds = this.assistantChatMessageService.getMessageIdsByUserMessageId(id);
+    
+            // Delete each AI parent Message.
+            for (const assistantMessageId of assistantMessageIds) {
+                this.chatMessageModel.delete(assistantMessageId, chatId);
+            }
+    
+            // Delete the user parent Message.
+            this.chatMessageModel.delete(id, chatId);
+        } catch (error) {
+            throw error;
+        }
     }
 }
