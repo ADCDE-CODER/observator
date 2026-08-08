@@ -21,7 +21,7 @@ export default class ChatService {
         } catch (error) {
             throw error;
         }
-    };
+    }
     
     getAll(userId) {
         if (!userId) {
@@ -33,7 +33,7 @@ export default class ChatService {
         } catch (error) {
             throw error;
         }
-    };
+    }
 
     getById(chatId, userId) {
         if (!chatId || !userId) {
@@ -53,7 +53,7 @@ export default class ChatService {
         } catch (error) {
             throw error;
         }
-    };
+    }
     
     update(chatData, chatId, userId) {        
         const { title } = chatData;
@@ -79,7 +79,7 @@ export default class ChatService {
         } catch (error) {
             throw error;
         }
-    };
+    }
     
     delete(chatId, userId) {
         if (!chatId || !userId) {
@@ -91,5 +91,5 @@ export default class ChatService {
         } catch (error) {
             throw error;
         }
-    };
+    }
 }
