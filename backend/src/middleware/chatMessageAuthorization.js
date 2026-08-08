@@ -1,5 +1,6 @@
 import { db } from "../config/database.js";
 import ChatMessageModel from "../modules/chatMessage/ChatMessageModel.js";
+import ChatMessageService from "../modules/chatMessage/ChatMessageService.js";
 
 export function verifyChatMessageOwner(req, res, next) {
     const chatId = req.chat.id;
@@ -7,12 +8,9 @@ export function verifyChatMessageOwner(req, res, next) {
     
     try {
         const chatMessageModel = new ChatMessageModel(db);
-        const chatMessage = chatMessageModel.findById(chatMessageId, chatId);
+        const chatMessageService = new ChatMessageService(chatMessageModel);
+        const chatMessage = chatMessageService.getById(chatMessageId, chatId);
 
-        if (!chatMessage) {
-            throw new Error("Chat message not found or user does not own this chat message.");
-        }
-        
         req.chatMessage = chatMessage;
         next();
     } catch (error) {

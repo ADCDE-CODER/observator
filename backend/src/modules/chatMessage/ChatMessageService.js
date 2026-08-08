@@ -144,6 +144,26 @@ export default class ChatMessageService {
         }
     }
 
+    getById(id, chatId) {
+        if (!id || !chatId) {
+            throw new Error("Chat message ID and chat ID are required to get a chat message.");
+        }
+
+        try {
+            const chatMessage = this.chatMessageModel.findById(id, chatId);
+
+            if (!chatMessage) {
+                const error = new Error("Chat message not found.");
+                error.status = 404;
+                throw error;
+            }
+
+            return chatMessage;
+        } catch (error) {
+            throw error;
+        }
+    }
+
     // TODO: Update for user and assistant
     update(userChatMessage, userChatMessageId, assistantChatMessageId, chatId) {
        /*  const userMessage = this.userChatMessageService.update(userChatMessage, userChatMessageId, chatId);
