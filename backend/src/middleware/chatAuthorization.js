@@ -11,11 +11,6 @@ export function verifyChatOwner(req, res, next) {
         const chatService = new ChatService(chatModel);
         const chat = chatService.getById(chatId, userId);
         
-        if (!chat) {
-            const error = new Error("Chat not found or user does not own this chat.");
-            next(error);
-        }
-        
         req.chat = chat;
         next();
     } catch (error) {
