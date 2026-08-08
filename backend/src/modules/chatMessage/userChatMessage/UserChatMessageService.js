@@ -35,7 +35,7 @@ export default class UserChatMessageService {
         }
     }
     
-    update(chatMessageData, id, chatMessageId) {  
+    update(chatMessageData, chatMessageId) {  
         const {content, images } = chatMessageData;
         
         if (!content && !images) {
@@ -44,12 +44,12 @@ export default class UserChatMessageService {
             throw error;
         }
         
-        if (!id || !chatMessageId ) {
-            throw new Error("UserChatMessageId and chatMessageId are required to update a chat message.");
+        if (!chatMessageId ) {
+            throw new Error("ChatMessageId is required to update a chat message.");
         }
 
         try {
-            const userChatMessage = this.userChatMessageModel.update(content, images, id, chatMessageId);
+            const userChatMessage = this.userChatMessageModel.update(content, images, chatMessageId);
 
             if(!userChatMessage) {
                 throw new Error("Update failed.");
@@ -61,13 +61,13 @@ export default class UserChatMessageService {
         }
     }
     
-    delete(id, chatMessageId) {
-        if (!id || !chatMessageId) {
-            throw new Error("UserChatMessageId and chatMessageId are required to delete a chat message.")
+    delete(chatMessageId) {
+        if (!chatMessageId) {
+            throw new Error("ChatMessageId is required to delete a chat message.")
         }
 
         try {
-            this.userChatMessageModel.delete(id, chatMessageId);
+            this.userChatMessageModel.delete(chatMessageId);
         } catch (error) {
             throw error;
         }

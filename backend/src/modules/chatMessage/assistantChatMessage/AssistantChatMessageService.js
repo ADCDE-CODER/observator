@@ -34,8 +34,20 @@ export default class AssistantChatMessageService {
             throw error;
         }
     }
+
+    findMessageIdsByUserMessageId(userChatMessageId) {
+        if (!userChatMessageId) {
+            throw new Error("UserChatMessageId is required to get all assistant ID:s.");
+        }
+
+        try {
+            return this.assistantChatMessageModel.findMessageIdsByUserMessageId(userChatMessageId);
+        } catch (error) {
+            throw error;
+        }
+    }
     
-    update(chatMessageData, id, chatMessageId) {        
+    update(chatMessageData, chatMessageId) {        
         const { content, images } = chatMessageData;
         
         if (!content && !images) {
@@ -44,12 +56,12 @@ export default class AssistantChatMessageService {
             throw error;
         }
         
-        if (!id || !chatMessageId ) {
-            throw new Error("AssistantChatMessageId and chatMessageId are required to update a chat message.");
+        if (!chatMessageId ) {
+            throw new Error("ChatMessageId is required to update a chat message.");
         }
 
         try {
-            const assistantChatMessage = this.assistantChatMessageModel.update(content, images, id, chatMessageId);
+            const assistantChatMessage = this.assistantChatMessageModel.update(content, images, chatMessageId);
 
             if(!assistantChatMessage) {
                 throw new Error("Update failed.");
@@ -61,13 +73,13 @@ export default class AssistantChatMessageService {
         }
     }
     
-    delete(id, chatMessageId) {
-        if (!id || !chatMessageId) {
-            throw new Error("AssistantChatMessageId and chatMessageId are required to delete a chat message.")
+    delete(chatMessageId, userChatMessageId) {
+        if (!chatMessageId || !userChatMessageId) {
+            throw new Error("ChatMessageId and userChatMessageId are required to delete a chat message.")
         }
 
         try {
-            this.assistantChatMessageModel.delete(id, chatMessageId);
+            this.assistantChatMessageModel.delete(chatMessageId, userChatMessageId);
         } catch (error) {
             throw error;
         }
