@@ -23,7 +23,7 @@ export default class UserChatMessageService {
         }
     }
     
-    findByIds(chatMessageIds) {
+    getByIds(chatMessageIds) {
         if (!chatMessageIds) {
             throw new Error("ChatMessageIds are required to get all chat messages.");
         }

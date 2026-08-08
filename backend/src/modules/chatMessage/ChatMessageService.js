@@ -79,8 +79,8 @@ export default class ChatMessageService {
         const assistantChatMessageIds = chatMessages.filter(message => message.role === "assistant").map(m => m.id);
 
         // Batch load children
-        const userChatMessages = this.userChatMessageService.findByIds(userChatMessageIds);
-        const assistantChatMessages = this.assistantChatMessageService.findByIds(assistantChatMessageIds);
+        const userChatMessages = this.userChatMessageService.getByIds(userChatMessageIds);
+        const assistantChatMessages = this.assistantChatMessageService.getByIds(assistantChatMessageIds);
 
         // Create lookup maps
         const userMap = new Map();
@@ -144,7 +144,7 @@ export default class ChatMessageService {
 
     delete(id, chatId) {
         // Find all AI replies.
-        const assistantMessageIds = this.assistantChatMessageService.findMessageIdsByUserMessageId(id);
+        const assistantMessageIds = this.assistantChatMessageService.getMessageIdsByUserMessageId(id);
 
         // Delete each AI parent Message.
         for (const assistantMessageId of assistantMessageIds) {

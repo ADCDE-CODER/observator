@@ -23,7 +23,7 @@ export default class AssistantChatMessageService {
         }
     }
     
-    findByIds(chatMessageIds) {
+    getByIds(chatMessageIds) {
         if (!chatMessageIds) {
             throw new Error("ChatMessageIds are required to get all chat messages.");
         }
@@ -35,7 +35,7 @@ export default class AssistantChatMessageService {
         }
     }
 
-    findMessageIdsByUserMessageId(userChatMessageId) {
+    getMessageIdsByUserMessageId(userChatMessageId) {
         if (!userChatMessageId) {
             throw new Error("UserChatMessageId is required to get all assistant ID:s.");
         }
