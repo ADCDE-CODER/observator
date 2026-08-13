@@ -32,8 +32,8 @@ export default class AssistantChatMessageModel {
         return this.db.prepare("SELECT chatmessage_id FROM assistantchatmessage WHERE userchatmessage_id = ?").all(userChatMessageId).map(row => row.chatmessage_id);
     }
 
-    update(content, images, chatMessageId) {
-        return this.db.prepare("UPDATE assistantchatmessage SET content = ?, images = ? WHERE chatmessage_id = ?").run(content, images, chatMessageId);
+    update(thinking, content, images, chatMessageId) {
+        return this.db.prepare("UPDATE assistantchatmessage SET thinking = ?, content = ?, images = ? WHERE chatmessage_id = ?").run(thinking, content, images, chatMessageId);
     }
 
     delete(chatMessageId, userChatMessageId) {

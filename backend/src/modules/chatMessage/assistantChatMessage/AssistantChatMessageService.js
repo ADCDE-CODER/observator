@@ -48,7 +48,7 @@ export default class AssistantChatMessageService {
     }
     
     update(chatMessageData, chatMessageId) {        
-        const { content, images } = chatMessageData;
+        const { thinking, content, images } = chatMessageData;
         
         if (!content && !images) {
             const error = new Error("Content and images are required to update a chat message.");
@@ -61,7 +61,7 @@ export default class AssistantChatMessageService {
         }
 
         try {
-            const assistantChatMessage = this.assistantChatMessageModel.update(content, images, chatMessageId);
+            const assistantChatMessage = this.assistantChatMessageModel.update(thinking, content, images, chatMessageId);
 
             if(!assistantChatMessage) {
                 throw new Error("Update failed.");
