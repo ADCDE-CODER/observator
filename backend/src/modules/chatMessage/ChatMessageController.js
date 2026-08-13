@@ -14,9 +14,7 @@ export default class ChatMessageController {
             res.setHeader('Connection', 'keep-alive');
 
             try {
-                const generator = this.chatMessageService.generateResponse(userChatMessage, chatId);
-                
-                for await (const event of generator) {
+                const assistantChatMessage = await this.chatMessageService.generateResponse(userChatMessage, chatId, (event) => {
                     if (event.thinking) {
                         res.write(`data: ${JSON.stringify(event)}\n\n`);
                     } else if (event.content) {
@@ -24,12 +22,15 @@ export default class ChatMessageController {
                     }
 
                     if (event.done) {
-                        res.write(`data: ${JSON.stringify(event)}\n\n`);
+                        res.write(`data: ${JSON.stringify(event)}\n\n`); 
                     }
-                }
+                });
                 
                 // End response when streaming is complete. 
                 res.end();
+
+                // Create the user and assistant messages in database.
+                this.chatMessageService.create(userChatMessage, assistantChatMessage, chatId);
             } catch (error) {
                 console.error(error);
                 res.status(error.status || 500).json({message: error.message});

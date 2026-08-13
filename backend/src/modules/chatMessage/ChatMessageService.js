@@ -6,7 +6,7 @@ export default class ChatMessageService {
         this.aiGenerationService = aiGenerationService;
     }
 
-    async *generateResponse(userChatMessage, chatId) {
+    async generateResponse(userChatMessage, chatId, onChunk) {
         const conversationContext = this.getChatMessages("ASC", chatId);
         conversationContext.push({role: userChatMessage.role, content: userChatMessage.content, images: userChatMessage.images});
         const stream = await this.aiGenerationService.generateResponse(conversationContext, chatId);
@@ -23,31 +23,31 @@ export default class ChatMessageService {
                 if(!inThinking) {
                     inThinking = true;
                     assistantChatMessage.thinking = "Thinking:\n\n";
-                    yield { done: chunk.done, role: chunk.message.role, model: chunk.model, thinking: "Thinking:\n\n" };
+                    onChunk({ done: chunk.done, role: chunk.message.role, model: chunk.model, thinking: "Thinking:\n\n" });
                 }
 
                 assistantChatMessage.thinking += chunk.message.thinking;
-                yield { done: chunk.done, role: chunk.message.role, model: chunk.model, thinking: chunk.message.thinking };
+                onChunk ({ done: chunk.done, role: chunk.message.role, model: chunk.model, thinking: chunk.message.thinking });
             } else if (chunk.message.content) {
                 if(inThinking) {
                     inThinking = false;
                     assistantChatMessage.content = "\n\nAnswer:\n\n";
-                    yield { done: chunk.done, role: chunk.message.role, model: chunk.model, content: "\n\nAnswer:\n" };
+                    onChunk({ done: chunk.done, role: chunk.message.role, model: chunk.model, content: "\n\nAnswer:\n" });
                 }
 
                 assistantChatMessage.content += chunk.message.content;
-                yield { done: chunk.done, role: chunk.message.role, model: chunk.model, content: chunk.message.content };
+                onChunk({ done: chunk.done, role: chunk.message.role, model: chunk.model, content: chunk.message.content });
             }
 
             if (chunk.done) {
                 assistantChatMessage.role = chunk.message.role;
                 assistantChatMessage.model = chunk.model;
                 assistantChatMessage.createdAt = chunk.created_at;
-                yield { done: chunk.done, role: chunk.message.role, model: chunk.model, createdAt: chunk.created_at };
+                onChunk({ done: chunk.done, role: chunk.message.role, model: chunk.model, createdAt: chunk.created_at });
             }
         }
 
-        this.create(userChatMessage, assistantChatMessage, chatId)
+        return assistantChatMessage;
     }
 
     create(userChatMessage, assistantChatMessage, chatId) {
