@@ -75,9 +75,21 @@ export default class ChatMessageService {
             throw new Error("OrderBy and chat ID are required to get all chat messages.");
         }
 
+        const chatMessages = this.chatMessageModel.getAll(orderBy, chatId);   
+        return this.mergeUserAndAssistantMessages(chatMessages);
+    }
+
+    getChatMessagesBySequence(orderBy, sequence, chatId) {
+        if (!orderBy || !sequence || !chatId) {
+            throw new Error("OrderBy, sequence, and chat ID are required to get all sequence chat messages.");
+        }
+
+        const chatMessages = this.chatMessageModel.getAllBySequence(orderBy, sequence, chatId);
+        return this.mergeUserAndAssistantMessages(chatMessages);
+    }
+
+    mergeUserAndAssistantMessages(chatMessages) {
         try {
-            // Get message order
-            const chatMessages = this.chatMessageModel.getAll(orderBy, chatId);
             const userChatMessageIds = chatMessages.filter(message => message.role === "user").map(m => m.id);
             const assistantChatMessageIds = chatMessages.filter(message => message.role === "assistant").map(m => m.id);
     
