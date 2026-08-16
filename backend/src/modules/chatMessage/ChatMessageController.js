@@ -59,18 +59,45 @@ export default class ChatMessageController {
         } 
     }
 
-    update(req, res) {
-        const chatMessageData = req.body;
+    async update(req, res) {
+        const userChatMessage = req.body;
         const chatId = req.chat.id;
-        const userChatMessageId = req.userChatMessage.id;
-        const assistantChatMessageId = req.assistantChatMessage.id;
-        
+        const chatMessageId = req.chatMessage.id;
+
+        // Get streaming from AI
         try {
-            const chatMessage = this.chatMessageService.update(chatMessageData, userChatMessageId, assistantChatMessageId, chatId)
-            res.status(200).json({message: "Chat message updated successfully", chatMessage});
+            res.setHeader('Content-Type', 'text/event-stream');
+            res.setHeader('Cache-Control', 'no-cache');
+            res.setHeader('Connection', 'keep-alive');
+
+            try {
+                const conversationContext = this.chatMessageService.updateUserMessage(userChatMessage, chatMessageId, chatId);
+                const assistantChatMessage = await this.chatMessageService.generateResponse(conversationContext, chatId, (event) => {
+                    if (event.thinking) {
+                        res.write(`data: ${JSON.stringify(event)}\n\n`);
+                    } else if (event.content) {
+                        res.write(`data: ${JSON.stringify(event)}\n\n`);
+                    }
+
+                    if (event.done) {
+                        res.write(`data: ${JSON.stringify(event)}\n\n`); 
+                    }
+                });
+                
+                // End response when streaming is complete. 
+                res.end();
+
+                this.chatMessageService.updateAssistantMessage(assistantChatMessage, chatMessageId, chatId);
+            } catch (error) {
+                console.error(error);
+                res.status(error.status || 500).json({message: error.message});
+            }
         } catch (error) {
             console.error(error);
-            res.status(error.status || 500).json({message: error.message})
+            
+            if (!res.headersSent) {                 
+                res.status(error.status || 500).json({message: error.message})
+            }
         }
     }
 
