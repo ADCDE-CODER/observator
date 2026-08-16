@@ -14,7 +14,10 @@ export default class ChatMessageController {
             res.setHeader('Connection', 'keep-alive');
 
             try {
-                const assistantChatMessage = await this.chatMessageService.generateResponse(userChatMessage, chatId, (event) => {
+                const conversationContext = this.chatMessageService.getChatMessages("ASC", chatId);
+                conversationContext.push({role: userChatMessage.role, content: userChatMessage.content, images: userChatMessage.images});
+
+                const assistantChatMessage = await this.chatMessageService.generateResponse(conversationContext, chatId, (event) => {
                     if (event.thinking) {
                         res.write(`data: ${JSON.stringify(event)}\n\n`);
                     } else if (event.content) {

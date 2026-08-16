@@ -6,9 +6,7 @@ export default class ChatMessageService {
         this.aiGenerationService = aiGenerationService;
     }
 
-    async generateResponse(userChatMessage, chatId, onChunk) {
-        const conversationContext = this.getChatMessages("ASC", chatId);
-        conversationContext.push({role: userChatMessage.role, content: userChatMessage.content, images: userChatMessage.images});
+    async generateResponse(conversationContext, chatId, onChunk) {
         const stream = await this.aiGenerationService.generateResponse(conversationContext, chatId);
 
         // Stream the content chunk by chunk
