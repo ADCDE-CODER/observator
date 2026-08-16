@@ -174,10 +174,39 @@ export default class ChatMessageService {
         }
     }
 
-    // TODO: Update for user and assistant
-    update(userChatMessage, userChatMessageId, assistantChatMessageId, chatId) {
-       /*  const userMessage = this.userChatMessageService.update(userChatMessage, userChatMessageId, chatId);
-        const assistantMessage = this.assistantChatMessageService.update(assistantChatMessage, assistantChatMessageId, chatId) */
+    updateUserMessage(userChatMessage, id, chatId) {
+        if (!userChatMessage.role || !userChatMessage.updatedAt) {
+            const error = new Error("User role and updated at are required to update the chat message.");
+            error.status = 400;
+            throw error;
+        }
+
+        const chatMessage = this.chatMessageModel.findById(id, chatId);
+
+        if (!chatMessage) {
+            throw new Error("Message not found");
+        }
+
+        if (chatMessage.role !== "user") {
+            throw new Error("Only user messages can be edited");
+        }
+
+        this.chatMessageModel.update(userChatMessage.role, userChatMessage.updatedAt, id, chatId);
+        this.userChatMessageService.update(userChatMessage, id);
+
+        return this.getChatMessagesBySequence("ASC", chatMessage.sequence, chatId);
+    }
+
+    updateAssistantMessage(assistantChatMessage, id, chatId) {
+        if (!assistantChatMessage.role) {
+            throw new Error("Assistant role is required to update the chat message.");
+        }
+
+        const assistantMessageIds = this.assistantChatMessageService.getMessageIdsByUserMessageId(id);
+        for (const assistantMessageId of assistantMessageIds) {
+            this.chatMessageModel.update(assistantChatMessage.role, assistantChatMessage.updatedAt, assistantMessageId, chatId);
+            this.assistantChatMessageService.update(assistantChatMessage, assistantMessageId);
+        }
     }
 
     delete(id, chatId) {
