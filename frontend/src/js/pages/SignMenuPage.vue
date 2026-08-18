@@ -3,7 +3,7 @@
     import SignupForm from '../components/SignupForm.vue';
     import SigninForm from '../components/SigninForm.vue';
     import { useRouter } from 'vue-router';
-    import { createAccount, readAccount } from '../services/userService';
+    import { createAccount, readAccount } from '../services/userService.js';
     import { authState } from '../state/authState.js';
 
     const router = useRouter();
