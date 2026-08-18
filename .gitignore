@@ -2,6 +2,7 @@
 node_modules/
 database.sqlite
 images/
+data/
 
 # Logs
 frontend/logs/
