@@ -1,15 +1,27 @@
 <script setup>
     import { ref } from 'vue';
-    import { createAccount } from '../services/authService';
+    import { createAccount } from '../services/userService';
 
     const email = ref('');
+    const username = ref('');
     const password = ref('');
 
     async function doSignup() {
-        const result = await createAccount(email.value, password.value);
-        if (result.ok && result.success) {
+        const user = {
+            email: email.value, 
+            username: username.value, 
+            password: password.value
+        };
+        
+        try {
+            const result = await createAccount(user);
+            alert(result.message);
+            
             email.value = '';
+            username.value = '';
             password.value = '';
+        } catch (error) {
+            alert(error.message);
         }
     }
 </script>
@@ -18,8 +30,9 @@
     <section>
         <h2>Sign up</h2>
         <form @submit.prevent="doSignup()">
-            <input class="email-input" type="email" placeholder="Email" v-model="email"/>
-            <input class="password-input" type="password" placeholder="Password" v-model="password"/>
+            <input class="input" type="email" placeholder="Email" v-model="email"/>
+            <input class="input" type="text" placeholder="Username" v-model="username"/>
+            <input class="input" type="password" placeholder="Password" v-model="password"/>
             <button class="secondary-button" type="submit">Sign up</button>
         </form>
     </section>
@@ -32,14 +45,14 @@
         align-items: center;
     }
 
-    .email-input, .password-input, .secondary-button {
+    .input, .secondary-button {
         width: 100%;
         padding: 1rem;
         box-sizing: border-box;
         border-radius: 20px;
     }
 
-    .email-input, .password-input {
+    .input {
         background-color: var(--color-surface-container-highest);
         color: var(--color-on-surface);
         border: 1px var(--color-outline) solid;
