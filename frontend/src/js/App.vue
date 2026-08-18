@@ -15,7 +15,7 @@
 
 <template>
 	<header>
-		<NavbarPage/>
+		<NavbarPage :auth-state="authState"/>
 	</header>
 	<main id="content-main">
 		<RouterView/>

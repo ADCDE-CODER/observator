@@ -1,8 +1,11 @@
 <script setup>
 	import logo from "./../../assets/images/logo.png"
 	import profile from "./../../assets/images/profile.png"
-	import { authState } from "../state/authState";
 	import { useRouter } from "vue-router";
+
+	const { authState } = defineProps({
+		authState: Object
+	});
 
 	const router = useRouter();
 	
