@@ -3,10 +3,20 @@
     import SignupForm from '../components/SignupForm.vue';
     import SigninForm from '../components/SigninForm.vue';
     import { useRouter } from 'vue-router';
+    import { createAccount } from '../services/userService';
     import { readAccount } from '../services/userService';
     import { authState } from '../state/authState.js';
 
     const router = useRouter();
+
+    async function doSignup(user) {
+        try {
+            const result = await createAccount(user);
+            alert(result.message);
+        } catch (error) {
+            alert(error.message);
+        }
+    }
 
     async function doSignin(user) {                
         try {
@@ -26,7 +36,7 @@
     <section class="sign-menu">
         <Card>
             <h2>Enter your information</h2>
-            <SignupForm/>
+            <SignupForm @create-user="(user) => doSignup(user)"/>
             <SigninForm @read-user="(user) => doSignin(user)"/>
         </Card>
     </section>

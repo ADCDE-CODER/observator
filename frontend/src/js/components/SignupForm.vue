@@ -1,35 +1,29 @@
 <script setup>
     import { ref } from 'vue';
-    import { createAccount } from '../services/userService';
 
     const email = ref('');
     const username = ref('');
     const password = ref('');
+    const emit = defineEmits(["create-user"]);
 
-    async function doSignup() {
+    async function sendUser() {
         const user = {
             email: email.value, 
             username: username.value, 
             password: password.value
         };
-        
-        try {
-            const result = await createAccount(user);
-            alert(result.message);
-            
-            email.value = '';
-            username.value = '';
-            password.value = '';
-        } catch (error) {
-            alert(error.message);
-        }
+
+        emit("create-user", user);
+        email.value = '';
+        username.value = '';
+        password.value = '';
     }
 </script>
 
 <template>
     <section>
         <h2>Sign up</h2>
-        <form @submit.prevent="doSignup()">
+        <form @submit.prevent="sendUser()">
             <input class="input" type="email" placeholder="Email" v-model="email"/>
             <input class="input" type="text" placeholder="Username" v-model="username"/>
             <input class="input" type="password" placeholder="Password" v-model="password"/>
