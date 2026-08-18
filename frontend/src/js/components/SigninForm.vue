@@ -1,39 +1,26 @@
 <script setup>
     import { ref } from 'vue';
-    import { useRouter } from 'vue-router';
-    import { authState } from '../state/authState';
-    import { readAccount } from '../services/userService';
 
     const email = ref('');
     const password = ref('');
-    const router = useRouter();
-   
-    async function doSignin() {        
+    const emit = defineEmits(["read-user"]);
+
+    async function sendUser() {        
         const user = {
             email: email.value, 
             password: password.value
         };
         
-        try {
-            const result = await readAccount(user);
-            alert(result.message);
-            
-            email.value = '';
-            password.value = '';
-            
-            authState.setUser(result.user);
-            authState.setToken(result.user.token);
-            router.push('/chat');
-        } catch (error) {
-            alert(error.message);
-        }
+        emit("read-user", user);
+        email.value = '';
+        password.value = '';
     }
 </script>
 
 <template>
     <section>
         <h2>Sign in</h2>
-        <form @submit.prevent="doSignin()">
+        <form @submit.prevent="sendUser()">
             <input class="input" type="email" placeholder="Email" v-model="email"/>
             <input class="input" type="password" placeholder="Password" v-model="password"/>
             <button class="primary-button" type="submit">Sign in</button>
