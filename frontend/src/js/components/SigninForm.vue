@@ -2,21 +2,30 @@
     import { ref } from 'vue';
     import { useRouter } from 'vue-router';
     import { authState } from '../state/authState';
-    import { readAccount } from '../services/authService';
+    import { readAccount } from '../services/userService';
 
     const email = ref('');
     const password = ref('');
     const router = useRouter();
    
     async function doSignin() {        
-        const response = await readAccount(email.value, password.value);
-        if (response.ok && response.success) {
+        const user = {
+            email: email.value, 
+            password: password.value
+        };
+        
+        try {
+            const result = await readAccount(user);
+            alert(result.message);
+            
             email.value = '';
             password.value = '';
             
-            authState.setUser(response.user);
-            authState.setToken(response.token);
+            authState.setUser(result.user);
+            authState.setToken(result.user.token);
             router.push('/chat');
+        } catch (error) {
+            alert(error.message);
         }
     }
 </script>
@@ -25,8 +34,8 @@
     <section>
         <h2>Sign in</h2>
         <form @submit.prevent="doSignin()">
-            <input class="email-input" type="email" placeholder="Email" v-model="email"/>
-            <input class="password-input" type="password" placeholder="Password" v-model="password"/>
+            <input class="input" type="email" placeholder="Email" v-model="email"/>
+            <input class="input" type="password" placeholder="Password" v-model="password"/>
             <button class="primary-button" type="submit">Sign in</button>
         </form>
     </section>
@@ -39,14 +48,14 @@
         align-items: center;
     }
 
-    .email-input, .password-input, .primary-button {
+    .input, .primary-button {
         width: 100%;
         padding: 1rem;
         box-sizing: border-box;
         border-radius: 20px;
     }
 
-    .email-input, .password-input {
+    .input {
         background-color: var(--color-surface-container-highest);
         color: var(--color-on-surface);
         border: 1px var(--color-outline) solid;
