@@ -64,6 +64,7 @@
 				<!-- Profile Button-->
 				<button class="profile-button" @click="toggleDropdown()" ref="profileButton">
 					<ProfileIcon color="var(--color-on-surface)" width="25" height="25" aria-label="profile image"/>
+					<div class="username">{{ authState.user.username }}</div>
 				</button>
 
 				<!-- The Dropdown Menu Panel -->
@@ -124,6 +125,10 @@
 		display: flex;
 		align-items: center;
 		gap: 10px;
+	}
+
+	.username {
+		color: var(--color-on-surface);
 	}
 
 	.dropdown-menu {
