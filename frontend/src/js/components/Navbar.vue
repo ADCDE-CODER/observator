@@ -1,6 +1,6 @@
 <script setup>
-	import ProfileIcon from '../components/ProfileIcon.vue';
-	import logo from "./../../assets/images/logo.png"
+	import LogoIcon from './LogoIcon.vue';
+	import ProfileIcon from './ProfileIcon.vue';
 	import { onMounted, onUnmounted, ref } from "vue";
 	import { useRouter } from "vue-router";
 	
@@ -44,14 +44,14 @@
 	<div class="navbar">
 		<div class="navbar-content" v-show="!authState.user">
 			<div class="navbar-logo">
-				<img :src="logo" alt="logo image" @click.prevent="router.push('/welcome')">
+				<LogoIcon color="var(--color-on-surface)" width="35" height="35" alt="logo image" @click.prevent="router.push('/welcome')"/>
 			</div>
 			<button class="primary-button" @click="goLogin()">Log in</button>
 		</div>
 
 		<div class="navbar-content" v-show="authState.user">
 			<div class="navbar-logo">
-				<img :src="logo" alt="logo image" @click.prevent="router.push('/welcome')">
+				<LogoIcon color="var(--color-on-surface)" width="35" height="35" alt="logo image" @click.prevent="router.push('/welcome')"/>
 			</div>
 			<nav class="navbar-links">
 				<RouterLink class="nav-link" to="/chat">Chat</RouterLink>
