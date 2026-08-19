@@ -1,7 +1,7 @@
 <script setup>
-	import { onMounted, onUnmounted, ref } from "vue";
+	import ProfileIcon from '../components/ProfileIcon.vue';
 	import logo from "./../../assets/images/logo.png"
-	import profile from "./../../assets/images/profile.png"
+	import { onMounted, onUnmounted, ref } from "vue";
 	import { useRouter } from "vue-router";
 	
 	const router = useRouter();
@@ -63,7 +63,7 @@
 			<div class="navbar-profile">
 				<!-- Profile Button-->
 				<button class="profile-button" @click="toggleDropdown()" ref="profileButton">
-					<img :src="profile" alt="profile image">
+					<ProfileIcon color="var(--color-on-surface)" width="25" height="25" aria-label="profile image"/>
 				</button>
 
 				<!-- The Dropdown Menu Panel -->
