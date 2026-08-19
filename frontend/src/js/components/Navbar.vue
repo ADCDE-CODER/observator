@@ -1,13 +1,34 @@
 <script setup>
+	import { onMounted, onUnmounted, ref } from "vue";
 	import logo from "./../../assets/images/logo.png"
 	import profile from "./../../assets/images/profile.png"
 	import { useRouter } from "vue-router";
-
+	
+	const router = useRouter();
+	const isDropdownOpen = ref(false);
+	const profileButton = ref(null);
+	const dropdownMenu = ref(null);
 	const { authState } = defineProps({
 		authState: Object
 	});
+	
+    onMounted(() => {
+        document.addEventListener('click', handleClickOutside);
+    });
 
-	const router = useRouter();
+	onUnmounted(() => {
+        document.removeEventListener('click', handleClickOutside);
+    });
+	
+    function handleClickOutside(event) {
+		if (!profileButton.value.contains(event.target) && !dropdownMenu.value.contains(event.target)) {
+			isDropdownOpen.value = false;
+        }
+    }
+
+	function toggleDropdown() {
+		isDropdownOpen.value = !isDropdownOpen.value;
+	}
 	
 	function goLogin() {
 		router.push('/sign');
@@ -38,10 +59,21 @@
 				<RouterLink class="nav-link" to="/video">Video</RouterLink>
 				<RouterLink class="nav-link" to="/post">Post</RouterLink>
 			</nav>
+
 			<div class="navbar-profile">
-				<img :src="profile" alt="profile image">
+				<!-- Profile Button-->
+				<button class="profile-button" @click="toggleDropdown()" ref="profileButton">
+					<img :src="profile" alt="profile image">
+				</button>
+
+				<!-- The Dropdown Menu Panel -->
+				<div class="dropdown-menu" v-show="isDropdownOpen" ref="dropdownMenu">
+					<RouterLink class="dropdown-item" to="/welcome">Profile 🚧</RouterLink>
+					<RouterLink class="dropdown-item" to="/welcome">Settings 🚧</RouterLink>
+					<div class="divider"></div>
+					<button class="dropdown-item secondary-button" @click="goLogout()">Log out</button>
+				</div>
 			</div>
-			<button class="secondary-button" @click="goLogout()">Log out</button>
 		</div>
 	</div>
 </template>
@@ -64,7 +96,7 @@
 		gap: 1em;
 	}
 	
-	.navbar-logo, .navbar-profile {
+	.navbar-logo {
 		display: flex;
 		cursor: pointer;
 	}
@@ -78,7 +110,54 @@
 		cursor: pointer;
 	}
 
-	.nav-link:hover, .router-link-exact-active {
+	.navbar-profile {
+		display: inline-block;
+		cursor: pointer;
+		position: relative;
+	}
+
+	.profile-button {
+		background: none;
+		border: none;
+		cursor: pointer;
+		padding: 0px;
+		display: flex;
+		align-items: center;
+		gap: 10px;
+	}
+
+	.dropdown-menu {
+		background-color: var(--color-surface-container-high);
+		border: 1px solid var(--color-outline);
+		position: absolute;
+		margin-top: 5px;
+		top: 100%;
+		left: 50%;
+		transform: translateX(-50%);
+		border-radius: 15px;
+		padding: 10px;
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+	}
+
+	.dropdown-item {
+		color: var(--color-on-surface);
+		text-decoration: none;
+		box-sizing: border-box;
+		padding: 10px 20px;
+		border-radius: 15px;
+		cursor: pointer;
+		text-align: center;
+		transition: background-color 1s, color 1s;
+	}
+
+	.divider {
+		height: 1px;
+		background-color: var(--color-outline);
+	}
+
+	.nav-link:hover, .dropdown-item:hover, .router-link-exact-active {
 		background-color: var(--color-secondary-container);
 		color: var(--color-on-secondary-container);
 	}
