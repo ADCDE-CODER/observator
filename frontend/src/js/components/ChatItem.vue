@@ -25,14 +25,7 @@
 
     function onRename() {
         const title = prompt("Please enter to change chat title");
-
-        if(title) {
-            if (title.length !== 0) {
-                emit('rename-chat', chat.id, title);
-            } else {
-                alert("No empty value!")
-            }
-        }
+        emit('rename-chat', chat.id, title);
     }
 
     function onDelete() {
