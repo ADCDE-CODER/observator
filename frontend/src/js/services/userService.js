@@ -1,6 +1,6 @@
 import { createUser, readUser } from "../api/userApi.js";
 
-async function createAccount(user) {
+export async function createAccount(user) {
     if (typeof user.email === 'string') {
         user.email = user.email.trim();
     }
@@ -16,7 +16,7 @@ async function createAccount(user) {
     return await createUser(user);
 };
 
-async function readAccount(user) {
+export async function readAccount(user) {
     if (typeof user.email === 'string') {
         user.email = user.email.trim();
     }
@@ -31,5 +31,3 @@ async function readAccount(user) {
 
     return await readUser(user);
 };
-
-export { createAccount, readAccount };
