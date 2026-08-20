@@ -1,38 +1,77 @@
-import { requestApi } from "./requestApi.js";
+export async function createChat(title, userToken) {
+    const url = "http://localhost:3000/chats/";    
+    const response = await fetch(url, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${userToken}`
+        },
+        body: JSON.stringify({ title })
+    });
+    
+    const result = await response.json();
 
-async function createChat(user) {
-    const data = {
-        user: user
-    };
+    if (!response.ok) {
+        throw new Error(result.message);
+    }
 
-    return requestApi("http://localhost:3000/chat/new", "POST", null, data, "New chat error:");
+    return result;
 };
 
-async function updateChat(user, chatId, title) {
-    const data = {
-        user: user,
-        chatId: chatId,
-        title: title
-    };
+export async function getAllChats(userToken) {
+    const url = "http://localhost:3000/chats/";    
+    const response = await fetch(url, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${userToken}`
+        }
+    });
+    
+    const result = await response.json();
 
-    return requestApi("http://localhost:3000/chat/update", "POST", null, data, "Update chat error:");
+    if (!response.ok) {
+        throw new Error(result.message);
+    }
+
+    return result;
 };
 
-async function readChat(user) {
-    const data = {
-        user: user
-    };
+export async function updateChat(title, id, userToken) {
+    const url = `http://localhost:3000/chats/${id}`;
+    const response = await fetch(url, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${userToken}`
+        },
+        body: JSON.stringify({ title })
+    });
+    
+    const result = await response.json();
 
-    return requestApi("http://localhost:3000/chat/one", "POST", null, data, "Get chat error:");
+    if (!response.ok) {
+        throw new Error(result.message);
+    }
+
+    return result;
 };
 
-async function deleteChat(user, chatId) {
-    const data = {
-        user: user,
-        chatId: chatId
-    };
+export async function deleteChat(id, userToken) {
+    const url = `http://localhost:3000/chats/${id}`;   
+    const response = await fetch(url, {
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${userToken}`
+        }
+    });
+    
+    const result = await response.json();
 
-    return requestApi("http://localhost:3000/chat/delete", "POST", null, data, "Delete chat error:");
+    if (!response.ok) {
+        throw new Error(result.message);
+    }
+
+    return result;
 };
-
-export { createChat, readChat, updateChat, deleteChat };
