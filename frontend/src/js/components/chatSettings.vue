@@ -97,11 +97,12 @@
         background-color: var(--color-surface-container);
         color: var(--color-on-surface);
         display: flex;
+        flex-grow: 0;
+        flex-shrink: 0;
+        flex-basis: clamp(250px, 15vw, 400px);
         flex-direction: column;
         justify-content: flex-start;
         align-items: center;
-        flex-shrink: 0;
-        width: clamp(200px, 15%, 300px);
     }
 
     .settings{

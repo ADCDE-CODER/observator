@@ -25,7 +25,7 @@
 
 <style scoped>
 	#content-main {
-		background-color: red;
+		background-color: var(--color-surface-container);
 		overflow: auto;
 	}
 </style>

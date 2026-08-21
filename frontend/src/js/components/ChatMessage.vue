@@ -79,9 +79,10 @@
         background-color: var(--color-surface-container);
         color: var(--color-on-surface);
         display: flex;
+        flex-grow: 0;
+        min-width: 400px;
         flex-direction: column;
         align-items: center;
-        width: 100%;
     }
 
     .output-container {
