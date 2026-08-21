@@ -1,31 +1,61 @@
-import { requestApi } from "./requestApi.js";
+export async function createMessage(userChatMessage, chatId, userToken, onChunk) {
+    const url = `http://localhost:3000/chats/${chatId}/chatmessages`;
+    console.log(JSON.stringify(userChatMessage))
 
-async function createMessage(token, userInputValue, chatSettings, chatId) {
-    const url = "http://localhost:3000/message/prompt";
-    const data = {
-        userInput: userInputValue, 
-        settings: chatSettings, 
-        chatId: chatId 
-    };
-    
     const response = await fetch(url, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
+            "Authorization": `Bearer ${userToken}`
         },
-        body: JSON.stringify({ data: data })
+        body: JSON.stringify(userChatMessage)
     });
+    
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder('utf-8');
+        
+    if (!reader) {
+        throw new Error("Response body could not be read (not a stream).");
+    }
 
-    return response;
+    while (true) {
+        const { value, done } = await reader.read();
+
+        if (done) break;
+
+        if (value) {
+            // Decode the binary chunk
+            const lines = decoder.decode(value).split("\n"); 
+
+            for (const line of lines) {
+                if (line.startsWith("data: ")) {
+                    const data = line.replace("data: ", "");
+                    const assistantChatMessage  = JSON.parse(data);
+
+                    // Call the provided callback function with the text chunk
+                    onChunk(assistantChatMessage);                                
+                }
+            }                        
+        }
+    } 
 };
 
-async function getMessage(chatId) {
-    const data = {
-        chatId: chatId 
-    };
+export async function getMessage(chatId, userToken) {
+    const url = `http://localhost:3000/chats/${chatId}/chatMessages`;
 
-    return requestApi("http://localhost:3000/message/one", "POST", null, data, "Failed to load chat messages:");
+    const response = await fetch(url, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${userToken}`
+        }
+    });
+    
+    const result = await response.json();
+
+    if (!response.ok) {
+        throw new Error(result.message);
+    }
+    
+    return result;
 };
-
-export { createMessage, getMessage };
