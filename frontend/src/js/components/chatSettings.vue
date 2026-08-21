@@ -35,6 +35,7 @@
                     :placeholder="input.placeholder" 
                     :min="input.min" 
                     :max="input.max"
+                    :step="input.step"
                     v-model="input.value" 
                     >
 
