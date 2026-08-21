@@ -1,5 +1,6 @@
 <script setup>
     import { ref } from 'vue';
+    import { DateUtil } from '../utils/DateUtil';
     
     const userInput = ref(null);
     const userInputContext = ref('');
@@ -41,7 +42,14 @@
     };
 
     function sendMessage() {
-        emit('create-message', userInputContext.value);
+        const userChatMessage = {
+            role: "user",
+            content: userInputContext.value,
+            images: null,
+            createdAt: new Date().toISOString()
+        };
+        
+        emit('create-message', userChatMessage);
         userInputContext.value = '';
         userInput.value.style.height = 'auto';
     }
@@ -62,9 +70,11 @@
     <div class="chatMessages" v-show="selectedId">
         <h2>Message</h2>
         <div class="output-container">
-            <section v-for="message in messages" :key="message.id" :class="message.sender">
+            <section v-for="message in messages" :key="message.id" :class="message.role">
                 <strong>{{ message.sender }}:</strong>
-                <div class="html-output" v-html="message.message"></div>
+                <div class="html-output" v-html="message.thinking"></div>
+                <div class="html-output" v-html="message.content"></div>
+                <div class="created-at">{{ DateUtil.formatDateTime(message.createdAt) }}</div>
             </section>
         </div>
         <form class="input-container" @submit.prevent="sendMessage()">
@@ -99,7 +109,7 @@
         gap: 1rem;
     }
 
-    .user, .ai {
+    .user, .assistant {
         padding: 1rem;
         border-radius: 20px;
         max-width: 80%;
@@ -111,13 +121,21 @@
         margin-left: auto;
     }
 
-    .ai {
+    .assistant {
         background-color: var(--color-surface-container-highest);
         color: var(--color-on-surface);
     }
 
     .html-output {
         overflow-x: auto;
+    }
+
+    .created-at {
+        display: block;
+        margin-top: 8px;
+        font-size: 0.75em;
+        color: var(--color-on-surface);
+        text-align: right;
     }
     
     .input-container {
