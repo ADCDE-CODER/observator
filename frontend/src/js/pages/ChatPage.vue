@@ -175,56 +175,96 @@
         authState.setSelectedChatId(null);
     }
 
-    async function createMessage(user, userInput, token, chatSettings, selectedChatId) {
-        const userInputHtml = renderMarkdown(userInput);
-        const userObj = {
-            sender: "user",
-            message: userInputHtml
-        };
-
-        messages.value.push(userObj);
+    async function createMessage(userChatMessage, username, chatId, userToken) {
+        const userMessage = { ...userChatMessage };
+        userMessage.sender = username;
+        userMessage.content = renderMarkdown(userMessage.content);
+        messages.value.push(userMessage);
         
-        let chunkBuffer = ""
-        let messageContainerIndex = null;
+        let thinkingBuffer = "";
+        let contentBuffer = "";
+        let lastMessageIndex = null;
 
-        await addMessages(user, userInput, token, chatSettings, selectedChatId, (chunk) => {
-            if (!messageContainerIndex) {
-                chunkBuffer = chunk;
-                const html = renderMarkdown(chunkBuffer);
-                const aiObj = {
-                    sender: "ai",
-                    message: html
-                };
+        try {
+            await addMessages(userChatMessage, chatId, userToken, (assistantChatMessage) => {
+                const currentMessage = assistantChatMessage;
                 
-                messages.value.push(aiObj);
-                messageContainerIndex = messages.value.length - 1;
-            } else {
-                chunkBuffer += chunk;
-                const html = renderMarkdown(chunkBuffer);
-                
-                messages.value[messageContainerIndex].message = html;
-            }
-        });
+                if (!lastMessageIndex) {
+                    if(currentMessage.thinking) {
+                        thinkingBuffer = currentMessage.thinking;
+                        currentMessage.thinking = renderMarkdown(thinkingBuffer);
+                    } else if (currentMessage.content) {
+                        contentBuffer = currentMessage.content;
+                        currentMessage.thinking = renderMarkdown(contentBuffer);
+                    }
+                    
+                    currentMessage.sender = currentMessage.model;
+    
+                    messages.value.push(currentMessage);
+                    lastMessageIndex = messages.value.length - 1;
+                } else {
+                    const targetMessage = messages.value[lastMessageIndex];
+    
+                    if (currentMessage.thinking) {
+                        thinkingBuffer += currentMessage.thinking;
+                        targetMessage.thinking = renderMarkdown(thinkingBuffer);
+                    } else if (currentMessage.content) {
+                        contentBuffer += currentMessage.content;
+                        targetMessage.content = renderMarkdown(contentBuffer);
+                    }
+    
+                    if(currentMessage.done) {
+                        targetMessage.createdAt = currentMessage.createdAt;
+                    }
+                }
+            });
+        } catch (error) {
+            alert(error.message);
+        }
     }
 
-    async function receiveAllMessages(user, id) {
-        const response = await getMessages(user, id);
+    async function receiveAllMessages(id, userToken) {
+        try {
+            const result = await getMessages(id, userToken);
+            
+            result.chatMessages.forEach(message => {
+                if (message.role === "assistant") {
+                    message.thinking = renderMarkdown(message.thinking);
+                    message.sender = message.model;
+                } else if (message.role === "user") {
+                    message.sender = authState.user.username;
+                }
 
-        const processedResponse = response.map(item => {
-            const message = item.message;
-            const html = renderMarkdown(message);
+                message.content = renderMarkdown(message.content);
+            });
 
-            return {
-                ...item,
-                message: html
-            }
-        });
-
-        messages.value = processedResponse;
+            messages.value = result.chatMessages;
+        } catch (error) {
+            alert(error.message);
+        }
     }
 
-    function applySettings(settings) {
-        authState.setChatSettings(settings);
+    async function applySettings(settings, chatId, userToken) {
+        try {
+            const result = await applyChatMetadata(settings, chatId, userToken);
+            alert(result.message);
+        } catch (error) {
+            alert(error.message);
+        }        
+    }
+
+    async function getSettings(chatId, userToken) {
+        try {
+            const result = await getChatMetadata(chatId, userToken);
+
+            settings.value.forEach(object => {
+                object.inputs.forEach(input => {
+                    input.value = result.metadata[input.name];
+                })
+            })
+        } catch (error) {
+            alert(error.message);
+        }
     }
 </script>
 
