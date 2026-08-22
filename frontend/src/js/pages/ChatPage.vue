@@ -4,8 +4,9 @@
     import ChatSettings from '../components/chatSettings.vue';
     import { onMounted, ref } from 'vue';
     import { authState } from '../state/authState';
+    import { applyChatMetadata, getChatMetadata } from '../services/chatMetadataService.js';
     import { addMessages, getMessages } from '../services/messageService';
-    import { addChat, getChat, modifyChat, removeChat } from '../services/chatService';
+    import { addChat, getChats, modifyChat, removeChat } from '../services/chatService';
     import { renderMarkdown } from '../utils/markdownUtils.js';
 
     const selectedChatId = ref(null);
