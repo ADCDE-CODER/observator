@@ -7,7 +7,7 @@
     import { applyChatMetadata, getChatMetadata } from '../services/chatMetadataService.js';
     import { addMessages, getMessages } from '../services/messageService';
     import { addChat, getChats, modifyChat, removeChat } from '../services/chatService';
-    import { renderMarkdown } from '../utils/markdownUtils.js';
+    import { MarkdownUtil } from '../utils/MarkdownUtil.js';
 
     const selectedChatId = ref(null);
     const chats = ref([]);
@@ -179,7 +179,7 @@
     async function createMessage(userChatMessage, username, chatId, userToken) {
         const userMessage = { ...userChatMessage };
         userMessage.sender = username;
-        userMessage.content = renderMarkdown(userMessage.content);
+        userMessage.content = MarkdownUtil.renderMarkdown(userMessage.content);
         messages.value.push(userMessage);
         
         let thinkingBuffer = "";
@@ -193,10 +193,10 @@
                 if (!lastMessageIndex) {
                     if(currentMessage.thinking) {
                         thinkingBuffer = currentMessage.thinking;
-                        currentMessage.thinking = renderMarkdown(thinkingBuffer);
+                        currentMessage.thinking = MarkdownUtil.renderMarkdown(thinkingBuffer);
                     } else if (currentMessage.content) {
                         contentBuffer = currentMessage.content;
-                        currentMessage.thinking = renderMarkdown(contentBuffer);
+                        currentMessage.thinking = MarkdownUtil.renderMarkdown(contentBuffer);
                     }
                     
                     currentMessage.sender = currentMessage.model;
@@ -208,10 +208,10 @@
     
                     if (currentMessage.thinking) {
                         thinkingBuffer += currentMessage.thinking;
-                        targetMessage.thinking = renderMarkdown(thinkingBuffer);
+                        targetMessage.thinking = MarkdownUtil.renderMarkdown(thinkingBuffer);
                     } else if (currentMessage.content) {
                         contentBuffer += currentMessage.content;
-                        targetMessage.content = renderMarkdown(contentBuffer);
+                        targetMessage.content = MarkdownUtil.renderMarkdown(contentBuffer);
                     }
     
                     if(currentMessage.done) {
@@ -230,13 +230,13 @@
             
             result.chatMessages.forEach(message => {
                 if (message.role === "assistant") {
-                    message.thinking = renderMarkdown(message.thinking);
+                    message.thinking = MarkdownUtil.renderMarkdown(message.thinking);
                     message.sender = message.model;
                 } else if (message.role === "user") {
                     message.sender = authState.user.username;
                 }
 
-                message.content = renderMarkdown(message.content);
+                message.content = MarkdownUtil.renderMarkdown(message.content);
             });
 
             messages.value = result.chatMessages;
