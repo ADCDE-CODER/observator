@@ -105,12 +105,13 @@
 
     onMounted(async () => {
         if (authState.user != null) {
-            await receiveAllChats(authState.user);
+            await receiveAllChats(authState.user.token);
         }
 
         if (authState.user != null && authState.selectedChatId != null) {
             selectedChatId.value = authState.selectedChatId;
-            await receiveAllMessages(authState.user, selectedChatId.value) 
+            await receiveAllMessages(selectedChatId.value, authState.user.token);
+            await getSettings(selectedChatId.value, authState.user.token);
         }
     });
 
