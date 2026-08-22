@@ -72,7 +72,12 @@
         <div class="output-container">
             <section v-for="message in messages" :key="message.id" :class="message.role">
                 <strong>{{ message.sender }}:</strong>
-                <div class="html-output" v-html="message.thinking"></div>
+
+                <details v-if="message.thinking" class="thinking-dropdown" @toggle="message.showThinking = $event.target.open">
+                    <summary>{{ message.showThinking ? 'Hide thinking' : 'Show thinking' }}</summary>
+                    <div class="html-output thinking-content" v-html="message.thinking"></div>
+                </details>
+                
                 <div class="html-output" v-html="message.content"></div>
                 <div class="created-at">{{ DateUtil.formatDateTime(message.createdAt) }}</div>
             </section>
@@ -90,7 +95,7 @@
         color: var(--color-on-surface);
         display: flex;
         flex-grow: 0;
-        min-width: 400px;
+        width: 100%;
         flex-direction: column;
         align-items: center;
     }
@@ -124,6 +129,22 @@
     .assistant {
         background-color: var(--color-surface-container-highest);
         color: var(--color-on-surface);
+    }
+
+    .thinking-dropdown {
+        margin: 10px 0px;
+    }
+
+    summary {
+        color: var(--color-on-surface);
+        cursor: pointer;
+        user-select: none;
+        font-size: 14px;
+    }
+
+    .thinking-content {
+        padding: 10px;
+        border-left: 3px solid var(--color-on-surface);
     }
 
     .html-output {
