@@ -17,6 +17,13 @@
             title: "Body",
             inputs: [
                 {
+                    name: "provider",
+                    label: "Provider",
+                    type: "select",
+                    value: "ollama",
+                    options: ["openai", "ollama"]
+                },
+                {
                     name: "model",
                     label: "Model",
                     type: "text",
@@ -44,37 +51,53 @@
                     name: "temperature",
                     label: "Temperature",
                     type: "number",
-                    value: 0
+                    value: 0,
+                    min: 0,
+                    max: 2,
+                    step: 0.1
                 },
                 {
                     name: "top_k",
                     label: "Top K",
                     type: "number",
-                    value: 0
+                    value: 1,
+                    min: 0,
+                    max: 100,
+                    step: 1,
                 },
                 {
                     name: "top_p",
                     label: "Top P",
                     type: "number",
-                    value: 0
+                    value: 0,
+                    min: 0,
+                    max: 1,
+                    step: 0.1
                 },
                 {
                     name: "min_p",
                     label: "Min P",
                     type: "number",
-                    value: 0
+                    value: 0,
+                    min: 0,
+                    max: 2,
+                    step: 0.01
                 },
                 {
-                    name: "num_ctx",
-                    label: "Num ctx",
+                    name: "context",
+                    label: "Context",
                     type: "number",
-                    value: 0
+                    value: 0,
+                    min: 0,
+                    step: 512
                 },
                 {
-                    name: "num_predict",
-                    label: "Num predict",
+                    name: "predict",
+                    label: "Predict",
                     type: "number",
-                    value: 0
+                    value: 0,
+                    min: 0,
+                    step: 512
                 }
             ]
         }
