@@ -278,22 +278,22 @@
        <ChatList 
        :chats="chats" 
        :selected-chat-id="selectedChatId" 
-       @select-chat="(id) => {selectChat(id), receiveAllMessages(authState.user, id)}"
+       @select-chat="(id) => {selectChat(id), receiveAllMessages(id, authState.user.token)}"
        @clear-selection="() => clearSelection()"
-       @create-chat="() => createChat(authState.user)"
-       @delete-chat="(id) => deleteChat(authState.user, id)"
-       @rename-chat="(id, title) => renameChat(authState.user, id, title)"
+       @create-chat="() => createChat(null, authState.user.token)"
+       @delete-chat="(id) => deleteChat(id, authState.user.token)"
+       @rename-chat="(id, title) => renameChat(title, id, authState.user.token)"
        />
 
        <ChatMessages
        :selected-id="selectedChatId"
        :messages="messages"
-       @create-message="(userInput) => createMessage(authState.user, userInput, authState.token, authState.chatSettings, authState.selectedChatId)"
+       @create-message="(userChatMessage) => createMessage(userChatMessage, authState.user.username, authState.selectedChatId, authState.user.token)"
        />
 
        <ChatSettings
        :settings="settings"
-       @apply-settings="(settings) => applySettings(settings)"
+       @apply-settings="(settings) => applySettings(settings, authState.selectedChatId, authState.user.token)"
        />
     </section>
 </template>
