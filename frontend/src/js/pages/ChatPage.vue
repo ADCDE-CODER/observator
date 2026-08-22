@@ -114,35 +114,54 @@
         }
     });
 
-    async function createChat(user) {
-        const response = await addChat(user);
-        chats.value.push(response) 
+    async function createChat(title, userToken) {
+        try {
+            const result = await addChat(title, userToken);
+            alert(result.message);
+            chats.value.push(result.chat.lastChatItem) 
+        } catch (error) {
+            alert(error.message);
+        }
     }
 
-    async function receiveAllChats(user) {
-        const response = await getChat(user);
-        chats.value = response;
+    async function receiveAllChats(userToken) {
+        try {
+            const result = await getChats(userToken);
+            chats.value = result.chats;
+        } catch (error) {
+            alert(error.message);
+        }
     }
 
-    async function renameChat(user, id, title) {
+    async function renameChat(title, id, userToken) {
         const chat = chats.value.find((chat) => {
             return chat.id === id 
         });
 
         if (chat) {
-            await modifyChat(user, id, title);
-            chat.title = title;
+            try {
+                const result = await modifyChat(title, id, userToken);
+                alert(result.message);
+                chat.title = title;
+            } catch (error) {
+                alert(error.message);
+            }
         }
     }
 
-    async function deleteChat(user, id) {
+    async function deleteChat(id, userToken) {
         const index = chats.value.findIndex((chat) => {
             return chat.id === id 
         });
 
         if (index !== -1) {
-            await removeChat(user, id);
-            chats.value.splice(index, 1)
+            try {
+                const result = await removeChat(id, userToken);
+                alert(result.message);
+                chats.value.splice(index, 1);
+            } catch (error) {
+                alert(error.message);
+            }
         }
     }
 
