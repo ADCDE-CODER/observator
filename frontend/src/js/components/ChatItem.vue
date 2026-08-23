@@ -37,12 +37,12 @@
 </script>
 
 <template>
-    <a class="chat" :class="{chatActive: isChatActive}" @click="emit('select-chat', chat.id)">
+    <a class="chat" :class="{chatActive: isChatActive}" @click.stop="emit('select-chat', chat.id)">
         {{chat.title}}
         <button class="dropdown-button" @click.stop="showDropdown()">...</button>
         <div class="dropdown-content" :class="{dropdownActive: isDropdownActive}" ref="dropdown">
-            <a class="dropdown-option" @click="onRename()">Rename</a>
-            <a class="dropdown-option" @click="onDelete()">Delete</a>
+            <a class="dropdown-option" @click.stop="onRename()">Rename</a>
+            <a class="dropdown-option" @click.stop="onDelete()">Delete</a>
         </div>
     </a>
 </template>
