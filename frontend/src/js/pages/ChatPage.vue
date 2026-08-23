@@ -160,6 +160,7 @@
                 const result = await removeChat(id, userToken);
                 alert(result.message);
                 chats.value.splice(index, 1);
+                clearSelection();
             } catch (error) {
                 alert(error.message);
             }
@@ -169,6 +170,8 @@
     function selectChat(id) {
         selectedChatId.value = id;
         authState.setSelectedChatId(id);
+        receiveAllMessages(id, authState.user.token);
+        getSettings(id, authState.user.token);
     }
 
     function clearSelection() {
@@ -278,7 +281,7 @@
        <ChatList 
        :chats="chats" 
        :selected-chat-id="selectedChatId" 
-       @select-chat="(id) => {selectChat(id), receiveAllMessages(id, authState.user.token)}"
+       @select-chat="(id) => selectChat(id)"
        @clear-selection="() => clearSelection()"
        @create-chat="() => createChat(null, authState.user.token)"
        @delete-chat="(id) => deleteChat(id, authState.user.token)"
