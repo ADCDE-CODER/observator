@@ -96,6 +96,7 @@
         display: flex;
         flex-grow: 0;
         width: 100%;
+        min-width: 400px;
         flex-direction: column;
         align-items: center;
     }
