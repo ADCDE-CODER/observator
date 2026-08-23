@@ -10,6 +10,16 @@
         messages: Array
     });
 
+    function handleKeydown(event) {
+        // If Enter is pressed and Shift is NOT held down, then send a message
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            this.sendMessage();
+        } 
+        
+        // If Enter is pressed and Shift IS held down, then do nothing
+    }
+
     const MAX_ROWS = 5;
 
     const autoHeight = () => {
@@ -82,10 +92,10 @@
                 <div class="created-at">{{ DateUtil.formatDateTime(message.createdAt) }}</div>
             </section>
         </div>
-        <form class="input-container" @submit.prevent="sendMessage()">
-            <textarea class="prompt-input" type="text" placeholder="Type here" rows="1" ref="userInput" v-model="userInputContext" @input="autoHeight()"></textarea>
-            <button class="primary-button" type="submit">Send</button>
-        </form>
+        <div class="input-container">
+            <textarea class="prompt-input" type="text" placeholder="Type here" rows="1" ref="userInput" v-model="userInputContext" @keydown="handleKeydown($event)" @input="autoHeight()"></textarea>
+            <button class="primary-button" type="button" @click="sendMessage()">Send</button>
+        </div>
     </div>
 </template>
 
