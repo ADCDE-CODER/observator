@@ -4,7 +4,6 @@ import { clearLocalStorage, loadFromLocalStorage, saveToLocalStorage } from "../
 export const authState = reactive ({
     user: null,
     token: null,
-    chatSettings: null,
     selectedChatId: null,
     
     setUser(user) {
@@ -17,11 +16,6 @@ export const authState = reactive ({
         saveToLocalStorage("TOKEN", token);
     },
     
-    setChatSettings(chatSettings) {
-        this.chatSettings = chatSettings;
-        saveToLocalStorage("CHATS_SETTINGS", chatSettings);
-    },
-    
     setSelectedChatId(selectedChatId) {
         this.selectedChatId = selectedChatId;
         saveToLocalStorage("SELECTED_CHAT_ID", selectedChatId);
@@ -30,7 +24,6 @@ export const authState = reactive ({
     loadLocalStorage() {
         this.user = loadFromLocalStorage("USER");
         this.token = loadFromLocalStorage("TOKEN");
-        this.chatSettings = loadFromLocalStorage("CHATS_SETTINGS");
         this.selectedChatId = loadFromLocalStorage("SELECTED_CHAT_ID");
     },
     
@@ -38,7 +31,6 @@ export const authState = reactive ({
         clearLocalStorage();
         this.user = null;
         this.token = null;
-        this.chatSettings = null;
         this.selectedChatId = null;
     }
 });
