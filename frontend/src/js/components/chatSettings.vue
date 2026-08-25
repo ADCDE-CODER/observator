@@ -1,6 +1,7 @@
 <script setup>
     const emit = defineEmits(["apply-settings"])
-    const {settings} = defineProps({
+    const {selectedId, settings} = defineProps({
+        selectedId: Number,
         settings: Array
     });
 
@@ -18,7 +19,18 @@
 </script>
 
 <template>
-    <div class="chat-settings">
+    <div class="chat-settings" v-show="!selectedId">
+        <h2>Settings</h2>
+        <div class="settings">
+            <p class="output-message">
+                <span>
+                    Select a chat to start applying chat settings.
+                </span>
+            </p>
+        </div>
+    </div>
+
+    <div class="chat-settings" v-show="selectedId">
         <h2>Settings</h2>
         <form class="settings" @submit.prevent="applySettings()">
             <div class="section" v-for="section in settings">
@@ -117,6 +129,11 @@
         min-width: 90%;
         height: 100%;
         overflow-y: auto;
+    }
+
+    .output-message {
+        text-align: center;
+        margin: auto;
     }
 
     .section {
