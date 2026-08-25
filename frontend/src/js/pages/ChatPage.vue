@@ -1,7 +1,7 @@
 <script setup>
     import ChatList from '../components/ChatList.vue';
     import ChatMessages from '../components/ChatMessage.vue';
-    import ChatSettings from '../components/chatSettings.vue';
+    import ChatSettings from '../components/ChatSettings.vue';
     import { onMounted, ref } from 'vue';
     import { authState } from '../state/authState';
     import { applyChatMetadata, getChatMetadata } from '../services/chatMetadataService.js';
