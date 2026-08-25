@@ -279,8 +279,8 @@
 
     <section class="chat" v-show="authState.user"> 
        <ChatList 
-       :chats="chats" 
        :selected-chat-id="selectedChatId" 
+       :chats="chats" 
        @select-chat="(id) => selectChat(id)"
        @clear-selection="() => clearSelection()"
        @create-chat="() => createChat(null, authState.user.token)"
@@ -295,6 +295,7 @@
        />
 
        <ChatSettings
+       :selected-id="selectedChatId"
        :settings="settings"
        @apply-settings="(settings) => applySettings(settings, authState.selectedChatId, authState.user.token)"
        />
