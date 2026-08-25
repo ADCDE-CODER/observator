@@ -119,7 +119,7 @@
         try {
             const result = await addChat(title, userToken);
             alert(result.message);
-            chats.value.push(result.chat.lastChatItem) 
+            chats.value.unshift(result.chat.lastChatItem) 
         } catch (error) {
             alert(error.message);
         }
@@ -128,7 +128,7 @@
     async function receiveAllChats(userToken) {
         try {
             const result = await getChats(userToken);
-            chats.value = result.chats;
+            chats.value = result.chats.reverse();
         } catch (error) {
             alert(error.message);
         }
