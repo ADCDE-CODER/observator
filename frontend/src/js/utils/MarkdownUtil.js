@@ -1,4 +1,6 @@
-import markdownit from 'markdown-it'
+import MarkdownIt from 'markdown-it'
+import markdownItKatex from '@vscode/markdown-it-katex'
+import katex from 'katex'
 import hljs from 'highlight.js';
 import DOMPurify from 'dompurify'
 
@@ -34,9 +36,13 @@ export class MarkdownUtil {
             return '';
         }
 
-        const md = markdownit({
+        const md = new MarkdownIt({
             ...MarkdownUtil.DEFAULT_OPTIONS,
             ...customOptions     
+        });
+
+        md.use(markdownItKatex.default, {
+            katex
         });
     
         const dirtyHtmlString = md.render(markdownText);

@@ -13,6 +13,7 @@
   "keywords": [],
   "author": "ADCDE-CODER",
   "dependencies": {
+    "@vscode/markdown-it-katex": "^1.1.2",
     "dompurify": "^3.4.11",
     "highlight.js": "^11.11.1",
     "markdown-it": "^14.3.0",
