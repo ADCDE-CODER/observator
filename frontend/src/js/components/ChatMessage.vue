@@ -69,7 +69,7 @@
     <div class="chatMessages" v-show="!selectedId">
         <h2>Message</h2>
         <div class="output-container">
-            <p>
+            <p class="output-message">
                 <span>
                     Select a chat to start messaging.
                 </span>
@@ -109,6 +109,11 @@
         min-width: 400px;
         flex-direction: column;
         align-items: center;
+    }
+
+    .output-message {
+        text-align: center;
+        margin: auto;
     }
 
     .output-container {
