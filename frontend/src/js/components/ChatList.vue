@@ -9,7 +9,19 @@
 </script>
 
 <template>
-    <div class="list-chat" @click="emit('clear-selection')">
+    <div class="list-chat" v-show="chats.length === 0">
+        <h2>Chats</h2>
+        <button class="new-chat-button" @click="emit('create-chat')">New chat</button>
+        <aside class="list">
+            <p class="output-message">
+                <span>
+                    Create a new chat to start sending messages.
+                </span>
+            </p>
+        </aside>
+    </div>
+
+    <div class="list-chat" @click="emit('clear-selection')" v-show="chats.length !== 0">
         <h2>Chats</h2>
         <button class="new-chat-button" @click="emit('create-chat')">New chat</button>
         <aside class="list">
@@ -39,6 +51,11 @@
         align-items: center;
     }
 
+    .output-message {
+        text-align: center;
+        margin: auto;
+    }
+
     .new-chat-button {
         background-color: var(--color-primary);
 		color: var(--color-on-primary);
@@ -65,6 +82,7 @@
         border-radius: 15px;
         gap: 1em;
         min-width: 90%;
+        height: 100%;
         overflow-y: auto;
     }
 </style>
