@@ -1,15 +1,40 @@
 <script setup>
+    import { onMounted, onUnmounted, ref } from 'vue';
     import ChatItem from './ChatItem.vue';
 
+    const chatList = ref(null);
+    const selectedDropdownId = ref(null);
     const emit = defineEmits(["select-chat", "clear-selection", "create-chat", "rename-chat", "delete-chat"]);
     const {chats, selectedChatId} = defineProps({
         chats: Array,
         selectedChatId: Number
     });
+
+    onMounted(() => {
+        document.addEventListener('click', handleClickOutside);
+    });
+
+    onUnmounted(() => {
+        document.removeEventListener('click', handleClickOutside);
+    });
+
+    function handleClickOutside(event) {
+        if (chatList.value && !chatList.value.contains(event.target)) {
+            selectedDropdownId.value = null;
+        }
+    }
+
+    function toggleDropdown(chatId) {
+        if(selectedDropdownId === chatId) {
+            selectedDropdownId.value = null;
+        } else {
+            selectedDropdownId.value = chatId
+        }
+    }
 </script>
 
 <template>
-    <div class="list-chat" v-show="chats.length === 0">
+    <div class="chat-list" v-show="chats.length === 0">
         <h2>Chats</h2>
         <button class="new-chat-button" @click="emit('create-chat')">New chat</button>
         <aside class="list">
@@ -21,15 +46,19 @@
         </aside>
     </div>
 
-    <div class="list-chat" @click="emit('clear-selection')" v-show="chats.length !== 0">
+    <div class="chat-list" @click="emit('clear-selection')" v-show="chats.length !== 0" >
         <h2>Chats</h2>
         <button class="new-chat-button" @click="emit('create-chat')">New chat</button>
-        <aside class="list">
-            <ChatItem v-for="chat in chats" 
+        <aside class="list" ref="chatList">
+            <ChatItem 
+            v-for="chat in chats" 
             :key="chat.id" 
             :chat="chat" 
-            :isChatActive="selectedChatId === chat.id" 
+            :is-chat-active="selectedChatId === chat.id"
+            :is-dropdown-active="selectedDropdownId === chat.id"
+            :scroll-container="chatList"
             @select-chat="(id) => emit('select-chat', id)" 
+            @toggle-dropdown="(id) => toggleDropdown(id)"
             @delete-chat="(id) => emit('delete-chat', id)"
             @rename-chat="(id, title) => emit('rename-chat', id, title)"
             @click.stop
@@ -39,7 +68,7 @@
 </template>
 
 <style scoped>
-    .list-chat {
+    .chat-list {
         background-color: var(--color-surface-container);
         color: var(--color-on-surface);
         display: flex;
