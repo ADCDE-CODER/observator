@@ -100,7 +100,7 @@
             <div  v-if="isDropdownActive" class="dropdown-content" :style="dropdownStyle" ref="dropdown">
                 <button class="dropdown-option" @click.stop="onRename()">Rename</button>
                 <button class="dropdown-option delete-option" @click.stop="onDelete()">
-                    <TrashIcon width="15" height="15" aria-label="Trash icon"/>Delete
+                    <TrashIcon color="red" width="15" height="15" aria-label="Trash icon"/>Delete
                 </button>
             </div>
         </Teleport>
@@ -174,12 +174,10 @@
 
     .delete-option {
         color: red;
-        --icon-color: red;
     }
 
     .delete-option:hover {
         background-color: rgba(255, 0, 0, 0.25);
         color: red;
-        --icon-color: red;
     }
 </style>
