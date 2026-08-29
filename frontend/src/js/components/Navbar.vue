@@ -55,9 +55,7 @@
 			</div>
 			<nav class="navbar-links">
 				<RouterLink class="nav-link" to="/chat">Chat</RouterLink>
-				<RouterLink class="nav-link" to="/image">Image</RouterLink>
-				<RouterLink class="nav-link" to="/video">Video</RouterLink>
-				<RouterLink class="nav-link" to="/post">Post</RouterLink>
+				<RouterLink class="nav-link" to="/iris">Iris</RouterLink>
 			</nav>
 
 			<div class="navbar-profile">

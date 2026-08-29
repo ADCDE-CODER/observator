@@ -1,13 +1,13 @@
 <script></script>
 
 <template>
-    <section id="image">
-        <h2>Image</h2>
+    <section id="iris">
+        <h2>Iris</h2>
     </section>
 </template>
 
 <style scoped>
-    #image {
+    #iris {
         background-color: var(--color-surface);
         color: var(--color-on-surface);
         display: flex;
