@@ -1,5 +1,6 @@
 <script setup>
     import { nextTick, onMounted, onUnmounted, ref } from 'vue';
+    import TrashIcon from './TrashIcon.vue';
 
     const dropdownButton = ref(null);
     const dropdown = ref(null);
@@ -98,7 +99,9 @@
         <Teleport to="body">
             <div  v-if="isDropdownActive" class="dropdown-content" :style="dropdownStyle" ref="dropdown">
                 <button class="dropdown-option" @click.stop="onRename()">Rename</button>
-                <button class="dropdown-option" @click.stop="onDelete()">Delete</button>
+                <button class="dropdown-option delete-option" @click.stop="onDelete()">
+                    <TrashIcon width="15" height="15" aria-label="Trash icon"/>Delete
+                </button>
             </div>
         </Teleport>
     </div>
@@ -152,11 +155,14 @@
     }
 
     .dropdown-option {
+        background-color: transparent;
         color: var(--color-on-surface);
-        background: none;
         border: none;
         padding: 8px 12px;
         border-radius: 15px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
         transition: background-color 1s, color 1s;
         cursor: pointer;
     }
@@ -164,5 +170,16 @@
     .dropdown-option:hover {
         background-color: var(--color-secondary-container);
 		color: var(--color-on-secondary-container);
+    }
+
+    .delete-option {
+        color: red;
+        --icon-color: red;
+    }
+
+    .delete-option:hover {
+        background-color: rgba(255, 0, 0, 0.25);
+        color: red;
+        --icon-color: red;
     }
 </style>
