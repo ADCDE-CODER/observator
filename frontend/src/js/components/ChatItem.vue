@@ -53,8 +53,8 @@
         const dropdownRect = dropdown.value.getBoundingClientRect();
         const spaceBelow = window.innerHeight - buttonRect.bottom;
         const spaceAbove = buttonRect.top;
-        const DROPDOWN_OFFSET_X = 100;
-        const DROPDOWN_OFFSET_Y = 0;
+        const DROPDOWN_OFFSET_X = 95;
+        const DROPDOWN_OFFSET_Y = -35;
         
         let top = null;
 
@@ -86,66 +86,67 @@
 </script>
 
 <template>
-    <button class="chatButton" :class="{chatActive: isChatActive}" @click.stop="selectChat()">
-        {{chat.title}}
-        <button class="dropdown-button" @click.stop="toggleDropdown()" ref="dropdownButton">...</button>
+    <div class="button-container" :class="{chatActive: isChatActive}">
+        <button class="chatButton" @click="selectChat()">
+            <span>
+                {{chat.title}}
+            </span>
+        </button>
+        <button class="dropdown-button" :class="{dropdownActive: isDropdownActive}" @click="toggleDropdown()" ref="dropdownButton">•••</button>
         <Teleport to="body">
             <div  v-if="isDropdownActive" class="dropdown-content" :style="dropdownStyle" ref="dropdown">
                 <button class="dropdown-option" @click.stop="onRename()">Rename</button>
                 <button class="dropdown-option" @click.stop="onDelete()">Delete</button>
             </div>
         </Teleport>
-    </button>
+    </div>
 </template>
 
 <style scoped>
+    .button-container {
+        display: flex;
+        justify-content: space-between;
+		border-radius: 15px;        
+		transition: background-color 1s, color 1s;
+    }
+
+    .button-container:hover, .chatActive {
+        background-color: var(--color-secondary-container);
+		color: var(--color-on-secondary-container);
+    }
+
     .chatButton {
         color: var(--color-on-surface);
         background: none;
         border: none;
-		padding: 0.5rem;
-		border-radius: 15px;
-        cursor: pointer; 
-		transition: background-color 1s, color 1s;
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
-        position: relative;
-    }
-
-    .chatButton:hover {
-        background-color: var(--color-secondary-container);
-		color: var(--color-on-secondary-container);
-    }
-
-    .chatActive {
-        background-color: var(--color-secondary-container);
-		color: var(--color-on-secondary-container);
+        cursor: pointer;
+        padding: 1rem;
+        flex-grow: 1;
     }
 
     .dropdown-button {
         background-color: transparent;
         color: var(--color-on-surface);
-        padding: 0.5rem;
 		border-radius: 15px;
         border: none;
         cursor: pointer;
+        padding: 1rem;
         transition: background-color 1s, color 1s;
     }
 
-    .dropdown-button:hover {
-        background-color: var(--color-secondary-container-high);
-		color: var(--color-on-secondary-container);
+    .dropdown-button:hover, .dropdownActive {
+        background-color: var(--color-primary-container);
+		color: var(--color-on-primary-container);
     }
     
     .dropdown-content {
         background-color: var(--color-surface-container);
-        gap: 10px;
         padding: 0.5rem;
         border-radius: 15px;
         position: fixed;
         display: flex;
         flex-direction: column;
+        gap: 10px;
     }
 
     .dropdown-option {
