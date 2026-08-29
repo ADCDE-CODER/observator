@@ -9,7 +9,7 @@
 	if (authState.user != null) {
 		router.push('/chat');
 	} else {
-		router.push('/welcome');
+		router.push('/');
 	}
 </script>
 

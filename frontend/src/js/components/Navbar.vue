@@ -36,7 +36,7 @@
 
 	function goLogout() {
 		authState.clearAllLocalStorage();
-		router.push('/welcome');
+		router.push('/');
 	}
 </script>
 
@@ -44,14 +44,14 @@
 	<div class="navbar">
 		<div class="navbar-content" v-show="!authState.user">
 			<div class="navbar-logo">
-				<LogoIcon color="var(--color-on-surface)" width="35" height="35" alt="logo image" @click.prevent="router.push('/welcome')"/>
+				<LogoIcon color="var(--color-on-surface)" width="35" height="35" alt="logo image" @click.prevent="router.push('/')"/>
 			</div>
 			<button class="primary-button" @click="goLogin()">Log in</button>
 		</div>
 
 		<div class="navbar-content" v-show="authState.user">
 			<div class="navbar-logo">
-				<LogoIcon color="var(--color-on-surface)" width="35" height="35" alt="logo image" @click.prevent="router.push('/welcome')"/>
+				<LogoIcon color="var(--color-on-surface)" width="35" height="35" alt="logo image" @click.prevent="router.push('/')"/>
 			</div>
 			<nav class="navbar-links">
 				<RouterLink class="nav-link" to="/chat">Chat</RouterLink>
@@ -67,8 +67,8 @@
 
 				<!-- The Dropdown Menu Panel -->
 				<div class="dropdown-menu" v-show="isDropdownOpen" ref="dropdownMenu">
-					<RouterLink class="dropdown-item" to="/welcome">Profile 🚧</RouterLink>
-					<RouterLink class="dropdown-item" to="/welcome">Settings 🚧</RouterLink>
+					<RouterLink class="dropdown-item" to="/">Profile 🚧</RouterLink>
+					<RouterLink class="dropdown-item" to="/">Settings 🚧</RouterLink>
 					<div class="divider"></div>
 					<button class="dropdown-item secondary-button" @click="goLogout()">Log out</button>
 				</div>

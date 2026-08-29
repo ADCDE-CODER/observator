@@ -1,13 +1,13 @@
 <script></script>
 
 <template>
-    <section id="welcome">
+    <section id="home">
         <h2>Welcome!</h2>
     </section>
 </template>
 
 <style scoped>
-    #welcome {
+    #home {
         background-color: var(--color-surface);
         color: var(--color-on-surface);
         display: flex;
