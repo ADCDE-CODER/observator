@@ -17,6 +17,10 @@ export async function getChats(userToken) {
 };
 
 export async function modifyChat(title, id, userToken) {
+    if (title === null) {
+        throw new Error("Title is null.");
+    }
+    
     if (!title.trim()) {
         throw new Error("Please enter a text to change the chat title.");
     }
