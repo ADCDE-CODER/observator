@@ -25,7 +25,7 @@
     }
 
     function toggleDropdown(chatId) {
-        if(selectedDropdownId === chatId) {
+        if(selectedDropdownId.value === chatId) {
             selectedDropdownId.value = null;
         } else {
             selectedDropdownId.value = chatId
