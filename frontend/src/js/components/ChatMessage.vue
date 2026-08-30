@@ -14,7 +14,7 @@
         // If Enter is pressed and Shift is NOT held down, then send a message
         if (event.key === 'Enter' && !event.shiftKey) {
             event.preventDefault();
-            this.sendMessage();
+            sendMessage();
         } 
         
         // If Enter is pressed and Shift IS held down, then do nothing
