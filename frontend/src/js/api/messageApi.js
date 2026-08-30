@@ -1,5 +1,5 @@
 export async function createMessage(userChatMessage, chatId, userToken, onChunk) {
-    const url = `http://localhost:3000/chats/${chatId}/chatmessages`;
+    const url = `/api/chats/${chatId}/chatmessages`;
     console.log(JSON.stringify(userChatMessage))
 
     const response = await fetch(url, {
@@ -41,7 +41,7 @@ export async function createMessage(userChatMessage, chatId, userToken, onChunk)
 };
 
 export async function getMessage(chatId, userToken) {
-    const url = `http://localhost:3000/chats/${chatId}/chatMessages`;
+    const url = `/api/chats/${chatId}/chatMessages`;
 
     const response = await fetch(url, {
         method: "GET",

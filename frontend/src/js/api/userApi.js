@@ -1,5 +1,5 @@
 export async function createUser(user) {
-    const url = "http://localhost:3000/users/signup";    
+    const url = "/api/users/signup";    
     
     const response = await fetch(url, {
         method: "POST",
@@ -19,7 +19,7 @@ export async function createUser(user) {
 };
 
 export async function readUser(user) {
-    const url = "http://localhost:3000/users/signin";    
+    const url = "/api/users/signin";    
     
     const response = await fetch(url, {
         method: "POST",

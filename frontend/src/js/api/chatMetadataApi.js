@@ -1,5 +1,5 @@
 export async function createChatMetadata(chatMetadata, chatId, userToken) {
-    const url = `http://localhost:3000/chats/${chatId}/chatMetadata`;    
+    const url = `/api/chats/${chatId}/chatMetadata`;    
     
     const response = await fetch(url, {
         method: "PUT",
@@ -20,7 +20,7 @@ export async function createChatMetadata(chatMetadata, chatId, userToken) {
 };
 
 export async function readChatMetadata(chatId, userToken) {
-    const url = `http://localhost:3000/chats/${chatId}/chatMetadata`;    
+    const url = `/api/chats/${chatId}/chatMetadata`;    
     
     const response = await fetch(url, {
         method: "GET",

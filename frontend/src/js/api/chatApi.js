@@ -1,5 +1,5 @@
 export async function createChat(title, userToken) {
-    const url = "http://localhost:3000/chats/";    
+    const url = "/api/chats/";    
     const response = await fetch(url, {
         method: "POST",
         headers: {
@@ -19,7 +19,7 @@ export async function createChat(title, userToken) {
 };
 
 export async function getAllChats(userToken) {
-    const url = "http://localhost:3000/chats/";    
+    const url = "/api/chats/";    
     const response = await fetch(url, {
         method: "GET",
         headers: {
@@ -38,7 +38,7 @@ export async function getAllChats(userToken) {
 };
 
 export async function updateChat(title, id, userToken) {
-    const url = `http://localhost:3000/chats/${id}`;
+    const url = `/api/chats/${id}`;
     const response = await fetch(url, {
         method: "PUT",
         headers: {
@@ -58,7 +58,7 @@ export async function updateChat(title, id, userToken) {
 };
 
 export async function deleteChat(id, userToken) {
-    const url = `http://localhost:3000/chats/${id}`;   
+    const url = `/api/chats/${id}`;   
     const response = await fetch(url, {
         method: "DELETE",
         headers: {
