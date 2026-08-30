@@ -1,6 +1,5 @@
 export async function createMessage(userChatMessage, chatId, userToken, onChunk) {
     const url = `/api/chats/${chatId}/chatmessages`;
-    console.log(JSON.stringify(userChatMessage))
 
     const response = await fetch(url, {
         method: "POST",
