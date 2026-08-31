@@ -20,7 +20,6 @@
 	<main id="content-main">
 		<RouterView/>
 	</main>
-	<footer></footer>
 </template>
 
 <style scoped>
