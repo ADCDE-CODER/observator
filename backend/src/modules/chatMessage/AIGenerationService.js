@@ -7,12 +7,12 @@ export default class AIGenerationService {
         this.chatMetadataService = chatMetadataService;
 
         this.openai = new OpenAI({ 
-            baseURL: "https://openrouter.ai/api/v1",
+            baseURL: env.openAIUrl,
             apiKey: env.openAIApiKey 
         });
 
         this.ollama = new Ollama({
-            host: 'http://127.0.0.1:11434',
+            host: env.ollamaUrl,
             headers: {
                 Authorization: `Bearer ${env.openAIApiKey}`
             }
