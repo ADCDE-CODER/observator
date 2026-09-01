@@ -9,10 +9,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.get("/", (req, res) => res.send("Welcome to Observator server!"));
-app.use("/users", userRouter);
-app.use("/chats", chatRouter);
-app.use("/chats/:chatId/chatMetadata", chatMetadataRouter);
-app.use("/chats/:chatId/chatMessages", chatMessageRouter);
+app.use("/api/users", userRouter);
+app.use("/api/chats", chatRouter);
+app.use("/api/chats/:chatId/chatMetadata", chatMetadataRouter);
+app.use("/api/chats/:chatId/chatMessages", chatMessageRouter);
 
 // Global error handler
 app.use((error, req, res, next) => {
