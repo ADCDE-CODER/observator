@@ -64,9 +64,16 @@ export default class UserService {
         try {
             const indentifier = email || username;
             const user = this.userModel.findByIdentifier(indentifier);
+
+            if (!user) {
+                const error = new Error("No user exists.")
+                error.status = 400;
+                throw error;
+            }
+
             const vaildPassword = await verifyPassword(password, user.password);
 
-            if (!user || !vaildPassword) {
+            if (!vaildPassword) {
                 const error = new Error("Invalid email or password.")
                 error.status = 400;
                 throw error;
