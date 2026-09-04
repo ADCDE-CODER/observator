@@ -1,13 +1,15 @@
 export default class ChatMessageService {
-    constructor(chatMessageModel, userChatMessageService, assistantChatMessageService, aiGenerationService) {
+    constructor(chatMessageModel, userChatMessageService, assistantChatMessageService, chatMetadataService, aiService) {
         this.chatMessageModel = chatMessageModel;
         this.userChatMessageService = userChatMessageService;
         this.assistantChatMessageService = assistantChatMessageService;
-        this.aiGenerationService = aiGenerationService;
+        this.chatMetadataService = chatMetadataService;
+        this.aiService = aiService;
     }
 
     async generateResponse(conversationContext, chatId, onChunk) {
-        const stream = await this.aiGenerationService.generateResponse(conversationContext, chatId);
+        const metadata = this.chatMetadataService.getById(chatId);
+        const stream = await this.aiService.generateMessage(conversationContext, metadata);
 
         // Stream the content chunk by chunk
         let inThinking = false
