@@ -1,6 +1,7 @@
 export default class ChatService {
-    constructor(chatModel) {
+    constructor(chatModel, chatMetadataService) {
         this.chatModel = chatModel;
+        this.chatMetadataService = chatMetadataService;
     }
 
     create(chatData, userId) {    
@@ -17,7 +18,8 @@ export default class ChatService {
         }
     
         try {
-            this.chatModel.create(title, userId);
+            const chatId = this.chatModel.create(title, userId).lastInsertRowid;
+            this.chatMetadataService.create(chatId);
         } catch (error) {
             throw error;
         }
