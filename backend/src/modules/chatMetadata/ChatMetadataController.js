@@ -3,28 +3,28 @@ export default class ChatMetadataController {
         this.chatMetadataService = chatMetadataService;
     }
     
-    getById(req, res) {
+    async getById(req, res) {
         const chatId = req.chat.id;
         
         try {
-            const metadata = this.chatMetadataService.getById(chatId);
+            const metadata = await this.chatMetadataService.getById(chatId);
             res.status(200).json({message: "Chat metadata read successfully", metadata}); 
         } catch (error) {
             console.error(error);
             res.status(error.status || 500).json({message: error.message})
         }
-    };
+    }
 
-    update(req, res) {
+    async update(req, res) {
         const chatMetadata = req.body;
         const chatId = req.chat.id;
         
         try {
-            const metadata = this.chatMetadataService.update(chatMetadata, chatId);
+            const metadata = await this.chatMetadataService.update(chatMetadata, chatId);
             res.status(200).json({message: "Chat metadata updated successfully", metadata});
         } catch (error) {
             console.error(error);
             res.status(error.status || 500).json({message: error.message})
         }
-    };
+    }
 }
