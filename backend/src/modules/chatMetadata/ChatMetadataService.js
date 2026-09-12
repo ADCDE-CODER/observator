@@ -22,7 +22,7 @@ export default class ChatMetadataService {
         }
     }
     
-    async getById(chatId) {
+    async getChatSettings(chatId) {
         if (!chatId) {
             throw new Error("Chat ID is required to get a chat metadata.");
         }

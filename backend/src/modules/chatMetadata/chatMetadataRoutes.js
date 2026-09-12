@@ -7,7 +7,7 @@ const router = express.Router({
     mergeParams: true
 });
 
-router.get("/", authenticate, verifyChatOwner, (req, res) => chatMetadataController.getById(req, res));
+router.get("/", authenticate, verifyChatOwner, (req, res) => chatMetadataController.getChatSettings(req, res));
 router.put("/", authenticate, verifyChatOwner, (req, res) => chatMetadataController.update(req, res));
 
 export default router;
