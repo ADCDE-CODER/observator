@@ -7,16 +7,9 @@ export default class ChatMetadataModel {
     initializeDatabase() {
         const table = `
             CREATE TABLE IF NOT EXISTS chatmetadata (
-                provider TEXT NOT NULL DEFAULT 'ollama',
-                model TEXT NOT NULL DEFAULT 'gemma4:latest',
-                system_content TEXT,
-                think TEXT DEFAULT medium,
-                temperature REAL DEFAULT 0.7,
-                top_k INTEGER DEFAULT 50,
-                top_p REAL DEFAULT 0.9,
-                min_p REAL DEFAULT 0.05,
-                context INTEGER DEFAULT 4096,
-                predict INTEGER DEFAULT 2048,
+                provider TEXT NOT NULL,
+                model TEXT NOT NULL,
+                config TEXT NOT NULL,
                 chat_id INTEGER PRIMARY KEY,
                 FOREIGN KEY (chat_id) REFERENCES chat(id) ON DELETE CASCADE
             );
@@ -24,12 +17,23 @@ export default class ChatMetadataModel {
         this.db.exec(table);
     }
 
-    findById(chatId) {
-        const rows = this.db.prepare("SELECT * FROM chatmetadata WHERE chat_id = ?").all(chatId);
-        return rows[0];
+    create(provider, model, config, chatId) {
+        this.db.prepare("INSERT INTO chatmetadata(provider, model, config, chat_id) VALUES (?, ?, ?, ?)").run(provider, model, config, chatId);
     }
 
-    update(columns, values, chatId) {
-        return this.db.prepare(`UPDATE chatmetadata SET ${columns} WHERE chat_id = ?`).run(...values, chatId);
+    findById(chatId) {
+        return this.db.prepare("SELECT * FROM chatmetadata WHERE chat_id = ?").get(chatId);
+    }
+
+    update(provider, model, config, chatId) {
+        return this.db.prepare(`UPDATE chatmetadata SET provider = ?, model = ?, config = ? WHERE chat_id = ?`).run(provider, model, config, chatId);
+    }
+
+    updateModel(model, chatId) {
+        return this.db.prepare(`UPDATE chatmetadata SET model = ? WHERE chat_id = ?`).run(model, chatId);
+    }
+
+    updateConfig(config, chatId) {
+        return this.db.prepare(`UPDATE chatmetadata SET config = ? WHERE chat_id = ?`).run(config, chatId);
     }
 }
