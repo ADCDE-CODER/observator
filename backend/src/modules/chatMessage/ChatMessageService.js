@@ -8,7 +8,7 @@ export default class ChatMessageService {
     }
 
     async generateResponse(conversationContext, chatId, onChunk) {
-        const metadata = this.chatMetadataService.getById(chatId);
+        const metadata = this.chatMetadataService.fetchChatMetadata(chatId);
         const stream = await this.aiService.generateMessage(conversationContext, metadata);
 
         // Stream the content chunk by chunk

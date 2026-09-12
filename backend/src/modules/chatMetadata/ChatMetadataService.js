@@ -24,7 +24,7 @@ export default class ChatMetadataService {
     
     async getChatSettings(chatId) {
         if (!chatId) {
-            throw new Error("Chat ID is required to get a chat metadata.");
+            throw new Error("Chat ID is required to get a chat settings.");
         }
 
         try {            
@@ -51,6 +51,32 @@ export default class ChatMetadataService {
                 provider: providerField,
                 model: modelField,
                 config: configField
+            };
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    fetchChatMetadata(chatId) {
+        if (!chatId) {
+            throw new Error("Chat ID is required to get a chat metadata.");
+        }
+
+        try {            
+            const chatMetadata = this.chatMetadataModel.findById(chatId);
+
+            if (!chatMetadata) {
+                throw new Error("Chat metadata not found.");
+            }
+            
+            chatMetadata.config = JSON.parse(chatMetadata.config)
+
+            const { provider, model, config } = chatMetadata;
+
+            return {
+                provider: provider,
+                model: model,
+                config: config
             };
         } catch (error) {
             throw error;
