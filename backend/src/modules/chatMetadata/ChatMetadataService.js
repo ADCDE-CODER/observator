@@ -21,41 +21,6 @@ export default class ChatMetadataService {
             throw error;
         }
     }
-    
-    async getChatSettings(chatId) {
-        if (!chatId) {
-            throw new Error("Chat ID is required to get a chat settings.");
-        }
-
-        try {            
-            const chatMetadata = this.chatMetadataModel.findById(chatId);
-
-            if (!chatMetadata) {
-                throw new Error("Chat metadata not found.");
-            }
-            
-            chatMetadata.config = JSON.parse(chatMetadata.config)
-
-            const { provider, model, config } = chatMetadata;
-            
-            // Update each field value
-            this.aiService.setProviderValue(provider);
-            this.aiService.setModelValue(provider, model);
-            this.aiService.setConfigValue(provider, config);
-
-            const providerField = this.aiService.getProviderField();
-            const modelField = await this.aiService.getModelField(provider);
-            const configField = this.aiService.getConfigField(provider);
-
-            return {
-                provider: providerField,
-                model: modelField,
-                config: configField
-            };
-        } catch (error) {
-            throw error;
-        }
-    }
 
     fetchChatMetadata(chatId) {
         if (!chatId) {
@@ -77,6 +42,29 @@ export default class ChatMetadataService {
                 provider: provider,
                 model: model,
                 config: config
+            };
+        } catch (error) {
+            throw error;
+        }
+    }
+    
+    async getChatSettings(chatId) {
+        try {            
+            const { provider, model, config } = this.fetchChatMetadata(chatId);
+            
+            // Update each field value
+            this.aiService.setProviderValue(provider);
+            this.aiService.setModelValue(provider, model);
+            this.aiService.setConfigValue(provider, config);
+
+            const providerField = this.aiService.getProviderField();
+            const modelField = await this.aiService.getModelField(provider);
+            const configField = this.aiService.getConfigField(provider);
+
+            return {
+                provider: providerField,
+                model: modelField,
+                config: configField
             };
         } catch (error) {
             throw error;
