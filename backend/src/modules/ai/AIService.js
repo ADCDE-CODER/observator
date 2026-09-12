@@ -2,6 +2,9 @@ export default class AIService {
     constructor(providers, whiteListOfModels = []) {
         this.providers = providers;
         this.whiteListOfModels = whiteListOfModels;
+        this.providerValue = null;
+        this.modelValue = {};
+        this.config = {};
     }
 
     #getProvider(providerName) {
@@ -15,7 +18,11 @@ export default class AIService {
     }
 
     getProviders() {
-        return this.providers;
+        try {
+            return Object.keys(this.providers);
+        } catch (error) {
+            throw error;
+        }
     }
 
     async getModels(provider) {
@@ -27,7 +34,7 @@ export default class AIService {
         }
     }
 
-    async pullModel(model) {
+    async pullModel(provider, model) {
         if (this.whiteListOfModels.length !== 0 && !this.whiteListOfModels.includes(model)) {
             const error = new Error("Unsupported model");
             error.status = 400;
@@ -40,6 +47,99 @@ export default class AIService {
         } catch (error) {
             throw error;
         }
+    }
+
+    getProviderField() {
+        try {
+            const providers = this.getProviders();
+            const defaultProvider = providers[0];
+            
+            return {
+                type: "select",
+                label: "Provider",
+                default: defaultProvider,
+                value: this.providerValue ?? defaultProvider,
+                options: providers
+            };
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    getProviderValue() {
+        if (this.providerValue !== null) {
+            return this.providerValue;
+        }
+
+        return this.getProviders()[0];
+    }
+
+    setProviderValue(value) {
+        this.providerValue = value;
+    }
+
+    async getModelField(provider) {
+        try {
+            const models = await this.getModels(provider);
+            
+            if (!this.modelValue[provider]) {
+                const defaultModel = models[0];
+                this.modelValue[provider] = defaultModel;
+            }
+
+            return {
+                type: "select",
+                label: "Model",
+                default: models[0],
+                value: this.modelValue[provider],
+                options: models
+            };
+        } catch (error) {
+            throw error;
+        }        
+    }
+
+    async getModelValue(provider) {
+        const model = await this.getModelField(provider);
+        return model.value;
+    }
+
+    setModelValue(provider, value) {
+        this.modelValue[provider] = value;
+    }
+    
+    getConfigField(provider) {
+        try {
+            if (!this.config[provider]) {
+                const aiProvider = this.#getProvider(provider);
+                this.config[provider] = aiProvider.getConfig();
+            }
+            
+            return this.config[provider];
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    getConfigValues(provider) {
+        const config = this.getConfigField(provider);
+
+
+        return Object.fromEntries(
+            Object.entries(config).map(([key, field]) => [
+                key, field.value
+            ])
+        );
+    }
+
+    setConfigValue(provider, values) {
+        const config = this.getConfigField(provider);
+
+        Object.entries(values).forEach(([key, value]) => {
+            if (value !== undefined && config[key]) {
+                config[key].value = value;
+            }
+        });
     }
     
     async generateMessage(chatMessages, metadata) {
