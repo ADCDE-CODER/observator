@@ -11,8 +11,8 @@ export default class ChatMetadataService {
 
         // Get default values
         const providerValue = this.aiService.getProviderValue();
-        const modelValue = await this.aiService.getModelValue(provider);
-        const configValue = JSON.stringify(this.aiService.getConfigValues(provider));
+        const modelValue = await this.aiService.getModelValue(providerValue);
+        const configValue = JSON.stringify(this.aiService.getConfigValues(providerValue));
 
         try {
             // Store default values
