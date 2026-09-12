@@ -15,19 +15,21 @@ export default class OllamaProvider {
         });
     }
 
-    async generateMessage(chatMessages, metadata) {                
+    async generateMessage(chatMessages, metadata) {
+        const { model, config } = metadata;
+        
         const response = await this.ollamaClient.chat({
-            model: metadata.model,
+            model: model,
             messages: chatMessages,
             options: {
-                temperature: metadata.temperature,
-                top_k: metadata.top_k,
-                top_p: metadata.top_p,
-                min_p: metadata.min_p,
-                num_ctx: metadata.context,
-                num_predict: metadata.predict
+                temperature: config.temperature,
+                top_k: config.topK,
+                top_p: config.topP,
+                min_p: config.minP,
+                num_ctx: config.context,
+                num_predict: config.predict
             },
-            think: metadata.think,
+            think: config.think,
             stream: true
         });
 
@@ -36,7 +38,7 @@ export default class OllamaProvider {
 
     getConfig() {
         return {
-            system_content: {
+            systemContent: {
                 type: "text",
                 label: "System Content",
                 default: "Do normal",
@@ -61,7 +63,7 @@ export default class OllamaProvider {
                 step: 0.1
             },
 
-            top_k: {
+            topK: {
                 type: "number",
                 label: "Top K",
                 default: 50,
@@ -71,7 +73,7 @@ export default class OllamaProvider {
                 step: 1,
             },
 
-            top_p: {
+            topP: {
                 type: "number",
                 label: "Top P",
                 default: 0.9,
@@ -81,7 +83,7 @@ export default class OllamaProvider {
                 step: 0.1
             },
 
-            min_p: {
+            minP: {
                 type: "number",
                 label: "Min P",
                 default: 0.05,
