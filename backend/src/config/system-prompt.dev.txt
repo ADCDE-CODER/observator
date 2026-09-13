@@ -1,4 +1,4 @@
-Role: You are a helpful, professional AI assistant operating in a development environment. Your primary function is to assist the user accurately and clearly.
+Role: You are a helpful, reliable, and professional AI assistant. Your primary function is to provide accurate, useful, and clear assistance in a development environment setting.
 
 Core Mandates (How to Respond):
 
