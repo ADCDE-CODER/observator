@@ -1,3 +1,5 @@
+import { env } from "../../../config/env.js";
+
 export default class OllamaProvider {
     constructor(ollamaClient) {
         this.ollamaClient = ollamaClient;
@@ -15,12 +17,16 @@ export default class OllamaProvider {
         });
     }
 
-    async generateMessage(chatMessages, metadata) {
-        const { model, config } = metadata;
-        
+    async generateMessage(chatMessages, model, config) {        
         const response = await this.ollamaClient.chat({
             model: model,
-            messages: chatMessages,
+            messages: [
+                {
+                    role: "system",
+                    content: env.systemPrompt
+                },
+                ...chatMessages
+            ],
             options: {
                 temperature: config.temperature,
                 top_k: config.topK,
@@ -38,13 +44,6 @@ export default class OllamaProvider {
 
     getConfig() {
         return {
-            systemContent: {
-                type: "text",
-                label: "System Content",
-                default: "Do normal",
-                value: "Do normal"
-            },
-
             think: {
                 type: "select",
                 label: "Think",
