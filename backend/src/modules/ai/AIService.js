@@ -82,9 +82,8 @@ export default class AIService {
         try {
             const models = await this.getModels(provider);
             
-            if (!this.modelValue[provider]) {
-                const defaultModel = models[0];
-                this.modelValue[provider] = defaultModel;
+            if (!this.modelValue[provider] && models.length > 0) {
+                this.modelValue[provider] = models[0];
             }
 
             return {
