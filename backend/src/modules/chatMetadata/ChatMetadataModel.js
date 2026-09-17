@@ -8,8 +8,8 @@ export default class ChatMetadataModel {
         const table = `
             CREATE TABLE IF NOT EXISTS chatmetadata (
                 provider TEXT NOT NULL,
-                model TEXT NOT NULL,
-                config TEXT NOT NULL,
+                model TEXT,
+                config TEXT,
                 chat_id INTEGER PRIMARY KEY,
                 FOREIGN KEY (chat_id) REFERENCES chat(id) ON DELETE CASCADE
             );
