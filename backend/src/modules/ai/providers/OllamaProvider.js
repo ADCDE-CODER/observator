@@ -49,7 +49,8 @@ export default class OllamaProvider {
                 label: "Think",
                 default: "medium",
                 value: "medium",
-                options: ["low", "medium", "high", "max"]
+                options: ["low", "medium", "high", "max"],
+                disabled: false
             },
 
             temperature: {

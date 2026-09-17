@@ -52,14 +52,14 @@ export default class AIService {
     getProviderField() {
         try {
             const providers = this.getProviders();
-            const defaultProvider = providers[0];
             
             return {
                 type: "select",
                 label: "Provider",
-                default: defaultProvider,
-                value: this.providerValue ?? defaultProvider,
-                options: providers
+                default: providers[0] ?? null,
+                value: this.providerValue ?? null,
+                options: providers,
+                disabled: providers.length === 0
             };
         } catch (error) {
             throw error;
@@ -90,9 +90,10 @@ export default class AIService {
             return {
                 type: "select",
                 label: "Model",
-                default: models[0],
-                value: this.modelValue[provider],
-                options: models
+                default: models[0] ?? null,
+                value: this.modelValue[provider] ?? null,
+                options: models,
+                disabled: models.length === 0
             };
         } catch (error) {
             throw error;
@@ -159,8 +160,19 @@ export default class AIService {
             }
         }
    
-        if (!metadata.provider || !metadata.model) {
+        const { provider, model, config } = metadata;
+   
+        if (!provider|| !model) {
             const error = new Error("Provider and model are required");
+            error.status = 400;
+            throw error;
+        }
+        
+        const listOfModels = await this.getModels(provider);
+        const modelExist = listOfModels.some(modelValue => modelValue === model);
+
+        if (!modelExist) {
+            const error = new Error(`AI provider does not have ${model}`);
             error.status = 400;
             throw error;
         }
@@ -170,18 +182,9 @@ export default class AIService {
             return {role, content, images};
         });
         
-        const listOfModels = await this.getModels(metadata.provider);
-        const modelExist = listOfModels.some(model => model.name === metadata.model);
-
-        if (!modelExist) {
-            const error = new Error(`AI provider does not have ${metadata.model}`);
-            error.status = 400;
-            throw error;
-        }
-        
         try {
-            const aiProvider = this.#getProvider(metadata.provider);
-            return await aiProvider.generateMessage(chatMessages, metadata);
+            const aiProvider = this.#getProvider(provider);
+            return await aiProvider.generateMessage(chatMessages, model, config);
         } catch (error) {
             throw error;
         }
