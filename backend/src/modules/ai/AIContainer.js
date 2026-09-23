@@ -7,7 +7,8 @@ import OpenAIProvider from "./providers/OpenAIProvider.js";
 
 const whiteListOfModels = [
     "gemma4:latest",
-    "qwen3.5:9b"
+    "qwen3.5:9b",
+    "qwen3.5:0.8b"
 ];
 
 const ollamaClient = new Ollama({
