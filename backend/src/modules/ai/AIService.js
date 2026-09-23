@@ -25,30 +25,6 @@ export default class AIService {
         }
     }
 
-    async getModels(provider) {
-        try {
-            const aiProvider = this.#getProvider(provider);
-            return await aiProvider.getModels();
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    async pullModel(provider, model) {
-        if (this.whiteListOfModels.length !== 0 && !this.whiteListOfModels.includes(model)) {
-            const error = new Error("Unsupported model");
-            error.status = 400;
-            throw error;
-        }
-        
-        try {
-            const aiProvider = this.#getProvider(provider);
-            return await aiProvider.pullModel(model);
-        } catch (error) {
-            throw error;
-        }
-    }
-
     getProviderField() {
         try {
             const providers = this.getProviders();
@@ -76,6 +52,30 @@ export default class AIService {
 
     setProviderValue(value) {
         this.providerValue = value;
+    }
+
+    async getModels(provider) {
+        try {
+            const aiProvider = this.#getProvider(provider);
+            return await aiProvider.getModels();
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async pullModel(provider, model) {
+        if (this.whiteListOfModels.length !== 0 && !this.whiteListOfModels.includes(model)) {
+            const error = new Error("Unsupported model");
+            error.status = 400;
+            throw error;
+        }
+        
+        try {
+            const aiProvider = this.#getProvider(provider);
+            return await aiProvider.pullModel(model);
+        } catch (error) {
+            throw error;
+        }
     }
 
     async getModelField(provider) {
