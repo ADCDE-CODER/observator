@@ -71,7 +71,7 @@ export default class ChatMetadataService {
         }
     }
     
-    async update(chatMetadata, chatId) {
+    async update(chatMetadata, chatId, onChunk) {
         const { section, value } = chatMetadata;
         
         if (!chatId) {
@@ -84,7 +84,7 @@ export default class ChatMetadataService {
             }
 
             if (section === "model") {
-                return await this.updateModel(value, chatId);
+                return await this.updateModel(value, chatId, onChunk);
             }
 
             if (section === "config") {
@@ -131,10 +131,19 @@ export default class ChatMetadataService {
         }
     }
 
-    async updateModel(value, chatId) {        
+    async updateModel(value, chatId, onChunk) {        
+        const { pullModel, selectModel } = value;
         const providerValue = this.aiService.getProviderValue();
-        
-        this.aiService.setModelValue(providerValue, value);
+
+        if (pullModel.value) {
+            const stream = await this.aiService.pullModel(providerValue, pullModel.value);
+    
+            for await (const progress of stream) {
+                onChunk(progress);
+            }
+        }
+
+        this.aiService.setModelValue(providerValue, selectModel.value);
         const modelValue = await this.aiService.getModelValue(providerValue);
 
         try {
