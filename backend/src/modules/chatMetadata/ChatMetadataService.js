@@ -132,8 +132,12 @@ export default class ChatMetadataService {
     }
 
     async updateModel(value, chatId, onChunk) {        
-        const { pullModel, selectModel } = value;
+        const { pullModel, selectModel, deleteModel } = value;
         const providerValue = this.aiService.getProviderValue();
+
+        if (pullModel.value && deleteModel.value) {
+            throw new Error("It is not possible to pull and delete the model at the same time.");
+        }
 
         if (pullModel.value) {
             const stream = await this.aiService.pullModel(providerValue, pullModel.value);
@@ -141,6 +145,10 @@ export default class ChatMetadataService {
             for await (const progress of stream) {
                 onChunk(progress);
             }
+        }
+
+        if (deleteModel.value) {
+            await this.aiService.deleteModel(providerValue, deleteModel.value);
         }
 
         this.aiService.setModelValue(providerValue, selectModel.value);

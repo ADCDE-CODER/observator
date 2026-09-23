@@ -17,6 +17,10 @@ export default class OllamaProvider {
         });
     }
 
+    async deleteModel(model) {
+        return await this.ollamaClient.delete({ model: model });
+    }
+
     async generateMessage(chatMessages, model, config) {        
         const response = await this.ollamaClient.chat({
             model: model,

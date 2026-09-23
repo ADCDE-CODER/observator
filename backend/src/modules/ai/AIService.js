@@ -78,6 +78,15 @@ export default class AIService {
         }
     }
 
+    async deleteModel(provider, model) {
+        try {
+            const aiProvider = this.#getProvider(provider);
+            return await aiProvider.deleteModel(model);
+        } catch (error) {
+            throw error;
+        }
+    }
+
     async getModelField(provider) {
         try {
             const models = await this.getModels(provider);
@@ -101,7 +110,16 @@ export default class AIService {
                     value: this.modelValue[provider] ?? null,
                     options: models,
                     disabled: models.length === 0
-                }
+                },
+
+                deleteModel: {
+                    type: "select",
+                    label: "Delete a model",
+                    default: null,
+                    value: null,
+                    options: models,
+                    disabled: models.length === 0
+                },
             };
         } catch (error) {
             throw error;
