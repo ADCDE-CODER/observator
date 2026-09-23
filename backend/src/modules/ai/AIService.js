@@ -87,12 +87,21 @@ export default class AIService {
             }
 
             return {
-                type: "select",
-                label: "Model",
-                default: models[0] ?? null,
-                value: this.modelValue[provider] ?? null,
-                options: models,
-                disabled: models.length === 0
+                pullModel: {
+                    type: "text",
+                    label: "Pull a model",
+                    placeholder: "Type a model name",
+                    value: null
+                },
+
+                selectModel: {
+                    type: "select",
+                    label: "Select a model",
+                    default: models[0] ?? null,
+                    value: this.modelValue[provider] ?? null,
+                    options: models,
+                    disabled: models.length === 0
+                }
             };
         } catch (error) {
             throw error;
@@ -100,8 +109,8 @@ export default class AIService {
     }
 
     async getModelValue(provider) {
-        const model = await this.getModelField(provider);
-        return model.value;
+        const modelField = await this.getModelField(provider);
+        return modelField.selectModel.value;
     }
 
     setModelValue(provider, value) {
