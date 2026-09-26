@@ -69,6 +69,14 @@ export default class AIService {
             error.status = 400;
             throw error;
         }
+
+        const models = await this.getModels(provider);
+
+        if (models.includes(model)) {
+            const error = new Error("This model is already installed");
+            error.status = 400;
+            throw error;
+        }
         
         try {
             const aiProvider = this.#getProvider(provider);
@@ -119,7 +127,7 @@ export default class AIService {
                     value: null,
                     options: models,
                     disabled: models.length === 0
-                },
+                }
             };
         } catch (error) {
             throw error;
