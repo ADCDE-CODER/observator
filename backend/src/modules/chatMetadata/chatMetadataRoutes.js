@@ -9,5 +9,8 @@ const router = express.Router({
 
 router.get("/", authenticate, verifyChatOwner, (req, res) => chatMetadataController.getChatSettings(req, res));
 router.put("/", authenticate, verifyChatOwner, (req, res) => chatMetadataController.update(req, res));
+router.get("/resetprovider", authenticate, verifyChatOwner, (req, res) => chatMetadataController.resetProvider(req, res));
+router.get("/resetmodel", authenticate, verifyChatOwner, (req, res) => chatMetadataController.resetModel(req, res));
+router.get("/resetconfig", authenticate, verifyChatOwner, (req, res) => chatMetadataController.resetConfig(req, res));
 
 export default router;
