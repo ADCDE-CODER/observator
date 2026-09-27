@@ -157,22 +157,21 @@ export default class AIService {
     }
 
     getConfigValues(provider) {
-        const config = this.getConfigField(provider);
-
+        const configField = this.getConfigField(provider);
 
         return Object.fromEntries(
-            Object.entries(config).map(([key, field]) => [
+            Object.entries(configField).map(([key, field]) => [
                 key, field.value
             ])
         );
     }
 
     setConfigValue(provider, values) {
-        const config = this.getConfigField(provider);
+        const configField = this.getConfigField(provider);
 
         Object.entries(values).forEach(([key, value]) => {
-            if (value !== undefined && config[key]) {
-                config[key].value = value;
+            if (value !== undefined && configField[key]) {
+                configField[key].value = value;
             }
         });
     }
