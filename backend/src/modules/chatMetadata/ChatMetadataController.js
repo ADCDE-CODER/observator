@@ -43,4 +43,40 @@ export default class ChatMetadataController {
             }
         }
     }
+
+    async resetProvider(req, res) {
+        const chatId = req.chat.id;
+
+        try {
+            const metadata = await this.chatMetadataService.resetProvider(chatId);
+            res.status(200).json({message: "The provider has been restored", metadata}); 
+        } catch (error) {
+            console.error(error);
+            res.status(error.status || 500).json({message: error.message});
+        }
+    }
+
+    async resetModel(req, res) {
+        const chatId = req.chat.id;
+
+        try {
+            const metadata = await this.chatMetadataService.resetModel(chatId);
+            res.status(200).json({message: "The model has been restored", metadata}); 
+        } catch (error) {
+            console.error(error);
+            res.status(error.status || 500).json({message: error.message});
+        }
+    }
+
+    async resetConfig(req, res) {
+        const chatId = req.chat.id;
+
+        try {
+            const metadata = await this.chatMetadataService.resetConfig(chatId);
+            res.status(200).json({message: "The config has been restored", metadata}); 
+        } catch (error) {
+            console.error(error);
+            res.status(error.status || 500).json({message: error.message});
+        }
+    }
 }
