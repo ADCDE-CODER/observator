@@ -201,4 +201,52 @@ export default class ChatMetadataService {
             throw error;
         }
     }
+
+    async resetProvider(chatId) {
+        this.aiService.resetProviderValue();
+
+        const providerValue = this.aiService.getProviderValue();
+
+        const providerField = this.aiService.getProviderField();
+        const modelField = await this.aiService.getModelField(providerValue);
+        const configField = this.aiService.getConfigField(providerValue);
+
+        return {
+            provider: providerField,
+            model: modelField,
+            config: configField
+        };
+    }
+
+    async resetModel(chatId) {
+        const providerValue = this.aiService.getProviderValue();
+        
+        await this.aiService.resetModelValue(providerValue);
+
+        const providerField = this.aiService.getProviderField();
+        const modelField = await this.aiService.getModelField(providerValue);
+        const configField = this.aiService.getConfigField(providerValue);
+
+        return {
+            provider: providerField,
+            model: modelField,
+            config: configField
+        };
+    }
+
+    async resetConfig(chatId) {
+        const providerValue = this.aiService.getProviderValue();
+        
+        this.aiService.resetConfigValues(providerValue);
+
+        const providerField = this.aiService.getProviderField();
+        const modelField = await this.aiService.getModelField(providerValue);
+        const configField = this.aiService.getConfigField(providerValue);
+
+        return {
+            provider: providerField,
+            model: modelField,
+            config: configField
+        };
+    }
 }
