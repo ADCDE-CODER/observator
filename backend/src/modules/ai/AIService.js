@@ -54,6 +54,11 @@ export default class AIService {
         this.providerValue = value;
     }
 
+    resetProviderValue() {
+        const providerField = this.getProviderField();
+        this.providerValue = providerField.default;
+    }
+
     async getModels(provider) {
         try {
             const aiProvider = this.#getProvider(provider);
@@ -142,6 +147,11 @@ export default class AIService {
     setModelValue(provider, value) {
         this.modelValue[provider] = value;
     }
+
+    async resetModelValue(provider) {
+        const modelField = await this.getModelField(provider);
+        this.modelValue[provider] = modelField.selectModel.default;
+    }
     
     getConfigField(provider) {
         try {
@@ -173,6 +183,14 @@ export default class AIService {
             if (value !== undefined && configField[key]) {
                 configField[key].value = value;
             }
+        });
+    }
+
+    resetConfigValues(provider) {
+        const configField = this.getConfigField(provider);
+
+        Object.entries(configField).forEach(([key]) => {
+            this.config[provider][key].value = configField[key].default;
         });
     }
     
