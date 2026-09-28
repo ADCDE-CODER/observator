@@ -1,14 +1,6 @@
-import { createChatMetadata, readChatMetadata } from "../api/chatMetadataApi";
+import { createChatMetadata, readChatMetadata, resetChatMetadata } from "../api/chatMetadataApi";
 
-export async function applyChatMetadata(chatMetadata, chatId, userToken) {
-    for (const key in chatMetadata) {
-        const value = chatMetadata[key];
-
-        if (!value) {
-            throw new Error(`${key} input value missing.`)
-        }
-    }
-
+export async function applyChatMetadata(chatMetadata, chatId, userToken, onChunk) {
     if (!chatId) {
         throw new Error("Chat ID missing.");
     }
@@ -17,7 +9,7 @@ export async function applyChatMetadata(chatMetadata, chatId, userToken) {
         throw new Error("User token missing.");
     }
 
-    return await createChatMetadata(chatMetadata, chatId, userToken);
+    await createChatMetadata(chatMetadata, chatId, userToken, onChunk);
 };
 
 export async function getChatMetadata(chatId, userToken) {
@@ -30,4 +22,16 @@ export async function getChatMetadata(chatId, userToken) {
     }
 
     return await readChatMetadata(chatId, userToken);
+};
+
+export async function restartChatMetadata(endpoint, chatId, userToken) {
+    if (!chatId) {
+        throw new Error("Chat ID missing.");
+    }
+
+    if (!userToken) {
+        throw new Error("User token missing.");
+    }
+
+    return await resetChatMetadata(endpoint, chatId, userToken);
 };
