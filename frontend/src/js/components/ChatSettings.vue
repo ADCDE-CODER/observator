@@ -1,25 +1,49 @@
 <script setup>
-    const emit = defineEmits(["apply-settings"])
-    const {selectedId, settings} = defineProps({
+    import SettingsField from './SettingsField.vue';
+
+    const emit = defineEmits(["apply-provider", "apply-model", "apply-config", "reset-settings"])
+    const props = defineProps({
         selectedId: Number,
-        settings: Array
+        settings: Object
     });
 
-    function applySettings() {
-        const result = {};
+    function applyProvider() {
+        const settings = {
+            section: "provider",
+            value: props.settings.provider.value
+        };
+        emit('apply-provider', settings);
+    }
 
-        settings.forEach(section => {
-            section.inputs.forEach( input => {
-                result[input.name] = input.value; 
-            })
-        });
+    function applyModel() {
+        const settings = {
+            section: "model",
+            value: props.settings.model
+        };
+        emit('apply-model', settings);
+    }
 
-        emit('apply-settings', result);
+    function applyConfig() {
+        const settings = {
+            section: "config",
+            value:  getConfigValues(props.settings.config)
+        };
+        emit('apply-config', settings);
+    }
+
+    function getConfigValues(config) {
+        const values = {};
+
+        for (const key in config) {
+            values[key] = config[key].value
+        }
+
+        return values
     }
 </script>
 
 <template>
-    <div class="chat-settings" v-show="!selectedId">
+    <div class="chat-settings" v-show="!props.selectedId">
         <h2>Settings</h2>
         <div class="settings">
             <p class="output-message">
@@ -30,77 +54,39 @@
         </div>
     </div>
 
-    <div class="chat-settings" v-show="selectedId">
+    <div class="chat-settings" v-show="props.selectedId">
         <h2>Settings</h2>
-        <form class="settings" @submit.prevent="applySettings()">
-            <div class="section" v-for="section in settings">
-                <h3 class="section-heading">{{section.title}}</h3>
-
-                <div v-for="input in section.inputs">
-                    <label>{{ input.label }}: </label>
-                    
-                    <!-- TEXT / NUMBER / DATE / RANGE -->
-                    <input 
-                    v-if="['text', 'number', 'date', 'range'].includes(input.type)" 
-                    :class="input.type" 
-                    :type="input.type" 
-                    :placeholder="input.placeholder" 
-                    :min="input.min" 
-                    :max="input.max"
-                    :step="input.step"
-                    v-model="input.value" 
-                    >
-
-                    <!-- TEXTAREA -->
-                    <textarea 
-                    v-else-if="input.type === 'textarea'"
-                    :placeholder="input.placeholder"
-                    v-model="input.value"
-                    ></textarea>
-
-                    <!-- SELECT -->
-                    <select
-                    v-else-if="input.type === 'select'"
-                    v-model="input.value"    
-                    >
-                        <option
-                        v-for="option in input.options"
-                        :key="option"
-                        :value="option"
-                        >
-                            {{ option }}
-                        </option>
-                    </select>
-
-                    <!-- RADIO -->
-                    <div v-else-if="input.type === 'radio'">
-                        <label
-                        v-for="option in input.options"
-                        :key="option"
-                        >
-                            {{ option }}:
-
-                            <input
-                            type="radio"
-                         
-                            :value="option"
-                            v-model="input.value"
-                            />
-                        </label>
-                    </div>
-
-                    <!-- CHECKBOX -->
-                    <input
-                    v-else-if="input.type === 'checkbox'"
-                    :class="input.type"
-                    type="checkbox"
-                    v-model="input.value"
-                    />
+        <div class="settings">
+            <!-- Provider -->
+            <form class="form-section" @submit.prevent="applyProvider()">
+                <h3 class="section-heading">Provider</h3>
+                <SettingsField :section="{ provider: props.settings.provider }" />
+                <div class="button-container">
+                    <button class="secondary-button" type="submit">Apply</button>
+                    <button class="reset-button" type="button" @click="emit('reset-settings', 'resetprovider')">⟳</button>
                 </div>
-            </div>
+            </form>
 
-            <button class="secondary-button" type="submit">Apply</button>
-        </form>
+            <!-- Model -->
+            <form class="form-section" @submit.prevent="applyModel()">
+                <h3 class="section-heading">Model</h3>
+                <SettingsField :section="{ model: props.settings.model }" />
+                <div class="button-container">
+                    <button class="secondary-button" type="submit">Apply</button>
+                    <button class="reset-button" type="button" @click="emit('reset-settings', 'resetmodel')">⟳</button>
+                </div>
+            </form>
+
+            <!-- Config -->
+            <form class="form-section" @submit.prevent="applyConfig()">
+                <h3 class="section-heading">Config</h3>
+                <SettingsField :section="{ config: props.settings.config }" />
+                <div class="button-container">
+                    <button class="secondary-button" type="submit">Apply</button>
+                    <button class="reset-button" type="button" @click="emit('reset-settings', 'resetconfig')">⟳</button>
+                </div>
+            </form>
+        </div>
     </div>
 </template>
 
@@ -117,7 +103,12 @@
         align-items: center;
     }
 
-    .settings{
+    .output-message {
+        text-align: center;
+        margin: auto;
+    }
+
+    .settings {
         background-color: var(--color-surface-container-high);
         margin: 0rem 1rem 1rem 1rem;
         padding: 0.5rem;
@@ -131,12 +122,7 @@
         overflow-y: auto;
     }
 
-    .output-message {
-        text-align: center;
-        margin: auto;
-    }
-
-    .section {
+    .form-section {
         background-color: var(--color-surface-container-highest);
         border-radius: 20px;
         padding: 0.5em;
@@ -146,34 +132,11 @@
         gap: 1em;
     }
 
-    .section-heading {
-        margin: 1rem 0rem 0rem 0rem;
-    }
-
-    .section > div {
+    .button-container {
         display: flex;
-        flex-direction: column;
-        justify-content: center;
         align-items: center;
+        gap: 0.5em;
         width: 100%;
-    }
-
-    .number, .text, select {
-        background-color: var(--color-surface-container-highest);
-        color: var(--color-on-surface);
-        border: 1px var(--color-outline) solid;
-        width: 100%;
-        padding: 1rem;
-        box-sizing: border-box;
-        border-radius: 20px;
-    }
-
-    .checkbox {
-        background-color: var(--color-surface-container-highest);
-        color: var(--color-on-surface);
-        border: 1px var(--color-outline) solid;
-        width: 25px;
-        height: 25px;
     }
 
    .secondary-button {
@@ -188,7 +151,18 @@
         transition: background-color 1s, color 1s;
 	}
 
-    .secondary-button:hover {
+    .reset-button {
+        background: none;
+		color: var(--color-on-surface);
+        font-size: large;
+		padding: 0.5rem;
+		border: none;
+		border-radius: 15px;
+		cursor: pointer;
+        transition: background-color 1s, color 1s;
+    }
+
+    .secondary-button:hover, .reset-button:hover  {
         background-color: var(--color-secondary-container);
 		color: var(--color-on-secondary-container);
     }
