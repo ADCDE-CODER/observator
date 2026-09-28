@@ -2,9 +2,10 @@
     import ChatList from '../components/ChatList.vue';
     import ChatMessages from '../components/ChatMessage.vue';
     import ChatSettings from '../components/ChatSettings.vue';
+    import ProgressOverlay from '../components/ProgressOverlay.vue';
     import { onMounted, ref } from 'vue';
     import { authState } from '../state/authState';
-    import { applyChatMetadata, getChatMetadata } from '../services/chatMetadataService.js';
+    import { applyChatMetadata, getChatMetadata, restartChatMetadata } from '../services/chatMetadataService.js';
     import { addMessages, getMessages } from '../services/messageService';
     import { addChat, getChats, modifyChat, removeChat } from '../services/chatService';
     import { MarkdownUtil } from '../utils/MarkdownUtil.js';
@@ -12,96 +13,9 @@
     const selectedChatId = ref(null);
     const chats = ref([]);
     const messages = ref([]);
-    const settings = ref([
-        {
-            title: "Body",
-            inputs: [
-                {
-                    name: "provider",
-                    label: "Provider",
-                    type: "select",
-                    value: "ollama",
-                    options: ["openai", "ollama"]
-                },
-                {
-                    name: "model",
-                    label: "Model",
-                    type: "text",
-                    value: ""
-                },
-                {
-                    name: "system_content",
-                    label: "System Content",
-                    type: "text",
-                    value: "",
-                },
-                {
-                    name: "think",
-                    label: "Think",
-                    type: "select",
-                    value: "medium",
-                    options: ["low", "medium", "high", "max"]
-                }
-            ]
-        },
-        {
-            title: "Options",
-            inputs: [
-                {
-                    name: "temperature",
-                    label: "Temperature",
-                    type: "number",
-                    value: 0,
-                    min: 0,
-                    max: 2,
-                    step: 0.1
-                },
-                {
-                    name: "top_k",
-                    label: "Top K",
-                    type: "number",
-                    value: 1,
-                    min: 0,
-                    max: 100,
-                    step: 1,
-                },
-                {
-                    name: "top_p",
-                    label: "Top P",
-                    type: "number",
-                    value: 0,
-                    min: 0,
-                    max: 1,
-                    step: 0.1
-                },
-                {
-                    name: "min_p",
-                    label: "Min P",
-                    type: "number",
-                    value: 0,
-                    min: 0,
-                    max: 2,
-                    step: 0.01
-                },
-                {
-                    name: "context",
-                    label: "Context",
-                    type: "number",
-                    value: 0,
-                    min: 0,
-                    step: 512
-                },
-                {
-                    name: "predict",
-                    label: "Predict",
-                    type: "number",
-                    value: 0,
-                    min: 0,
-                    step: 512
-                }
-            ]
-        }
-    ]);
+    const settings = ref({});
+    const progress = ref({});
+    const showProgress = ref(false);
 
     onMounted(async () => {
         if (authState.user != null) {
@@ -248,10 +162,19 @@
         }
     }
 
-    async function applySettings(settings, chatId, userToken) {
+    async function applySettings(settingsValue, chatId, userToken) {
         try {
-            const result = await applyChatMetadata(settings, chatId, userToken);
-            alert(result.message);
+            await applyChatMetadata(settingsValue, chatId, userToken, (eventType, data) => {
+                if (eventType === "progress") {
+                    progress.value = data;
+                    showProgress.value = true;
+                }
+
+                if (eventType === "complete") {
+                    console.log(data.metadata)
+                    settings.value = data.metadata;
+                }
+            });
         } catch (error) {
             alert(error.message);
         }        
@@ -260,15 +183,25 @@
     async function getSettings(chatId, userToken) {
         try {
             const result = await getChatMetadata(chatId, userToken);
-
-            settings.value.forEach(object => {
-                object.inputs.forEach(input => {
-                    input.value = result.metadata[input.name];
-                })
-            })
+            console.log(result)
+            settings.value = result.metadata
         } catch (error) {
             alert(error.message);
         }
+    }
+
+    async function resetSettings(endpoint, chatId, userToken) {
+        try {
+            const result = await restartChatMetadata(endpoint, chatId, userToken);
+            console.log(result)
+            settings.value = result.metadata
+        } catch (error) {
+            alert(error.message);
+        }
+    }
+
+    function closeProgress() {
+        showProgress.value = false;
     }
 </script>
 
@@ -297,7 +230,16 @@
        <ChatSettings
        :selected-id="selectedChatId"
        :settings="settings"
-       @apply-settings="(settings) => applySettings(settings, authState.selectedChatId, authState.user.token)"
+       @apply-provider="(settings) => applySettings(settings, authState.selectedChatId, authState.user.token)"
+       @apply-model="(settings) => applySettings(settings, authState.selectedChatId, authState.user.token)"
+       @apply-config="(settings) => applySettings(settings, authState.selectedChatId, authState.user.token)"
+       @reset-settings="(endpoint) => resetSettings(endpoint, authState.selectedChatId, authState.user.token)"
+       />
+
+       <ProgressOverlay
+       :show-progress="showProgress"
+       :progress="progress"
+       @close="() => closeProgress()"
        />
     </section>
 </template>
