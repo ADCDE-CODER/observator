@@ -202,7 +202,7 @@ export default class ChatMetadataService {
         }
     }
 
-    async resetProvider(chatId) {
+    async resetProvider() {
         this.aiService.resetProviderValue();
 
         const providerValue = this.aiService.getProviderValue();
@@ -218,35 +218,19 @@ export default class ChatMetadataService {
         };
     }
 
-    async resetModel(chatId) {
+    async resetModel() {
         const providerValue = this.aiService.getProviderValue();
-        
         await this.aiService.resetModelValue(providerValue);
-
-        const providerField = this.aiService.getProviderField();
         const modelField = await this.aiService.getModelField(providerValue);
-        const configField = this.aiService.getConfigField(providerValue);
 
-        return {
-            provider: providerField,
-            model: modelField,
-            config: configField
-        };
+        return modelField;
     }
 
-    async resetConfig(chatId) {
+    async resetConfig() {
         const providerValue = this.aiService.getProviderValue();
-        
         this.aiService.resetConfigValues(providerValue);
-
-        const providerField = this.aiService.getProviderField();
-        const modelField = await this.aiService.getModelField(providerValue);
         const configField = this.aiService.getConfigField(providerValue);
 
-        return {
-            provider: providerField,
-            model: modelField,
-            config: configField
-        };
+        return configField;
     }
 }
