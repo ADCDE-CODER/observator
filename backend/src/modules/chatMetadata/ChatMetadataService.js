@@ -21,118 +21,85 @@ export default class ChatMetadataService {
             throw error;
         }
     }
-
-    fetchChatMetadata(chatId) {
+    
+    async getChatMetadata(chatId) {
         if (!chatId) {
             throw new Error("Chat ID is required to get a chat metadata.");
         }
+        
+        const chatMetadata = this.chatMetadataModel.findById(chatId);
 
-        try {            
-            const chatMetadata = this.chatMetadataModel.findById(chatId);
-
-            if (!chatMetadata) {
-                throw new Error("Chat metadata not found.");
-            }
-            
-            chatMetadata.config = JSON.parse(chatMetadata.config)
-
-            const { provider, model, config } = chatMetadata;
-
-            return {
-                provider: provider,
-                model: model,
-                config: config
-            };
-        } catch (error) {
-            throw error;
+        if (!chatMetadata) {
+            throw new Error("Chat metadata not found.");
         }
+        
+        chatMetadata.config = JSON.parse(chatMetadata.config);
+
+        const { provider, model, config } = chatMetadata;
+        
+        // Update each field value
+        this.aiService.setProviderValue(provider);
+        this.aiService.setModelValue(provider, model);
+        this.aiService.setConfigValue(provider, config);
+
+        // Get each field value
+        const providerField = this.aiService.getProviderField();
+        const modelField = await this.aiService.getModelField(provider);
+        const configField = this.aiService.getConfigField(provider);
+
+        return {
+            provider: providerField,
+            model: modelField,
+            config: configField
+        };
     }
-    
-    async getChatSettings(chatId) {
-        try {            
-            const { provider, model, config } = this.fetchChatMetadata(chatId);
-            
-            // Update each field value
-            this.aiService.setProviderValue(provider);
-            this.aiService.setModelValue(provider, model);
-            this.aiService.setConfigValue(provider, config);
 
-            const providerField = this.aiService.getProviderField();
-            const modelField = await this.aiService.getModelField(provider);
-            const configField = this.aiService.getConfigField(provider);
-
-            return {
-                provider: providerField,
-                model: modelField,
-                config: configField
-            };
-        } catch (error) {
-            throw error;
+    async updateProvider(provider, chatId) {
+        if (provider.section !== "provider") {
+            throw new Error("The section is not a provider");
         }
-    }
-    
-    async update(chatMetadata, chatId, onChunk) {
-        const { section, value } = chatMetadata;
         
         if (!chatId) {
-            throw new Error("Chat ID is required to update a chat metadata.");
+            throw new Error("Chat ID is required to update a provider metadata.");
         }
-
-        try {
-            if (section === "provider") {
-                return await this.updateProvider(value, chatId);
-            }
-
-            if (section === "model") {
-                return await this.updateModel(value, chatId, onChunk);
-            }
-
-            if (section === "config") {
-                return await this.updateConfig(value, chatId);
-            }
-
-            throw new Error("Unknown settings section.");
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    async updateProvider(value, chatId) {
-        this.aiService.setProviderValue(value);
-
-        const providerValue = this.aiService.getProviderValue();
-        const modelValue = await this.aiService.getModelValue(providerValue);
-        const configValue = JSON.stringify(await this.aiService.getConfigValues(providerValue));
-
+        
+        const modelValue = await this.aiService.getModelValue(provider.value);
+        const configValue = JSON.stringify(await this.aiService.getConfigValues(provider.value));
+        
         // When updated provider value, then model and config need also update. 
         // Because each provider have diffrent list of models and config.
-        this.aiService.setModelValue(providerValue, modelValue);
-        this.aiService.setConfigValue(providerValue, configValue);
+        this.aiService.setProviderValue(provider.value);
+        this.aiService.setModelValue(provider.value, modelValue);
+        this.aiService.setConfigValue(provider.value, configValue);
         
-        try {
-            const metadata = this.chatMetadataModel.update(providerValue, modelValue, configValue, chatId)
+        const metadata = this.chatMetadataModel.update(provider.value, modelValue, configValue, chatId)
 
-            if(!metadata) {
-                throw new Error("Update failed.");
-            }
-
-            // Once a specific provider has been selected, a specific list of models and config is retrieved.
-            const providerField = this.aiService.getProviderField();
-            const modelField = await this.aiService.getModelField(value);
-            const configField = this.aiService.getConfigField(value);
-
-            return {
-                provider: providerField,
-                model: modelField,
-                config: configField
-            };
-        } catch (error) {
-            throw error;
+        if(!metadata) {
+            throw new Error("Update failed.");
         }
+
+        // Once a specific provider has been selected, a specific list of models and config is retrieved.
+        const providerField = this.aiService.getProviderField();
+        const modelField = await this.aiService.getModelField(provider.value);
+        const configField = this.aiService.getConfigField(provider.value);
+
+        return {
+            provider: providerField,
+            model: modelField,
+            config: configField
+        };
     }
 
-    async updateModel(value, chatId, onChunk) {        
-        const { pullModel, selectModel, deleteModel } = value;
+    async updateModel(model, chatId, onChunk) {  
+        if (model.section !== "model") {
+            throw new Error("The section is not a model");
+        }
+
+        if (!chatId) {
+            throw new Error("Chat ID is required to update a model metadata.");
+        }
+
+        const { pullModel, selectModel, deleteModel } = model.value;
         const providerValue = this.aiService.getProviderValue();
 
         if (pullModel.value && deleteModel.value) {
@@ -161,24 +128,26 @@ export default class ChatMetadataService {
                 throw new Error("Update failed.");
             }
 
-            const providerField = this.aiService.getProviderField();
             const modelField = await this.aiService.getModelField(providerValue);
-            const configField = this.aiService.getConfigField(providerValue);
 
-            return {
-                provider: providerField,
-                model: modelField,
-                config: configField
-            };
+            return modelField;
         } catch (error) {
             throw error;
         }
     }
 
-    async updateConfig(value, chatId) {
+    async updateConfig(config, chatId) {
+        if (model.section !== "config") {
+            throw new Error("The section is not a config");
+        }
+
+        if (!chatId) {
+            throw new Error("Chat ID is required to update a config metadata.");
+        }
+
         const providerValue = this.aiService.getProviderValue();
         
-        this.aiService.setConfigValue(providerValue, value);
+        this.aiService.setConfigValue(providerValue, config);
         const configValue = JSON.stringify(await this.aiService.getConfigValues(providerValue));
 
         try {
@@ -188,15 +157,9 @@ export default class ChatMetadataService {
                 throw new Error("Update failed.");
             }
 
-            const providerField = this.aiService.getProviderField();
-            const modelField = await this.aiService.getModelField(providerValue);
             const configField = this.aiService.getConfigField(providerValue);
 
-            return {
-                provider: providerField,
-                model: modelField,
-                config: configField
-            };
+            return configField;
         } catch (error) {
             throw error;
         }
