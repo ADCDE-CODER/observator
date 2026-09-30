@@ -46,8 +46,8 @@ export default class ChatMetadataController {
 
     async resetProvider(req, res) {
         try {
-            const providerMetadata = await this.chatMetadataService.resetProvider();
-            res.status(200).json({message: "The provider has been restored", providerMetadata}); 
+            const metadata = await this.chatMetadataService.resetProvider();
+            res.status(200).json({message: "The provider has been restored", metadata}); 
         } catch (error) {
             console.error(error);
             res.status(error.status || 500).json({message: error.message});
@@ -56,18 +56,18 @@ export default class ChatMetadataController {
 
     async resetModel(req, res) {
         try {
-            const modelMetadata = await this.chatMetadataService.resetModel();
-            res.status(200).json({message: "The model has been restored", modelMetadata}); 
+            const metadata = await this.chatMetadataService.resetModel();
+            res.status(200).json({message: "The model has been restored", metadata}); 
         } catch (error) {
             console.error(error);
             res.status(error.status || 500).json({message: error.message});
         }
     }
 
-    async resetConfig(req, res) {
+    resetConfig(req, res) {
         try {
-            const configMetadata = await this.chatMetadataService.resetConfig();
-            res.status(200).json({message: "The config has been restored", configMetadata}); 
+            const metadata = this.chatMetadataService.resetConfig();
+            res.status(200).json({message: "The config has been restored", metadata}); 
         } catch (error) {
             console.error(error);
             res.status(error.status || 500).json({message: error.message});
