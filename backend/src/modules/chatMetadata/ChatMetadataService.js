@@ -40,7 +40,7 @@ export default class ChatMetadataService {
         }
     }
     
-    async getChatMetadata(chatId) {
+    fetchChatMetadata(chatId) {
         if (!chatId) {
             throw new Error("Chat ID is required to get a chat metadata.");
         }
@@ -53,7 +53,11 @@ export default class ChatMetadataService {
         
         chatMetadata.config = JSON.parse(chatMetadata.config);
 
-        const { provider, model, config } = chatMetadata;
+        return chatMetadata;
+    }
+    
+    async getChatMetadata(chatId) {
+        const { provider, model, config } = this.fetchChatMetadata(chatId);
         
         // Update each field value
         this.setChatMetadataValue(provider, model, config);
