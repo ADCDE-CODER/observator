@@ -3,11 +3,11 @@ export default class ChatMetadataController {
         this.chatMetadataService = chatMetadataService;
     }
     
-    async getChatSettings(req, res) {
+    async getChatMetadata(req, res) {
         const chatId = req.chat.id;
         
         try {
-            const metadata = await this.chatMetadataService.getChatSettings(chatId);
+            const metadata = await this.chatMetadataService.getChatMetadata(chatId);
             res.status(200).json({message: "Chat metadata read successfully", metadata}); 
         } catch (error) {
             console.error(error);
