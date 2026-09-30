@@ -160,8 +160,12 @@ export default class ChatMetadataService {
     async resetProvider() {
         this.aiService.resetProviderValue();
         const providerValue = this.aiService.getProviderValue();
+        const metadataField = await this.getChatMetadataField(providerValue);
 
-        return await this.getChatMetadataField(providerValue);
+        return {
+            section: "provider",
+            ...metadataField
+        };
     }
 
     async resetModel() {
@@ -169,7 +173,10 @@ export default class ChatMetadataService {
         await this.aiService.resetModelValue(providerValue);
         const modelField = await this.aiService.getModelField(providerValue);
 
-        return { model: modelField };
+        return { 
+            section: "model",
+            model: modelField 
+        };
     }
 
     resetConfig() {
@@ -177,6 +184,9 @@ export default class ChatMetadataService {
         this.aiService.resetConfigValues(providerValue);
         const configField = this.aiService.getConfigField(providerValue);
 
-        return { config: configField };
+        return { 
+            section: "config",
+            config: configField 
+        };
     }
 }
