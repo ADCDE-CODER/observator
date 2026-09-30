@@ -4,6 +4,24 @@ export default class ChatMetadataService {
         this.aiService = aiService;
     }
 
+    async getChatMetadataField(provider) {
+        const providerField = this.aiService.getProviderField();
+        const modelField = await this.aiService.getModelField(provider);
+        const configField = this.aiService.getConfigField(provider);
+
+        return {
+            provider: providerField,
+            model: modelField,
+            config: configField
+        };
+    }
+
+    setChatMetadataValue(provider, model, config) {
+        this.aiService.setProviderValue(provider);
+        this.aiService.setModelValue(provider, model);
+        this.aiService.setConfigValue(provider, config);
+    }
+
     async create(chatId) {
         if (!chatId) {
             throw new Error("Chat ID is required to create a chat metadata.");
@@ -38,20 +56,10 @@ export default class ChatMetadataService {
         const { provider, model, config } = chatMetadata;
         
         // Update each field value
-        this.aiService.setProviderValue(provider);
-        this.aiService.setModelValue(provider, model);
-        this.aiService.setConfigValue(provider, config);
+        this.setChatMetadataValue(provider, model, config);
 
         // Get each field value
-        const providerField = this.aiService.getProviderField();
-        const modelField = await this.aiService.getModelField(provider);
-        const configField = this.aiService.getConfigField(provider);
-
-        return {
-            provider: providerField,
-            model: modelField,
-            config: configField
-        };
+        return await this.getChatMetadataField(provider);
     }
 
     async updateProvider(provider, chatId) {
@@ -68,9 +76,7 @@ export default class ChatMetadataService {
         
         // When updated provider value, then model and config need also update. 
         // Because each provider have diffrent list of models and config.
-        this.aiService.setProviderValue(provider.value);
-        this.aiService.setModelValue(provider.value, modelValue);
-        this.aiService.setConfigValue(provider.value, configValue);
+        this.setChatMetadataValue(provider.value, modelValue, configValue);
         
         const metadata = this.chatMetadataModel.update(provider.value, modelValue, configValue, chatId)
 
@@ -79,15 +85,7 @@ export default class ChatMetadataService {
         }
 
         // Once a specific provider has been selected, a specific list of models and config is retrieved.
-        const providerField = this.aiService.getProviderField();
-        const modelField = await this.aiService.getModelField(provider.value);
-        const configField = this.aiService.getConfigField(provider.value);
-
-        return {
-            provider: providerField,
-            model: modelField,
-            config: configField
-        };
+        return await this.getChatMetadataField(provider.value);
     }
 
     async updateModel(model, chatId, onChunk) {  
@@ -119,25 +117,20 @@ export default class ChatMetadataService {
         }
 
         this.aiService.setModelValue(providerValue, selectModel.value);
-        const modelValue = await this.aiService.getModelValue(providerValue);
 
-        try {
-            const metadata = this.chatMetadataModel.updateModel(modelValue, chatId);
+        const metadata = this.chatMetadataModel.updateModel(selectModel.value, chatId);
 
-            if(!metadata) {
-                throw new Error("Update failed.");
-            }
-
-            const modelField = await this.aiService.getModelField(providerValue);
-
-            return modelField;
-        } catch (error) {
-            throw error;
+        if(!metadata) {
+            throw new Error("Update failed.");
         }
+
+        const modelField = await this.aiService.getModelField(providerValue);
+
+        return { model: modelField };
     }
 
-    async updateConfig(config, chatId) {
-        if (model.section !== "config") {
+    updateConfig(config, chatId) {
+        if (config.section !== "config") {
             throw new Error("The section is not a config");
         }
 
@@ -146,39 +139,25 @@ export default class ChatMetadataService {
         }
 
         const providerValue = this.aiService.getProviderValue();
-        
-        this.aiService.setConfigValue(providerValue, config);
-        const configValue = JSON.stringify(await this.aiService.getConfigValues(providerValue));
+        this.aiService.setConfigValue(providerValue, config.value);
+        config.value = JSON.stringify(config.value);
 
-        try {
-            const metadata = this.chatMetadataModel.updateConfig(configValue, chatId);
+        const metadata = this.chatMetadataModel.updateConfig(config.value, chatId);
 
-            if(!metadata) {
-                throw new Error("Update failed.");
-            }
-
-            const configField = this.aiService.getConfigField(providerValue);
-
-            return configField;
-        } catch (error) {
-            throw error;
+        if(!metadata) {
+            throw new Error("Update failed.");
         }
+
+        const configField = this.aiService.getConfigField(providerValue);
+
+        return { config: configField };
     }
 
     async resetProvider() {
         this.aiService.resetProviderValue();
-
         const providerValue = this.aiService.getProviderValue();
 
-        const providerField = this.aiService.getProviderField();
-        const modelField = await this.aiService.getModelField(providerValue);
-        const configField = this.aiService.getConfigField(providerValue);
-
-        return {
-            provider: providerField,
-            model: modelField,
-            config: configField
-        };
+        return await this.getChatMetadataField(providerValue);
     }
 
     async resetModel() {
@@ -186,14 +165,14 @@ export default class ChatMetadataService {
         await this.aiService.resetModelValue(providerValue);
         const modelField = await this.aiService.getModelField(providerValue);
 
-        return modelField;
+        return { model: modelField };
     }
 
-    async resetConfig() {
+    resetConfig() {
         const providerValue = this.aiService.getProviderValue();
         this.aiService.resetConfigValues(providerValue);
         const configField = this.aiService.getConfigField(providerValue);
 
-        return configField;
+        return { config: configField };
     }
 }
