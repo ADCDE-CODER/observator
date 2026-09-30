@@ -15,8 +15,21 @@ export default class ChatMetadataController {
         }
     }
 
-    async update(req, res) {
-        const chatMetadata = req.body;
+    async updateProvider(req, res) {
+        const provider = req.body;
+        const chatId = req.chat.id;
+        
+        try {
+            const metadata = await this.chatMetadataService.updateProvider(provider, chatId);
+            res.status(200).json({message: 'The provider updated successfully', metadata}); 
+        } catch (error) {
+            console.error(error);
+            res.status(error.status || 500).json({message: error.message})
+        }
+    }
+
+    async updateModel(req, res) {
+        const model = req.body;
         const chatId = req.chat.id;
 
         try {
@@ -25,11 +38,11 @@ export default class ChatMetadataController {
             res.setHeader('Connection', 'keep-alive');
         
             try {
-                const metadata = await this.chatMetadataService.update(chatMetadata, chatId, (progress) => {
+                const metadata = await this.chatMetadataService.updateModel(model, chatId, (progress) => {
                     res.write(`event: progress\n` + `data: ${JSON.stringify(progress)}\n\n`);
                 });
                 
-                res.write(`event: complete\n` + `data: ${JSON.stringify({ message: 'Chat metadata updated successfully', metadata })}\n\n`);
+                res.write(`event: complete\n` + `data: ${JSON.stringify({ message: 'The model updated successfully', metadata })}\n\n`);
                 res.end();
             } catch (error) {
                 console.error(error);
@@ -44,6 +57,19 @@ export default class ChatMetadataController {
         }
     }
 
+    updateConfig(req, res) {
+        const config = req.body;
+        const chatId = req.chat.id;
+        
+        try {
+            const metadata = this.chatMetadataService.updateConfig(config, chatId);
+            res.status(200).json({message: 'The config updated successfully', metadata}); 
+        } catch (error) {
+            console.error(error);
+            res.status(error.status || 500).json({message: error.message})
+        }
+    }
+    
     async resetProvider(req, res) {
         try {
             const metadata = await this.chatMetadataService.resetProvider();
