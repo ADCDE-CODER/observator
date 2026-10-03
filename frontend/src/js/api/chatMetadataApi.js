@@ -1,5 +1,25 @@
-export async function createChatMetadata(chatMetadata, chatId, userToken, onChunk) {
+export async function readChatMetadata(chatId, userToken) {
     const url = `/api/chats/${chatId}/chatMetadata`;    
+    
+    const response = await fetch(url, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${userToken}`
+        }
+    });
+    
+    const result = await response.json();
+
+    if (!response.ok) {
+        throw new Error(result.message);
+    }
+    
+    return result;
+};
+
+export async function updateProviderChatMetadata(provider, chatId, userToken) {
+    const url = `/api/chats/${chatId}/chatMetadata/provider`;    
     
     const response = await fetch(url, {
         method: "PUT",
@@ -7,7 +27,28 @@ export async function createChatMetadata(chatMetadata, chatId, userToken, onChun
             "Content-Type": "application/json",
             "Authorization": `Bearer ${userToken}`
         },
-        body: JSON.stringify(chatMetadata)
+        body: JSON.stringify(provider)
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+        throw new Error(result.message);
+    }
+    
+    return result;
+};
+
+export async function updateModelChatMetadata(model, chatId, userToken, onChunk) {
+    const url = `/api/chats/${chatId}/chatMetadata/model`;    
+    
+    const response = await fetch(url, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${userToken}`
+        },
+        body: JSON.stringify(model)
     });
 
     const reader = response.body.getReader();
@@ -47,17 +88,18 @@ export async function createChatMetadata(chatMetadata, chatId, userToken, onChun
     } 
 };
 
-export async function readChatMetadata(chatId, userToken) {
-    const url = `/api/chats/${chatId}/chatMetadata`;    
+export async function updateConfigChatMetadata(config, chatId, userToken) {
+    const url = `/api/chats/${chatId}/chatMetadata/config`;    
     
     const response = await fetch(url, {
-        method: "GET",
+        method: "PUT",
         headers: {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${userToken}`
-        }
+        },
+        body: JSON.stringify(config)
     });
-    
+
     const result = await response.json();
 
     if (!response.ok) {
