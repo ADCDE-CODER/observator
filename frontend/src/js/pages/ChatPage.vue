@@ -5,7 +5,7 @@
     import ProgressOverlay from '../components/ProgressOverlay.vue';
     import { onMounted, ref } from 'vue';
     import { authState } from '../state/authState';
-    import { applyChatMetadata, getChatMetadata, restartChatMetadata } from '../services/chatMetadataService.js';
+    import { applyProvider, applyModel, applyConfig, getChatMetadata, restartChatMetadata } from '../services/chatMetadataService.js';
     import { addMessages, getMessages } from '../services/messageService';
     import { addChat, getChats, modifyChat, removeChat } from '../services/chatService';
     import { MarkdownUtil } from '../utils/MarkdownUtil.js';
@@ -162,24 +162,6 @@
         }
     }
 
-    async function applySettings(settingsValue, chatId, userToken) {
-        try {
-            await applyChatMetadata(settingsValue, chatId, userToken, (eventType, data) => {
-                if (eventType === "progress") {
-                    progress.value = data;
-                    showProgress.value = true;
-                }
-
-                if (eventType === "complete") {
-                    console.log(data.metadata)
-                    settings.value = data.metadata;
-                }
-            });
-        } catch (error) {
-            alert(error.message);
-        }        
-    }
-
     async function getSettings(chatId, userToken) {
         try {
             const result = await getChatMetadata(chatId, userToken);
@@ -190,11 +172,50 @@
         }
     }
 
+    async function applySettings(settingsObject, chatId, userToken) {
+        try {
+            if (settingsObject.section === "provider") {
+                const result = await applyProvider(settingsObject, chatId, userToken);
+                settings.value = result.metadata
+            }
+
+            if (settingsObject.section === "model") {
+                await applyModel(settingsObject, chatId, userToken, (eventType, data) => {
+                    if (eventType === "progress") {
+                        progress.value = data;
+                        showProgress.value = true;
+                    }
+
+                    if (eventType === "complete") {
+                        settings.value.model = data.metadata.model;
+                    }
+                });
+            }
+
+            if (settingsObject.section === "config") {
+                const result = await applyConfig(settingsObject, chatId, userToken);
+                settings.value.config = result.metadata.config
+            }
+        } catch (error) {
+            alert(error.message);
+        }
+    }
+
     async function resetSettings(endpoint, chatId, userToken) {
         try {
             const result = await restartChatMetadata(endpoint, chatId, userToken);
-            console.log(result)
-            settings.value = result.metadata
+            
+            if (result.metadata.section === "provider") {
+                settings.value = result.metadata;
+            }
+
+            if (result.metadata.section === "model") {
+                settings.value.model = result.metadata.model;
+            }
+
+            if (result.metadata.section === "config") {
+                settings.value.config = result.metadata.config;
+            }
         } catch (error) {
             alert(error.message);
         }
@@ -230,9 +251,7 @@
        <ChatSettings
        :selected-id="selectedChatId"
        :settings="settings"
-       @apply-provider="(settings) => applySettings(settings, authState.selectedChatId, authState.user.token)"
-       @apply-model="(settings) => applySettings(settings, authState.selectedChatId, authState.user.token)"
-       @apply-config="(settings) => applySettings(settings, authState.selectedChatId, authState.user.token)"
+       @apply-settings="(settings) => applySettings(settings, authState.selectedChatId, authState.user.token)"
        @reset-settings="(endpoint) => resetSettings(endpoint, authState.selectedChatId, authState.user.token)"
        />
 
