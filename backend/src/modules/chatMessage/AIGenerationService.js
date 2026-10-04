@@ -44,6 +44,43 @@ export default class AIGenerationService {
             throw error;
         }
 
+        const allowedModels = [
+            "gemma4:latest",
+            "qwen3.5:9b"
+        ];
+
+        if (!allowedModels.includes(metadata.model)) {
+            const error = new Error("Unsupported model");
+            error.status = 400;
+            throw error;
+        }
+
+        if (metadata.system_content) {
+            const existingSystemMessage = chatMessages.find((chatMessage) => {
+                chatMessage.role === "system";
+            });
+
+            if (!existingSystemMessage) {
+                const chatMessage = {
+                    role: "system",
+                    content: metadata.system_content
+                }
+
+                chatMessages.unshift(chatMessage);
+            } else {
+                existingSystemMessage = metadata.system_content;
+            }
+        } else {
+            const existingSystemMessage = chatMessages.findIndex((chatMessage) => {
+                return chatMessage.role === "system";
+            });
+
+            // Delete a object if system exist from chatMessages array
+            if (existingSystemMessage !== -1) {
+                chatMessages.splice(existingSystemMessage, 1);
+            }
+        }
+
         // Get only role, content, and images
         chatMessages = chatMessages.map(({role, content, images}) => {
             return {role, content, images};
@@ -74,7 +111,17 @@ export default class AIGenerationService {
                 })
                 
                 return openAICompletion.choices[0];
-            } else if (metadata.provider.toLowerCase() === "ollama") {
+            } else if (metadata.provider.toLowerCase() === "ollama") {                
+                const listOfModels = await this.ollama.list();
+                const modelExist = listOfModels.models.some(model => model.name === metadata.model);
+
+                if (!modelExist) {
+                    const stream = await this.ollama.pull({
+                        model: metadata.model,
+                        stream: true
+                    });
+                }
+                
                 const ollamaCompletion = await this.ollama.chat({
                     model: metadata.model,
                     messages: chatMessages,
