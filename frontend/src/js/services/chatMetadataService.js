@@ -65,6 +65,10 @@ export async function applyConfig(config, chatId, userToken) {
 };
 
 export async function restartChatMetadata(endpoint, chatId, userToken) {
+    if (!endpoint) {
+        throw new Error("Endpoint missing.")
+    }
+    
     if (!chatId) {
         throw new Error("Chat ID missing.");
     }
