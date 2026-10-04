@@ -1,44 +1,44 @@
 <script setup>
     import SettingsField from './SettingsField.vue';
 
-    const emit = defineEmits(["apply-provider", "apply-model", "apply-config", "reset-settings"])
+    const emit = defineEmits(["apply-settings", "reset-settings"])
     const props = defineProps({
         selectedId: Number,
         settings: Object
     });
 
-    function applyProvider() {
-        const settings = {
-            section: "provider",
-            value: props.settings.provider.value
-        };
-        emit('apply-provider', settings);
-    }
-
-    function applyModel() {
-        const settings = {
-            section: "model",
-            value: props.settings.model
-        };
-        emit('apply-model', settings);
-    }
-
-    function applyConfig() {
-        const settings = {
-            section: "config",
-            value:  getConfigValues(props.settings.config)
-        };
-        emit('apply-config', settings);
-    }
-
-    function getConfigValues(config) {
+    function getObjectValues(object) {
         const values = {};
 
-        for (const key in config) {
-            values[key] = config[key].value
+        for (const key in object) {
+            values[key] = object[key].value
         }
 
         return values
+    }
+
+    function applyProvider() {
+        const provider = {
+            section: "provider",
+            value: props.settings.provider.value
+        };
+        emit('apply-settings', provider);
+    }
+
+    function applyModel() {
+        const model = {
+            section: "model",
+            value: getObjectValues(props.settings.model)
+        };
+        emit('apply-settings', model);
+    }
+
+    function applyConfig() {
+        const config = {
+            section: "config",
+            value:  getObjectValues(props.settings.config)
+        };
+        emit('apply-settings', config);
     }
 </script>
 
