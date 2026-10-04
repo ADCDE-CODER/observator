@@ -104,25 +104,25 @@ export default class ChatMetadataService {
         const { pullModel, selectModel, deleteModel } = model.value;
         const providerValue = this.aiService.getProviderValue();
 
-        if (pullModel.value && deleteModel.value) {
+        if (pullModel && deleteModel) {
             throw new Error("It is not possible to pull and delete the model at the same time.");
         }
 
-        if (pullModel.value) {
-            const stream = await this.aiService.pullModel(providerValue, pullModel.value);
+        if (pullModel) {
+            const stream = await this.aiService.pullModel(providerValue, pullModel);
     
             for await (const progress of stream) {
                 onChunk(progress);
             }
         }
 
-        if (deleteModel.value) {
-            await this.aiService.deleteModel(providerValue, deleteModel.value);
+        if (deleteModel) {
+            await this.aiService.deleteModel(providerValue, deleteModel);
         }
 
-        this.aiService.setModelValue(providerValue, selectModel.value);
+        this.aiService.setModelValue(providerValue, selectModel);
 
-        const metadata = this.chatMetadataModel.updateModel(selectModel.value, chatId);
+        const metadata = this.chatMetadataModel.updateModel(selectModel, chatId);
 
         if(!metadata) {
             throw new Error("Update failed.");
