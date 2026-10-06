@@ -83,6 +83,31 @@ export default class OllamaProvider {
         return response;
     }
 
+    getProvider() {
+        return {
+            selectProvider: {
+                type: "select",
+                label: "Select a provider",
+                default: null,
+                value: null,
+                options: null,
+                disabled: true
+            },
+            apiKey: {
+                type: "text",
+                label: "API key (optional)",
+                placeholder: "Type an api key",
+                value: null
+            },
+            baseURL: {
+                type: "text",
+                label: "Base url (optional)",
+                placeholder: "Type a base url",
+                value: null
+            }
+        };
+    }
+
     async getModel() {
         const models = await this.listModels();
 
