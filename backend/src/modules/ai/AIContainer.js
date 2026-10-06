@@ -1,31 +1,22 @@
 import { env } from "../../config/env.js";
-import { Ollama } from "ollama";
-import OpenAI from "openai";
 import AIService from "./AIService.js";
 import OllamaProvider from "./providers/OllamaProvider.js";
 import OpenAIProvider from "./providers/OpenAIProvider.js";
 
-const whiteListOfModels = [
-    "gemma4:latest",
-    "qwen3.5:9b",
-    "qwen3.5:0.8b"
-];
-
-const ollamaClient = new Ollama({
-    host: env.ollamaUrl,
-    headers: {
-        Authorization: `Bearer ${env.openAIApiKey}`
-    }
+const ollama = new OllamaProvider({ 
+    apiKey: env.ollamaApiKey || undefined, 
+    baseURL: env.ollamaUrl || undefined 
+});
+const openAI = new OpenAIProvider({ 
+    apiKey: env.openAIApiKey || undefined, 
+    baseURL: env.openAIUrl || undefined
 });
 
-const openaiClient = new OpenAI({ 
-    baseURL: env.openAIUrl,
-    apiKey: env.openAIApiKey 
-});
+const providers = {
+    ollama, 
+    openAI
+};
 
-const ollamaProvider = new OllamaProvider(ollamaClient);
-const openaiProvider = new OpenAIProvider(openaiClient);
-
-const aiService = new AIService({ollama: ollamaProvider, openai: openaiProvider}, whiteListOfModels);
+const aiService = new AIService(providers, env.whiteListOfModels);
 
 export { aiService };
