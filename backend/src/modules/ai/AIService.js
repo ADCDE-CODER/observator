@@ -25,6 +25,11 @@ export default class AIService {
         }
     }
 
+    updateProvider(provider, config) {
+        const aiProvider = this.#getProvider(provider);
+        aiProvider.configure(config);
+    }
+
     getProviderField() {
         try {
             const providers = this.getProviders();
