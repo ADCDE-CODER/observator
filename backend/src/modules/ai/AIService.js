@@ -73,10 +73,10 @@ export default class AIService {
         this.providerValue = providerField.provider.default;
     }
 
-    async getModels(provider) {
+    async listModels(provider) {
         try {
             const aiProvider = this.#getProvider(provider);
-            return await aiProvider.getModels();
+            return await aiProvider.listModels();
         } catch (error) {
             throw error;
         }
@@ -89,7 +89,7 @@ export default class AIService {
             throw error;
         }
 
-        const models = await this.getModels(provider);
+        const models = await this.listModels(provider);
 
         if (models.includes(model)) {
             const error = new Error("This model is already installed");
@@ -116,38 +116,12 @@ export default class AIService {
 
     async getModelField(provider) {
         try {
-            const models = await this.getModels(provider);
-            
-            if (!this.modelValue[provider] && models.length > 0) {
-                this.modelValue[provider] = models[0];
+            if (!this.modelValue[provider]) {
+                const aiProvider = this.#getProvider(provider);
+                this.modelValue[provider] = await aiProvider.getModel();
             }
 
-            return {
-                pullModel: {
-                    type: "text",
-                    label: "Pull a model",
-                    placeholder: "Type a model name",
-                    value: null
-                },
-
-                selectModel: {
-                    type: "select",
-                    label: "Select a model",
-                    default: models[0] ?? null,
-                    value: this.modelValue[provider] ?? null,
-                    options: models,
-                    disabled: models.length === 0
-                },
-
-                deleteModel: {
-                    type: "select",
-                    label: "Delete a model",
-                    default: null,
-                    value: null,
-                    options: models,
-                    disabled: models.length === 0
-                }
-            };
+            return this.modelValue[provider];
         } catch (error) {
             throw error;
         }        
@@ -158,13 +132,14 @@ export default class AIService {
         return modelField.selectModel.value;
     }
 
-    setModelValue(provider, value) {
-        this.modelValue[provider] = value;
+    async setModelValue(provider, value) {
+        const modelField = await this.getModelField(provider);
+        modelField.selectModel.value = value;
     }
 
     async resetModelValue(provider) {
         const modelField = await this.getModelField(provider);
-        this.modelValue[provider] = modelField.selectModel.default;
+        modelField.selectModel.value = modelField.selectModel.default;
     }
     
     getConfigField(provider) {
