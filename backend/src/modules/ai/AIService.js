@@ -3,7 +3,7 @@ export default class AIService {
         this.providers = providers;
         this.whiteListOfModels = whiteListOfModels;
         this.providerValue = null;
-        this.modelValue = {};
+        this.model = {};
         this.config = {};
     }
 
@@ -121,12 +121,12 @@ export default class AIService {
 
     async getModelField(provider) {
         try {
-            if (!this.modelValue[provider]) {
+            if (!this.model[provider]) {
                 const aiProvider = this.#getProvider(provider);
-                this.modelValue[provider] = await aiProvider.getModel();
+                this.model[provider] = await aiProvider.getModel();
             }
 
-            return this.modelValue[provider];
+            return this.model[provider];
         } catch (error) {
             throw error;
         }        
