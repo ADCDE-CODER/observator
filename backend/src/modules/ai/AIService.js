@@ -70,7 +70,7 @@ export default class AIService {
 
     resetProviderValue() {
         const providerField = this.getProviderField();
-        this.providerValue = providerField.provider.default;
+        this.providerValue = providerField.selectProvider.default;
     }
 
     async listModels(provider) {
@@ -179,7 +179,7 @@ export default class AIService {
         const configField = this.getConfigField(provider);
 
         Object.entries(configField).forEach(([key]) => {
-            this.config[provider][key].value = configField[key].default;
+            configField[key].value = configField[key].default;
         });
     }
     
@@ -208,7 +208,7 @@ export default class AIService {
             throw error;
         }
         
-        const listOfModels = await this.getModels(provider);
+        const listOfModels = await this.listModels(provider);
         const modelExist = listOfModels.some(modelValue => modelValue === model);
 
         if (!modelExist) {
