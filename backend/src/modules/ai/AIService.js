@@ -30,12 +30,26 @@ export default class AIService {
             const providers = this.getProviders();
             
             return {
-                type: "select",
-                label: "Provider",
-                default: providers[0] ?? null,
-                value: this.providerValue ?? null,
-                options: providers,
-                disabled: providers.length === 0
+                selectProvider: {
+                    type: "select",
+                    label: "Select a provider",
+                    default: providers[0] ?? null,
+                    value: this.providerValue ?? null,
+                    options: providers,
+                    disabled: providers.length === 0
+                },
+                apiKey: {
+                    type: "text",
+                    label: "API key (optional)",
+                    placeholder: "Type an api key",
+                    value: null
+                },
+                baseURL: {
+                    type: "text",
+                    label: "Base url (optional)",
+                    placeholder: "Type a base url",
+                    value: null
+                }
             };
         } catch (error) {
             throw error;
@@ -56,7 +70,7 @@ export default class AIService {
 
     resetProviderValue() {
         const providerField = this.getProviderField();
-        this.providerValue = providerField.default;
+        this.providerValue = providerField.provider.default;
     }
 
     async getModels(provider) {
