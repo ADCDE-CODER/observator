@@ -1,28 +1,61 @@
+import { Ollama } from "ollama";
 import { env } from "../../../config/env.js";
 
 export default class OllamaProvider {
-    constructor(ollamaClient) {
-        this.ollamaClient = ollamaClient;
+    constructor(config = {}) {
+        this.configure(config);
+    }
+
+    configure(config = {}) {
+        this.apiKey = config.apiKey;
+        this.baseURL = config.baseURL;
+
+        this.client = null;
+
+        if (this.isConfigured()) {
+            this.client = new Ollama({
+                headers: {
+                    Authorization: `Bearer ${config.apiKey}`
+                },
+                host: config.baseURL
+            });
+        }
+    }
+
+    isConfigured() {
+        return Boolean(this.apiKey || this.baseURL);
     }
 
     async getModels() {
-        const response = await this.ollamaClient.list();
+        const response = await this.client.list();
         return response.models.map((model) => model.model);
     }
 
     async pullModel(model) {
-        return await this.ollamaClient.pull({
+        if (!this.isConfigured()) {
+            throw new Error("Ollama provider is not configured.")
+        }
+
+        return await this.client.pull({
             model: model,
             stream: true
         });
     }
 
     async deleteModel(model) {
-        return await this.ollamaClient.delete({ model: model });
+        if (!this.isConfigured()) {
+            throw new Error("Ollama provider is not configured.")
+        }
+
+        return await this.client.delete({ model: model });
     }
 
-    async generateMessage(chatMessages, model, config) {        
-        const response = await this.ollamaClient.chat({
+    async generateMessage(chatMessages, model, config) { 
+        if (!this.isConfigured()) {
+            throw new Error("Ollama provider is not configured.")
+        }
+
+        const response = await this.client.chat({
             model: model,
             messages: [
                 {
