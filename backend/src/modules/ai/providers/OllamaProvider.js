@@ -26,7 +26,11 @@ export default class OllamaProvider {
         return Boolean(this.apiKey || this.baseURL);
     }
 
-    async getModels() {
+    async listModels() {
+        if (!this.isConfigured()) {
+            return [];
+        }
+
         const response = await this.client.list();
         return response.models.map((model) => model.model);
     }
@@ -77,6 +81,37 @@ export default class OllamaProvider {
         });
 
         return response;
+    }
+
+    async getModel() {
+        const models = await this.listModels();
+
+        return {
+            selectModel: {
+                type: "select",
+                label: "Select a model",
+                default: models[0] ?? null,
+                value: models[0] ?? null,
+                options: models,
+                disabled: models.length === 0
+            },
+
+            pullModel: {
+                type: "text",
+                label: "Pull a model",
+                placeholder: "Type a model name",
+                value: null
+            },
+
+            deleteModel: {
+                type: "select",
+                label: "Delete a model",
+                default: null,
+                value: null,
+                options: models,
+                disabled: models.length === 0
+            }
+        };
     }
 
     getConfig() {
