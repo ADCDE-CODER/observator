@@ -2,7 +2,7 @@ export default class AIService {
     constructor(providers, whiteListOfModels = []) {
         this.providers = providers;
         this.whiteListOfModels = whiteListOfModels;
-        this.provider = {};
+        this.providerValue = null;
         this.model = {};
         this.config = {};
     }
@@ -33,40 +33,47 @@ export default class AIService {
     getProviderField() {
         try {
             const providers = this.getProviders();
-            const provider = providers[0];
+            let provider = null;
 
-            if (!this.provider[provider]) {
-                const aiProvider = this.#getProvider(provider);
-                this.provider[provider] = aiProvider.getProvider();
-
-                this.provider[provider].selectProvider = {
-                    ...this.provider[provider].selectProvider,
-                    default: provider,
-                    value: provider,
-                    options: providers,
-                    disabled: providers.length === 0
-                }
+            if (this.providerValue !== null) {
+                provider = this.providerValue;
+            } else {
+                provider = providers[0];
             }
 
-            return this.provider[provider];
+                const aiProvider = this.#getProvider(provider);
+
+            return {
+                selectProvider: {
+                    type: "select",
+                    label: "Select a provider",
+                    default: providers[0] ?? null,
+                    value: provider ?? null,
+                    options: providers,
+                    disabled: providers.length === 0
+                },
+                ...aiProvider.getProviderConfig()
+            }
         } catch (error) {
             throw error;
         }
     }
 
     getProviderValue() {        
-        const providerField = this.getProviderField();
-        return providerField.selectProvider.value;
+        if (this.providerValue !== null) {
+            return this.providerValue;
+        }
+        
+        return this.getProviders()[0];
     }
 
-    setProviderValue(value) {
-        const providerField = this.getProviderField();
-        providerField.selectProvider.value = value;
+    setProviderValue(providerValue) {
+        this.providerValue = providerValue;
     }
 
     resetProviderValue() {
         const providerField = this.getProviderField();
-        providerField.selectProvider.value = providerField.selectProvider.default;
+        this.providerValue = providerField.selectProvider.default;
     }
 
     async listModels(provider) {
