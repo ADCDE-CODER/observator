@@ -61,9 +61,11 @@ export default class ChatMetadataService {
             throw new Error("Chat metadata not found.");
         }
         
-        chatMetadata.config = JSON.parse(chatMetadata.config);
-
-        return chatMetadata;
+        return {
+            ...chatMetadata,
+            providerConfig: JSON.parse(chatMetadata.provider_config),
+            config: JSON.parse(chatMetadata.config)
+        };
     }
     
     async getChatMetadata(chatId) {
