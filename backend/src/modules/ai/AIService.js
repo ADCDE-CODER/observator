@@ -3,9 +3,12 @@ export default class AIService {
         this.providers = providers;
         this.whiteListOfModels = whiteListOfModels;
         this.providerValue = null;
+        this.providerConfig = {};
         this.model = {};
         this.config = {};
     }
+
+    // ### PROVIDER ###
 
     #getProvider(providerName) {
         const provider = this.providers[providerName];
@@ -25,34 +28,19 @@ export default class AIService {
         }
     }
 
-    updateProvider(provider, config) {
-        const aiProvider = this.#getProvider(provider);
-        aiProvider.configure(config);
-    }
-
     getProviderField() {
         try {
             const providers = this.getProviders();
-            let provider = null;
-
-            if (this.providerValue !== null) {
-                provider = this.providerValue;
-            } else {
-                provider = providers[0];
-            }
-
-                const aiProvider = this.#getProvider(provider);
 
             return {
                 selectProvider: {
                     type: "select",
                     label: "Select a provider",
                     default: providers[0] ?? null,
-                    value: provider ?? null,
+                    value: this.providerValue ?? null,
                     options: providers,
                     disabled: providers.length === 0
-                },
-                ...aiProvider.getProviderConfig()
+                }
             }
         } catch (error) {
             throw error;
@@ -75,6 +63,52 @@ export default class AIService {
         const providerField = this.getProviderField();
         this.providerValue = providerField.selectProvider.default;
     }
+
+    // ### PROVIDER CONFIG ###
+
+    updateProviderConfig(provider, config) {
+        const aiProvider = this.#getProvider(provider);
+        aiProvider.configure(config);
+    }
+
+    getProviderConfigField(provider) {
+        if (!this.providerConfig[provider]) {
+            const aiProvider = this.#getProvider(provider);
+            this.providerConfig[provider] = aiProvider.getProviderConfig();
+        }
+
+        return this.providerConfig[provider];
+    }
+
+    getProviderConfigValues(provider) {        
+        const providerConfigField = this.getProviderConfigField(provider);
+
+        return Object.fromEntries(
+            Object.entries(providerConfigField).map(([key, field]) => [
+                key, field.value
+            ])
+        );
+    }
+
+    setProviderConfigValue(provider, values) {
+        const providerConfigField = this.getProviderConfigField(provider);
+
+        Object.entries(values).forEach(([key, value]) => {
+            if (value !== undefined && providerConfigField[key]) {
+                providerConfigField[key].value = value;
+            }
+        });
+    }
+
+    resetProviderConfigValues(provider) {
+        const providerConfigField = this.getProviderConfigField(provider);
+
+        Object.entries(providerConfigField).forEach(([key]) => {
+            providerConfigField[key].value = providerConfigField[key].default;
+        });
+    }
+
+    // ### MODEL ###
 
     async listModels(provider) {
         try {
@@ -149,6 +183,8 @@ export default class AIService {
         modelField.selectModel.value = modelField.selectModel.default;
     }
     
+    // ### CONFIG ###
+
     getConfigField(provider) {
         try {
             if (!this.config[provider]) {
