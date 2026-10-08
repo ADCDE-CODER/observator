@@ -136,7 +136,7 @@ export default class ChatMetadataService {
             throw new Error("Chat ID is required to update a model metadata.");
         }
 
-        const { pullModel, selectModel, deleteModel } = model.value;
+        const { pullModel, deleteModel } = model.value;
         const providerValue = this.aiService.getProviderValue();
 
         if (pullModel && deleteModel) {
@@ -153,9 +153,12 @@ export default class ChatMetadataService {
 
         if (deleteModel) {
             await this.aiService.deleteModel(providerValue, deleteModel);
+            model.value.selectModel = await this.aiService.getModelValue(providerValue);
         }
 
-        this.aiService.setModelValue(providerValue, selectModel);
+        const selectModel = model.value.selectModel;
+
+        await this.aiService.setModelValue(providerValue, selectModel);
 
         const metadata = this.chatMetadataModel.updateModel(selectModel, chatId);
 
