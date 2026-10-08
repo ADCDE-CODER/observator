@@ -13,7 +13,7 @@ export async function getChatMetadata(chatId, userToken) {
 };
 
 export async function applyProvider(provider, chatId, userToken) {
-    if (!provider.value) {
+    if (!provider.value.selectProvider) {
         throw new Error("Provider input value missing.")
     }
     
@@ -49,10 +49,6 @@ export async function applyProviderConfig(providerConfig, chatId, userToken) {
 };
 
 export async function applyModel(model, chatId, userToken, onChunk) {
-    if (!model.value.selectModel) {
-        throw new Error("Select model input value missing.");
-    }
-    
     if (!chatId) {
         throw new Error("Chat ID missing.");
     }
