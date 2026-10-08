@@ -6,11 +6,13 @@ export default class ChatMetadataService {
 
     async getChatMetadataField(provider) {
         const providerField = this.aiService.getProviderField();
+        const providerConfigField = this.aiService.getProviderConfigField(provider);
         const modelField = await this.aiService.getModelField(provider);
         const configField = this.aiService.getConfigField(provider);
 
         return {
             provider: providerField,
+            providerConfig: providerConfigField,
             model: modelField,
             config: configField
         };
