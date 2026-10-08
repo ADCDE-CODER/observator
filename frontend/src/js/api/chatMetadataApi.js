@@ -39,6 +39,27 @@ export async function updateProviderChatMetadata(provider, chatId, userToken) {
     return result;
 };
 
+export async function updateProviderConfigChatMetadata(providerConfig, chatId, userToken) {
+    const url = `/api/chats/${chatId}/chatMetadata/providerconfig`;    
+    
+    const response = await fetch(url, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${userToken}`
+        },
+        body: JSON.stringify(providerConfig)
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+        throw new Error(result.message);
+    }
+    
+    return result;
+};
+
 export async function updateModelChatMetadata(model, chatId, userToken, onChunk) {
     const url = `/api/chats/${chatId}/chatMetadata/model`;    
     
