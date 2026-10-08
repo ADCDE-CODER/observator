@@ -104,6 +104,29 @@ export default class ChatMetadataService {
         return await this.getChatMetadataField(selectProvider);
     }
 
+    updateProviderConfig(providerConfig, chatId) {
+        if (providerConfig.section !== "providerConfig") {
+            throw new Error("The section is not a provider config");
+        }
+
+        if (!chatId) {
+            throw new Error("Chat ID is required to update a provider config metadata.");
+        }
+
+        const providerValue = this.aiService.getProviderValue();
+        this.aiService.setProviderConfigValue(providerValue, providerConfig.value);
+        providerConfig.value = JSON.stringify(providerConfig.value);
+
+        const metadata = this.chatMetadataModel.updateProviderConfig(providerConfig.value, chatId);
+
+        if(!metadata) {
+            throw new Error("Update failed.");
+        }
+
+        const providerConfigField = this.aiService.getProviderConfigField(providerValue);
+        return { providerConfig: providerConfigField };
+    }
+
     async updateModel(model, chatId, onChunk) {  
         if (model.section !== "model") {
             throw new Error("The section is not a model");
@@ -177,6 +200,17 @@ export default class ChatMetadataService {
         return {
             section: "provider",
             ...metadataField
+        };
+    }
+
+    resetProviderConfig() {
+        const providerValue = this.aiService.getProviderValue();
+        this.aiService.resetProviderConfigValues(providerValue);
+        const providerConfigField = this.aiService.getProviderConfigField(providerValue);
+
+        return { 
+            section: "providerConfig",
+            providerConfig: providerConfigField 
         };
     }
 
