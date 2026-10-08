@@ -69,10 +69,10 @@ export default class ChatMetadataService {
     }
     
     async getChatMetadata(chatId) {
-        const { provider, model, config } = this.fetchChatMetadata(chatId);
+        const { provider, providerConfig, model, config } = this.fetchChatMetadata(chatId);
         
         // Update each field value
-        this.setChatMetadataValue(provider, model, config);
+        await this.setChatMetadataValue(provider, providerConfig, model, config);
 
         // Get each field value
         return await this.getChatMetadataField(provider);
