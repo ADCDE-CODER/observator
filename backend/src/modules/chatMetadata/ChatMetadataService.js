@@ -18,9 +18,18 @@ export default class ChatMetadataService {
         };
     }
 
-    setChatMetadataValue(provider, model, config) {
+    async getChatMetadataValue(provider) {
+        return {
+            providerConfigValue: JSON.stringify(this.aiService.getProviderConfigValues(provider)),
+            modelValue: await this.aiService.getModelValue(provider),
+            configValue: JSON.stringify(await this.aiService.getConfigValues(provider))
+        };
+    }
+
+    async setChatMetadataValue(provider, providerConfig, model, config) {
         this.aiService.setProviderValue(provider);
-        this.aiService.setModelValue(provider, model);
+        this.aiService.setProviderConfigValue(provider, providerConfig);
+        await this.aiService.setModelValue(provider, model);
         this.aiService.setConfigValue(provider, config);
     }
 
@@ -31,12 +40,11 @@ export default class ChatMetadataService {
 
         // Get default values
         const providerValue = this.aiService.getProviderValue();
-        const modelValue = await this.aiService.getModelValue(providerValue);
-        const configValue = JSON.stringify(this.aiService.getConfigValues(providerValue));
+        const { providerConfigValue, modelValue, configValue } = await this.getChatMetadataValue(providerValue);
 
         try {
             // Store default values
-            this.chatMetadataModel.create(providerValue, modelValue, configValue, chatId);
+            this.chatMetadataModel.create(providerValue, providerConfigValue, modelValue, configValue, chatId);
         } catch (error) {
             throw error;
         }
@@ -77,21 +85,21 @@ export default class ChatMetadataService {
             throw new Error("Chat ID is required to update a provider metadata.");
         }
         
-        const modelValue = await this.aiService.getModelValue(provider.value);
-        const configValue = JSON.stringify(await this.aiService.getConfigValues(provider.value));
+        const selectProvider = provider.value.selectProvider;
+        const { providerConfigValue, modelValue, configValue } = await this.getChatMetadataValue(selectProvider);
         
-        // When updated provider value, then model and config need also update. 
-        // Because each provider have diffrent list of models and config.
-        this.setChatMetadataValue(provider.value, modelValue, configValue);
+        // When updated provider value, then provider config, model and config need also update. 
+        // Because each provider have diffrent provider config, list of models and config.
+        await this.setChatMetadataValue(selectProvider, providerConfigValue, modelValue, configValue);
         
-        const metadata = this.chatMetadataModel.update(provider.value, modelValue, configValue, chatId)
+        const metadata = this.chatMetadataModel.update(selectProvider, providerConfigValue, modelValue, configValue, chatId)
 
         if(!metadata) {
             throw new Error("Update failed.");
         }
 
-        // Once a specific provider has been selected, a specific list of models and config is retrieved.
-        return await this.getChatMetadataField(provider.value);
+        // Once a specific provider has been selected, a specific provider config, list of models and config is retrieved.
+        return await this.getChatMetadataField(selectProvider);
     }
 
     async updateModel(model, chatId, onChunk) {  
