@@ -1,4 +1,4 @@
-import { updateProviderChatMetadata, updateModelChatMetadata, updateConfigChatMetadata, readChatMetadata, resetChatMetadata } from "../api/chatMetadataApi";
+import { updateProviderChatMetadata, updateProviderConfigChatMetadata, updateModelChatMetadata, updateConfigChatMetadata, readChatMetadata, resetChatMetadata } from "../api/chatMetadataApi";
 
 export async function getChatMetadata(chatId, userToken) {
     if (!chatId) {
@@ -26,6 +26,26 @@ export async function applyProvider(provider, chatId, userToken) {
     }
 
     return await updateProviderChatMetadata(provider, chatId, userToken);
+};
+
+export async function applyProviderConfig(providerConfig, chatId, userToken) {
+    for (const key in providerConfig.value) {
+        const value = providerConfig.value[key];
+
+        if (!value) {
+            throw new Error(`${key} input value missing.`)
+        }
+    }
+
+    if (!chatId) {
+        throw new Error("Chat ID missing.");
+    }
+
+    if (!userToken) {
+        throw new Error("User token missing.");
+    }
+
+    return await updateProviderConfigChatMetadata(providerConfig, chatId, userToken);
 };
 
 export async function applyModel(model, chatId, userToken, onChunk) {
