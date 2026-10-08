@@ -101,6 +101,8 @@ export default class AIService {
         }
         
         try {
+            // Set the model to null, to get a new model field when calling getModelField()
+            this.model[provider] = null;
             const aiProvider = this.#getProvider(provider);
             return await aiProvider.pullModel(model);
         } catch (error) {
@@ -110,6 +112,8 @@ export default class AIService {
 
     async deleteModel(provider, model) {
         try {
+            // Set the model to null, to get a new model field when calling getModelField()
+            this.model[provider] = null;
             const aiProvider = this.#getProvider(provider);
             return await aiProvider.deleteModel(model);
         } catch (error) {
