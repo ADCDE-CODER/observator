@@ -5,7 +5,7 @@
     import ProgressOverlay from '../components/ProgressOverlay.vue';
     import { onMounted, ref } from 'vue';
     import { authState } from '../state/authState';
-    import { applyProvider, applyModel, applyConfig, getChatMetadata, restartChatMetadata } from '../services/chatMetadataService.js';
+    import { applyProvider, applyProviderConfig, applyModel, applyConfig, getChatMetadata, restartChatMetadata } from '../services/chatMetadataService.js';
     import { addMessages, getMessages } from '../services/messageService';
     import { addChat, getChats, modifyChat, removeChat } from '../services/chatService';
     import { MarkdownUtil } from '../utils/MarkdownUtil.js';
@@ -179,6 +179,11 @@
                 settings.value = result.metadata
             }
 
+            if (settingsObject.section === "providerConfig") {
+                const result = await applyProviderConfig(settingsObject, chatId, userToken);
+                settings.value.providerConfig = result.metadata.providerConfig
+            }
+
             if (settingsObject.section === "model") {
                 await applyModel(settingsObject, chatId, userToken, (eventType, data) => {
                     if (eventType === "progress") {
@@ -207,6 +212,10 @@
             
             if (result.metadata.section === "provider") {
                 settings.value = result.metadata;
+            }
+
+            if (result.metadata.section === "providerConfig") {
+                settings.value.providerConfig = result.metadata.providerConfig;
             }
 
             if (result.metadata.section === "model") {
