@@ -20,7 +20,7 @@
     function applyProvider() {
         const provider = {
             section: "provider",
-            value: props.settings.provider.value
+            value: getObjectValues(props.settings.provider)
         };
         emit('apply-settings', provider);
     }
@@ -36,7 +36,7 @@
     function applyConfig() {
         const config = {
             section: "config",
-            value:  getObjectValues(props.settings.config)
+            value: getObjectValues(props.settings.config)
         };
         emit('apply-settings', config);
     }
