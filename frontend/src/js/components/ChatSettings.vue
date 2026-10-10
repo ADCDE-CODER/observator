@@ -25,6 +25,14 @@
         emit('apply-settings', provider);
     }
 
+    function applyProviderConfig() {
+        const providerConfig = {
+            section: "providerConfig",
+            value: getObjectValues(props.settings.providerConfig)
+        };
+        emit('apply-settings', providerConfig);
+    }
+
     function applyModel() {
         const model = {
             section: "model",
@@ -64,6 +72,16 @@
                 <div class="button-container">
                     <button class="secondary-button" type="submit">Apply</button>
                     <button class="reset-button" type="button" @click="emit('reset-settings', 'resetprovider')">⟳</button>
+                </div>
+            </form>
+
+            <!-- Provider config -->
+            <form class="form-section" @submit.prevent="applyProviderConfig()">
+                <h3 class="section-heading">Provider Config</h3>
+                <SettingsField :section="{ provider: props.settings.providerConfig }" />
+                <div class="button-container">
+                    <button class="secondary-button" type="submit">Apply</button>
+                    <button class="reset-button" type="button" @click="emit('reset-settings', 'resetproviderconfig')">⟳</button>
                 </div>
             </form>
 
