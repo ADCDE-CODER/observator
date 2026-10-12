@@ -3,9 +3,6 @@ export default class AIService {
         this.providers = providers;
         this.whiteListOfModels = whiteListOfModels;
         this.providerValue = null;
-        this.providerConfig = {};
-        this.model = {};
-        this.config = {};
     }
 
     // ### PROVIDER ###
@@ -66,57 +63,31 @@ export default class AIService {
 
     // ### PROVIDER CONFIG ###
 
-    updateProviderConfig(provider, config) {
-        const aiProvider = this.#getProvider(provider);
-        aiProvider.configure(config);
-    }
-
     getProviderConfigField(provider) {
-        if (!this.providerConfig[provider]) {
-            const aiProvider = this.#getProvider(provider);
-            this.providerConfig[provider] = aiProvider.getProviderConfig();
-        }
-
-        return this.providerConfig[provider];
+        const aiProvider = this.#getProvider(provider);
+        return aiProvider.getProviderConfig();
     }
 
     getProviderConfigValues(provider) {        
-        const providerConfigField = this.getProviderConfigField(provider);
-
-        return Object.fromEntries(
-            Object.entries(providerConfigField).map(([key, field]) => [
-                key, field.value
-            ])
-        );
+        const aiProvider = this.#getProvider(provider);
+        return aiProvider.getProviderConfigValues();
     }
 
     setProviderConfigValue(provider, values) {
-        const providerConfigField = this.getProviderConfigField(provider);
-
-        Object.entries(values).forEach(([key, value]) => {
-            if (value !== undefined && providerConfigField[key]) {
-                providerConfigField[key].value = value;
-            }
-        });
+        const aiProvider = this.#getProvider(provider);
+        aiProvider.setProviderConfigValue(values);
     }
 
     resetProviderConfigValues(provider) {
-        const providerConfigField = this.getProviderConfigField(provider);
-
-        Object.entries(providerConfigField).forEach(([key]) => {
-            providerConfigField[key].value = providerConfigField[key].default;
-        });
+        const aiProvider = this.#getProvider(provider);
+        aiProvider.resetProviderConfigValues();
     }
 
     // ### MODEL ###
 
     async listModels(provider) {
-        try {
-            const aiProvider = this.#getProvider(provider);
-            return await aiProvider.listModels();
-        } catch (error) {
-            throw error;
-        }
+        const aiProvider = this.#getProvider(provider);
+        return await aiProvider.listModels();
     }
 
     async pullModel(provider, model) {
@@ -134,97 +105,66 @@ export default class AIService {
             throw error;
         }
         
-        try {
-            // Set the model to null, to get a new model field when calling getModelField()
-            this.model[provider] = null;
-            const aiProvider = this.#getProvider(provider);
-            return await aiProvider.pullModel(model);
-        } catch (error) {
-            throw error;
-        }
+        const aiProvider = this.#getProvider(provider);
+        return await aiProvider.pullModel(model);
     }
 
     async deleteModel(provider, model) {
-        try {
-            // Set the model to null, to get a new model field when calling getModelField()
-            this.model[provider] = null;
-            const aiProvider = this.#getProvider(provider);
-            return await aiProvider.deleteModel(model);
-        } catch (error) {
-            throw error;
-        }
+        const aiProvider = this.#getProvider(provider);
+        return await aiProvider.deleteModel(model);
     }
 
     async getModelField(provider) {
-        try {
-            if (!this.model[provider]) {
-                const aiProvider = this.#getProvider(provider);
-                this.model[provider] = await aiProvider.getModel();
-            }
-
-            return this.model[provider];
-        } catch (error) {
-            throw error;
-        }        
+        const aiProvider = this.#getProvider(provider);
+        return aiProvider.getModel();       
     }
 
     async getModelValue(provider) {
-        const modelField = await this.getModelField(provider);
-        return modelField.selectModel.value;
+        const aiProvider = this.#getProvider(provider);
+        return aiProvider.getModelValue();  
     }
 
     async setModelValue(provider, value) {
-        const modelField = await this.getModelField(provider);
-        modelField.selectModel.value = value;
+        const aiProvider = this.#getProvider(provider);
+        aiProvider.setModelValue(value);
     }
 
     async resetModelValue(provider) {
-        const modelField = await this.getModelField(provider);
-        modelField.selectModel.value = modelField.selectModel.default;
+        const aiProvider = this.#getProvider(provider);
+        aiProvider.resetModelValue();
     }
     
     // ### CONFIG ###
 
     getConfigField(provider) {
-        try {
-            if (!this.config[provider]) {
-                const aiProvider = this.#getProvider(provider);
-                this.config[provider] = aiProvider.getConfig();
-            }
-            
-            return this.config[provider];
-        } catch (error) {
-            throw error;
-        }
+        const aiProvider = this.#getProvider(provider);
+        return aiProvider.getConfig();    
     }
 
     getConfigValues(provider) {
-        const configField = this.getConfigField(provider);
-
-        return Object.fromEntries(
-            Object.entries(configField).map(([key, field]) => [
-                key, field.value
-            ])
-        );
+        const aiProvider = this.#getProvider(provider);
+        return aiProvider.getConfigValues();
     }
 
     setConfigValue(provider, values) {
-        const configField = this.getConfigField(provider);
-
-        Object.entries(values).forEach(([key, value]) => {
-            if (value !== undefined && configField[key]) {
-                configField[key].value = value;
-            }
-        });
+        const aiProvider = this.#getProvider(provider);
+        aiProvider.setConfigValue(values);
     }
 
     resetConfigValues(provider) {
-        const configField = this.getConfigField(provider);
-
-        Object.entries(configField).forEach(([key]) => {
-            configField[key].value = configField[key].default;
-        });
+        const aiProvider = this.#getProvider(provider);
+        aiProvider.resetConfigValues();
     }
+
+    // ### RESET ALL VALUES ###
+
+    async resetAllValues(provider) {
+        this.resetProviderValue();
+        const aiProvider = this.#getProvider(provider);
+        aiProvider.resetAllValues();
+    }
+
+    // ### GENERATE A MESSAGE ###
     
     async generateMessage(chatMessages, metadata) {
         if (!chatMessages) {
