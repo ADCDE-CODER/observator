@@ -15,9 +15,9 @@ export default class ChatMetadataService {
 
     async getChatMetadataValue(provider) {
         return {
-            providerConfigValue: JSON.stringify(this.aiService.getProviderConfigValues(provider)),
+            providerConfigValue: this.aiService.getProviderConfigValues(provider),
             modelValue: await this.aiService.getModelValue(provider),
-            configValue: JSON.stringify(await this.aiService.getConfigValues(provider))
+            configValue: await this.aiService.getConfigValues(provider)
         };
     }
 
@@ -57,11 +57,7 @@ export default class ChatMetadataService {
             throw new Error("Chat metadata not found.");
         }
         
-        return {
-            ...chatMetadata,
-            providerConfig: JSON.parse(chatMetadata.provider_config),
-            config: JSON.parse(chatMetadata.config)
-        };
+        return chatMetadata;
     }
     
     async getChatMetadata(chatId) {
@@ -111,9 +107,13 @@ export default class ChatMetadataService {
 
         const providerValue = this.aiService.getProviderValue();
         this.aiService.setProviderConfigValue(providerValue, providerConfig.value);
-        providerConfig.value = JSON.stringify(providerConfig.value);
 
-        const metadata = this.chatMetadataModel.updateProviderConfig(providerConfig.value, chatId);
+        const model = await this.aiService.getModelValue(providerValue);
+
+        const metadata = {
+            ...this.chatMetadataModel.updateProviderConfig(providerConfig.value, chatId),
+            ...this.chatMetadataModel.updateModel(model, chatId)
+        };
 
         if(!metadata) {
             throw new Error("Update failed.");
@@ -178,7 +178,6 @@ export default class ChatMetadataService {
 
         const providerValue = this.aiService.getProviderValue();
         this.aiService.setConfigValue(providerValue, config.value);
-        config.value = JSON.stringify(config.value);
 
         const metadata = this.chatMetadataModel.updateConfig(config.value, chatId);
 
