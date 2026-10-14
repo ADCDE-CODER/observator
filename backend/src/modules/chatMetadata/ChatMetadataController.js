@@ -28,12 +28,12 @@ export default class ChatMetadataController {
         }
     }
 
-    updateProviderConfig(req, res) {
+    async updateProviderConfig(req, res) {
         const providerConfig = req.body;
         const chatId = req.chat.id;
         
         try {
-            const metadata = this.chatMetadataService.updateProviderConfig(providerConfig, chatId);
+            const metadata = await this.chatMetadataService.updateProviderConfig(providerConfig, chatId);
             res.status(200).json({message: 'The provider config updated successfully', metadata}); 
         } catch (error) {
             console.error(error);
@@ -83,9 +83,9 @@ export default class ChatMetadataController {
         }
     }
     
-    async resetProvider(req, res) {
+    resetProvider(req, res) {
         try {
-            const metadata = await this.chatMetadataService.resetProvider();
+            const metadata = this.chatMetadataService.resetProvider();
             res.status(200).json({message: "The provider has been restored", metadata}); 
         } catch (error) {
             console.error(error);
