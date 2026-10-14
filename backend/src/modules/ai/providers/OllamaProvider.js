@@ -2,15 +2,29 @@ import { Ollama } from "ollama";
 import { env } from "../../../config/env.js";
 
 export default class OllamaProvider {
+    // Private State Flags for Initialization Tracking
+    #providerConfigInitialized = false;
+    #modelInitialized = false; 
+    #configInitialized = false;
+
     constructor(config = {}) {
         this.defaultConfig = config;
         this.#configure(config);
-        this.providerConfig = {};
-        this.model = {};
-        this.config = {};
     }
 
-    // ### PROVIDER CONFIG ####
+    #setProviderConfigNeedsUpdate() {
+        this.#providerConfigInitialized = false;
+    }
+
+    #setModelNeedsUpdate() {
+        this.#modelInitialized = false;
+    }
+
+    #setConfigNeedsUpdate() {
+        this.#configInitialized = false;
+    }
+
+    // --- Provider Config ---
 
     #configure(config = {}) {
         this.host = config.host?.trim();
@@ -34,12 +48,11 @@ export default class OllamaProvider {
             });
         }
 
-        // Set the model to empty, to get a new model field when calling getModel()
-        this.model = {};
+        this.#setModelNeedsUpdate();  
     }
 
     getProviderConfig() {
-        if (Object.keys(this.providerConfig).length === 0) {
+        if (!this.#providerConfigInitialized) {
             this.providerConfig = {
                 host: {
                     type: "text",
@@ -57,6 +70,8 @@ export default class OllamaProvider {
                     value: null
                 }
             };
+
+            this.#providerConfigInitialized = true;
         }
 
         return this.providerConfig;
@@ -92,7 +107,7 @@ export default class OllamaProvider {
         });
     }
 
-    // ### MODEL ####
+    // --- Model ---
 
     async listLocalModels() {
         if (!this.localClient) {
@@ -124,8 +139,7 @@ export default class OllamaProvider {
             throw new Error("Ollama provider is not configured.")
         }
 
-        // Set the model to empty, to get a new model field when calling getModel()
-        this.model = {};
+        this.#setModelNeedsUpdate(); 
 
         return await this.localClient.pull({
             model: model,
@@ -138,14 +152,13 @@ export default class OllamaProvider {
             throw new Error("Ollama provider is not configured.")
         }
 
-        // Set the model to empty, to get a new model field when calling getModel()
-        this.model = {};
+        this.#setModelNeedsUpdate(); 
 
         return await this.localClient.delete({ model: model });
     }
 
     async getModel() {
-        if (Object.keys(this.model).length === 0) {
+        if (!this.#modelInitialized) {
             const models = await this.listModels();
             
             this.model = {
@@ -174,6 +187,8 @@ export default class OllamaProvider {
                     disabled: models.length === 0
                 }
             };
+
+            this.#modelInitialized = true;
         }
 
         return this.model;
@@ -194,10 +209,10 @@ export default class OllamaProvider {
         modelField.selectModel.value = modelField.selectModel.default;
     }
 
-    // ### CONFIG ###
+    // --- General Config ---
 
     getConfig() {
-        if (Object.keys(this.config).length === 0) {
+        if (!this.#configInitialized) {
             this.config = {
                 think: {
                     type: "select",
@@ -266,6 +281,8 @@ export default class OllamaProvider {
                     step: 512
                 }
             };
+
+            this.#configInitialized = true;
         }
         
         return this.config;
@@ -299,7 +316,7 @@ export default class OllamaProvider {
         });
     }
 
-    // ### RESET ALL VALUES ###
+    // --- Global Reset ---
 
     async resetAllValues() {
         this.#configure(this.defaultConfig);
@@ -308,7 +325,7 @@ export default class OllamaProvider {
         this.resetConfigValues();
     }
 
-    // ### GENERATE A MESSAGE ###
+    // --- Message Generation ---
     
     async generateMessage(chatMessages, model, config) { 
         if (!this.localClient) {
