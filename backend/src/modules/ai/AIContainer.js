@@ -5,7 +5,7 @@ import OpenAIProvider from "./providers/OpenAIProvider.js";
 
 const ollama = new OllamaProvider({ 
     apiKey: env.ollamaApiKey || undefined, 
-    baseURL: env.ollamaUrl || undefined 
+    host: env.ollamaUrl || undefined 
 });
 const openAI = new OpenAIProvider({ 
     apiKey: env.openAIApiKey || undefined, 
