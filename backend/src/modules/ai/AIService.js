@@ -5,7 +5,7 @@ export default class AIService {
         this.providerValue = null;
     }
 
-    // ### PROVIDER ###
+    // --- Provider ---
 
     #getProvider(providerName) {
         const provider = this.providers[providerName];
@@ -61,7 +61,7 @@ export default class AIService {
         this.providerValue = providerField.selectProvider.default;
     }
 
-    // ### PROVIDER CONFIG ###
+    // --- Provider Config ---
 
     getProviderConfigField(provider) {
         const aiProvider = this.#getProvider(provider);
@@ -83,7 +83,7 @@ export default class AIService {
         aiProvider.resetProviderConfigValues();
     }
 
-    // ### MODEL ###
+    // --- Model ---
 
     async listModels(provider) {
         const aiProvider = this.#getProvider(provider);
@@ -116,25 +116,25 @@ export default class AIService {
 
     async getModelField(provider) {
         const aiProvider = this.#getProvider(provider);
-        return aiProvider.getModel();       
+        return await aiProvider.getModel();       
     }
 
     async getModelValue(provider) {
         const aiProvider = this.#getProvider(provider);
-        return aiProvider.getModelValue();  
+        return await aiProvider.getModelValue();  
     }
 
     async setModelValue(provider, value) {
         const aiProvider = this.#getProvider(provider);
-        aiProvider.setModelValue(value);
+        await aiProvider.setModelValue(value);
     }
 
     async resetModelValue(provider) {
         const aiProvider = this.#getProvider(provider);
-        aiProvider.resetModelValue();
+        await aiProvider.resetModelValue();
     }
     
-    // ### CONFIG ###
+    // --- General Config ---
 
     getConfigField(provider) {
         const aiProvider = this.#getProvider(provider);
@@ -156,15 +156,15 @@ export default class AIService {
         aiProvider.resetConfigValues();
     }
 
-    // ### RESET ALL VALUES ###
+    // --- Global Reset ---
 
     async resetAllValues(provider) {
         this.resetProviderValue();
         const aiProvider = this.#getProvider(provider);
-        aiProvider.resetAllValues();
+        await aiProvider.resetAllValues();
     }
 
-    // ### GENERATE A MESSAGE ###
+    // --- Message Generation ---
     
     async generateMessage(chatMessages, metadata) {
         if (!chatMessages) {
