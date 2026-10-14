@@ -195,47 +195,43 @@ export default class ChatMetadataService {
         return { config: configField };
     }
 
-    async resetProvider() {
+    resetProvider() {
         this.aiService.resetProviderValue();
         const providerValue = this.aiService.getProviderValue();
-        const metadataField = await this.getChatMetadataField(providerValue);
 
         return {
             section: "provider",
-            ...metadataField
+            provider: this.aiService.getProviderField()
         };
     }
 
     resetProviderConfig() {
         const providerValue = this.aiService.getProviderValue();
         this.aiService.resetProviderConfigValues(providerValue);
-        const providerConfigField = this.aiService.getProviderConfigField(providerValue);
 
         return { 
             section: "providerConfig",
-            providerConfig: providerConfigField 
+            providerConfig: this.aiService.getProviderConfigField(providerValue) 
         };
     }
 
     async resetModel() {
         const providerValue = this.aiService.getProviderValue();
         await this.aiService.resetModelValue(providerValue);
-        const modelField = await this.aiService.getModelField(providerValue);
 
         return { 
             section: "model",
-            model: modelField 
+            model: await this.aiService.getModelField(providerValue) 
         };
     }
 
     resetConfig() {
         const providerValue = this.aiService.getProviderValue();
         this.aiService.resetConfigValues(providerValue);
-        const configField = this.aiService.getConfigField(providerValue);
 
         return { 
             section: "config",
-            config: configField 
+            config: this.aiService.getConfigField(providerValue) 
         };
     }
 }
