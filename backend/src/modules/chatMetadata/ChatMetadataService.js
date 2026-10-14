@@ -5,16 +5,11 @@ export default class ChatMetadataService {
     }
 
     async getChatMetadataField(provider) {
-        const providerField = this.aiService.getProviderField();
-        const providerConfigField = this.aiService.getProviderConfigField(provider);
-        const modelField = await this.aiService.getModelField(provider);
-        const configField = this.aiService.getConfigField(provider);
-
         return {
-            provider: providerField,
-            providerConfig: providerConfigField,
-            model: modelField,
-            config: configField
+            provider: this.aiService.getProviderField(),
+            providerConfig: this.aiService.getProviderConfigField(provider),
+            model: await this.aiService.getModelField(provider),
+            config: this.aiService.getConfigField(provider)
         };
     }
 
@@ -105,7 +100,7 @@ export default class ChatMetadataService {
         return await this.getChatMetadataField(selectProvider);
     }
 
-    updateProviderConfig(providerConfig, chatId) {
+    async updateProviderConfig(providerConfig, chatId) {
         if (providerConfig.section !== "providerConfig") {
             throw new Error("The section is not a provider config");
         }
@@ -124,8 +119,10 @@ export default class ChatMetadataService {
             throw new Error("Update failed.");
         }
 
-        const providerConfigField = this.aiService.getProviderConfigField(providerValue);
-        return { providerConfig: providerConfigField };
+        return { 
+            providerConfig: this.aiService.getProviderConfigField(providerValue),
+            model: await this.aiService.getModelField(providerValue)
+        };
     }
 
     async updateModel(model, chatId, onChunk) {  
@@ -167,9 +164,7 @@ export default class ChatMetadataService {
             throw new Error("Update failed.");
         }
 
-        const modelField = await this.aiService.getModelField(providerValue);
-
-        return { model: modelField };
+        return { model: await this.aiService.getModelField(providerValue) };
     }
 
     updateConfig(config, chatId) {
@@ -191,9 +186,7 @@ export default class ChatMetadataService {
             throw new Error("Update failed.");
         }
 
-        const configField = this.aiService.getConfigField(providerValue);
-
-        return { config: configField };
+        return { config: this.aiService.getConfigField(providerValue) };
     }
 
     resetProvider() {
