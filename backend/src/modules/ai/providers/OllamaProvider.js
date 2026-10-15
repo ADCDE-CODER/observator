@@ -24,6 +24,26 @@ export default class OllamaProvider {
         this.#configInitialized = false;
     }
 
+    #extractValues(fields) {
+        return Object.fromEntries(
+            Object.entries(fields).map(([key, field]) => [key, field.value])
+        );
+    }
+
+    #insertValues(fields, values) {
+        Object.entries(values).forEach(([key, value]) => {
+            if (value !== undefined && fields[key]) {
+                fields[key].value = value;
+            }
+        });
+    }
+
+    #resetValues(fields) {
+        Object.entries(fields).forEach(([key]) => {
+            fields[key].value = fields[key].default;
+        });
+    }
+
     // --- Provider Config ---
 
     #configure(config = {}) {
@@ -81,13 +101,7 @@ export default class OllamaProvider {
     }
 
     getProviderConfigValues() {        
-        const providerConfigField = this.getProviderConfig();
-
-        return Object.fromEntries(
-            Object.entries(providerConfigField).map(([key, field]) => [
-                key, field.value
-            ])
-        );
+        return this.#extractValues(this.getProviderConfig());
     }
 
     setProviderConfigValue(values) {
@@ -98,22 +112,11 @@ export default class OllamaProvider {
         };
 
         this.#configure(merged);
-
-        const providerConfigField = this.getProviderConfig();
-
-        Object.entries(values).forEach(([key, value]) => {
-            if (value !== undefined && providerConfigField[key]) {
-                providerConfigField[key].value = value;
-            }
-        });
+        this.#insertValues(this.getProviderConfig(), values);
     }
 
     resetProviderConfigValues() {
-        const providerConfigField = this.getProviderConfig();
-
-        Object.entries(providerConfigField).forEach(([key]) => {
-            providerConfigField[key].value = providerConfigField[key].default;
-        });
+        this.#resetValues(this.getProviderConfig());
     }
 
     // --- Model ---
@@ -310,31 +313,15 @@ export default class OllamaProvider {
     }
 
     getConfigValues() {
-        const configField = this.getConfig();
-
-        return Object.fromEntries(
-            Object.entries(configField).map(([key, field]) => [
-                key, field.value
-            ])
-        );
+        return this.#extractValues(this.getConfig());
     }
 
     setConfigValue(values) {
-        const configField = this.getConfig();
-
-        Object.entries(values).forEach(([key, value]) => {
-            if (value !== undefined && configField[key]) {
-                configField[key].value = value;
-            }
-        });
+        this.#insertValues(this.getConfig(), values);
     }
 
     resetConfigValues() {
-        const configField = this.getConfig();
-
-        Object.entries(configField).forEach(([key]) => {
-            configField[key].value = configField[key].default;
-        });
+        this.#resetValues(this.getConfig());
     }
 
     // --- Global Reset ---
