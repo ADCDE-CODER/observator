@@ -4,8 +4,9 @@ import OllamaProvider from "./providers/OllamaProvider.js";
 import OpenAIProvider from "./providers/OpenAIProvider.js";
 
 const ollama = new OllamaProvider({ 
+    localHost: env.ollamaLocalHostUrl || undefined,
+    cloudHost: env.ollamaCloudHostUrl || undefined,
     apiKey: env.ollamaApiKey || undefined, 
-    host: env.ollamaUrl || undefined 
 });
 const openAI = new OpenAIProvider({ 
     apiKey: env.openAIApiKey || undefined, 
