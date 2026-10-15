@@ -91,7 +91,13 @@ export default class OllamaProvider {
     }
 
     setProviderConfigValue(values) {
-        this.#configure(values);
+        const merged = {
+            localHost: values.localHost ?? this.localHost,
+            cloudHost: values.cloudHost ?? this.cloudHost,
+            apiKey: values.apiKey ?? this.apiKey
+        };
+
+        this.#configure(merged);
 
         const providerConfigField = this.getProviderConfig();
 
