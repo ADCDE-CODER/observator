@@ -222,7 +222,6 @@ export default class OllamaProvider {
                     options: ["low", "medium", "high", "max"],
                     disabled: false
                 },
-
                 temperature: {
                     type: "number",
                     label: "Temperature",
@@ -232,7 +231,6 @@ export default class OllamaProvider {
                     max: 2,
                     step: 0.1
                 },
-
                 topK: {
                     type: "number",
                     label: "Top K",
@@ -242,7 +240,6 @@ export default class OllamaProvider {
                     max: 100,
                     step: 1,
                 },
-
                 topP: {
                     type: "number",
                     label: "Top P",
@@ -252,7 +249,6 @@ export default class OllamaProvider {
                     max: 1,
                     step: 0.1
                 },
-
                 minP: {
                     type: "number",
                     label: "Min P",
@@ -262,7 +258,6 @@ export default class OllamaProvider {
                     max: 2,
                     step: 0.01
                 },
-
                 context: {
                     type: "number",
                     label: "Context",
@@ -271,7 +266,6 @@ export default class OllamaProvider {
                     min: 0,
                     step: 512
                 },
-
                 predict: {
                     type: "number",
                     label: "Predict",
