@@ -27,24 +27,21 @@ export default class OllamaProvider {
     // --- Provider Config ---
 
     #configure(config = {}) {
-        this.host = config.host?.trim();
+        this.localHost = config.localHost?.trim();
+        this.cloudHost = config.cloudHost?.trim();
         this.apiKey = config.apiKey?.trim();
 
         this.localClient = null;
         this.cloudClient = null;
 
-        if(this.host) {
-            this.localClient = new Ollama({
-                host: this.host 
-            });
+        if (this.localHost) {
+            this.localClient = new Ollama({ host: this.localHost });
         }
         
-        if (this.apiKey) {
+        if (this.apiKey && this.cloudHost) {
             this.cloudClient = new Ollama({
-                headers: {
-                    Authorization: `Bearer ${this.apiKey}`
-                },
-                host: this.host
+                host: this.cloudHost,
+                headers: { Authorization: `Bearer ${this.apiKey}` },
             });
         }
 
@@ -54,20 +51,26 @@ export default class OllamaProvider {
     getProviderConfig() {
         if (!this.#providerConfigInitialized) {
             this.providerConfig = {
-                host: {
+                localHost: {
                     type: "text",
-                    label: "Host URL (required)",
-                    placeholder: "Type a host URL",
-                    default: this.defaultConfig.host ?? null,
-                    value: this.host ?? null
+                    label: "Local host URL",
+                    placeholder: this.defaultConfig.localHost ?? null,
+                    default: this.defaultConfig.localHost ?? null,
+                    value: this.localHost ?? null,
                 },
-                
+                cloudHost: {
+                    type: "text",
+                    label: "Cloud host URL (optional)",
+                    placeholder: this.defaultConfig.cloudHost ?? null,
+                    default: null,
+                    value: null,
+                },
                 apiKey: {
                     type: "text",
-                    label: "API key (optional)",
+                    label: "Cloud API key (optional)",
                     placeholder: "Type an api key",
                     default: null,
-                    value: null
+                    value: null,
                 }
             };
 
