@@ -325,11 +325,17 @@ export default class OllamaProvider {
     // --- Message Generation ---
     
     async generateMessage(chatMessages, model, config) { 
-        if (!this.localClient) {
-            throw new Error("Ollama provider is not configured.")
+        // Pick exactly one client: local first, Cloud as fallback
+        const client = this.localClient ?? this.cloudClient;
+
+        if (!client) {
+            throw new Error(
+                "Ollama provider is not configured. " +
+                "At least one of localClient or cloudClient must be set."
+            );
         }
 
-        const response = await this.localClient.chat({
+        const response = await client.chat({
             model: model,
             messages: [
                 {
