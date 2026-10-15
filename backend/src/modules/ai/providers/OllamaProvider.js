@@ -168,6 +168,8 @@ export default class OllamaProvider {
 
     async getModel() {
         if (!this.#modelInitialized) {
+            this.#modelInitialized = true;
+
             const models = await this.listModels();
             const hasLocal = this.localClient !== null;
 
@@ -202,7 +204,6 @@ export default class OllamaProvider {
             }
 
             this.model = modelFields;
-            this.#modelInitialized = true;
         }
 
         return this.model;
