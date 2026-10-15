@@ -118,6 +118,14 @@ export default class OllamaProvider {
 
     // --- Model ---
 
+    #validateModel(model) {
+        if (typeof model !== "string" || model.trim().length === 0) {
+            throw new Error("Model name must be a non-empty string.");
+        }
+
+        return model.trim();
+    }
+
     async listLocalModels() {
         if (!this.localClient) {
             return [];
@@ -148,6 +156,8 @@ export default class OllamaProvider {
             throw new Error("Cannot pull model: localClient is not configured.");
         }
 
+        model = this.#validateModel(model);
+
         this.#setModelNeedsUpdate(); 
 
         return await this.localClient.pull({
@@ -160,6 +170,8 @@ export default class OllamaProvider {
         if (!this.localClient) {
             throw new Error("Cannot delete model: localClient is not configured.");
         }
+
+        model = this.#validateModel(model);
 
         this.#setModelNeedsUpdate(); 
 
@@ -346,6 +358,8 @@ export default class OllamaProvider {
                 "At least one of localClient or cloudClient must be set."
             );
         }
+
+        model = this.#validateModel(model);
 
         const response = await client.chat({
             model: model,
