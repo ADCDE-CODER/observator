@@ -37,7 +37,7 @@ export default class OllamaProvider {
         if (this.localHost) {
             this.localClient = new Ollama({ host: this.localHost });
         }
-        
+
         if (this.apiKey && this.cloudHost) {
             this.cloudClient = new Ollama({
                 host: this.cloudHost,
@@ -139,7 +139,7 @@ export default class OllamaProvider {
 
     async pullModel(model) {
         if (!this.localClient) {
-            throw new Error("Ollama provider is not configured.")
+            throw new Error("Cannot pull model: localClient is not configured.");
         }
 
         this.#setModelNeedsUpdate(); 
@@ -152,7 +152,7 @@ export default class OllamaProvider {
 
     async deleteModel(model) {
         if (!this.localClient) {
-            throw new Error("Ollama provider is not configured.")
+            throw new Error("Cannot delete model: localClient is not configured.");
         }
 
         this.#setModelNeedsUpdate(); 
@@ -163,8 +163,9 @@ export default class OllamaProvider {
     async getModel() {
         if (!this.#modelInitialized) {
             const models = await this.listModels();
-            
-            this.model = {
+            const hasLocal = this.localClient !== null;
+
+            const modelFields = {
                 selectModel: {
                     type: "select",
                     label: "Select a model",
@@ -173,24 +174,28 @@ export default class OllamaProvider {
                     options: models,
                     disabled: models.length === 0
                 },
+            };
 
-                pullModel: {
+            // pullModel & deleteModel only when localClient exists
+            if (hasLocal) {
+                modelFields.pullModel = {
                     type: "text",
                     label: "Pull a model",
                     placeholder: "Type a model name",
                     value: null
-                },
+                };
 
-                deleteModel: {
+                modelFields.deleteModel = {
                     type: "select",
                     label: "Delete a model",
                     default: null,
                     value: null,
                     options: models,
                     disabled: models.length === 0
-                }
-            };
+                };
+            }
 
+            this.model = modelFields;
             this.#modelInitialized = true;
         }
 
@@ -324,7 +329,7 @@ export default class OllamaProvider {
 
     // --- Message Generation ---
     
-    async generateMessage(chatMessages, model, config) { 
+    async generateMessage(chatMessages, model, config) {
         // Pick exactly one client: local first, Cloud as fallback
         const client = this.localClient ?? this.cloudClient;
 
