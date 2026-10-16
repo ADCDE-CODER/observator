@@ -253,6 +253,76 @@ export default class OllamaProvider {
 
     // --- General Config ---
 
+    #validateConfig(config) {
+        if (config == null || typeof config !== "object") {
+            throw new Error("Config must be an object.");
+        }
+
+        const errors = [];
+
+        // temperature: 0 - 2
+        if (config.temperature != null) {
+            if (typeof config.temperature !== "number" || config.temperature < 0 || config.temperature > 2) {
+                errors.push("temperature must be a number between 0 and 2.");
+            }
+        }
+
+        // topK: positive integer
+        if (config.topK != null) {
+            if (!Number.isInteger(config.topK) || config.topK < 1) {
+                errors.push("topK must be a positive integer.");
+            }
+        }
+
+        // topP: 0 - 1
+        if (config.topP != null) {
+            if (typeof config.topP !== "number" || config.topP < 0 || config.topP > 1) {
+                errors.push("topP must be a number between 0 and 1.");
+            }
+        }
+
+        // minP: 0 - 1
+        if (config.minP != null) {
+            if (typeof config.minP !== "number" || config.minP < 0 || config.minP > 1) {
+                errors.push("minP must be a number between 0 and 1.");
+            }
+        }
+
+        // context: positive integer
+        if (config.context != null) {
+            if (!Number.isInteger(config.context) || config.context < 1) {
+                errors.push("context must be a positive integer.");
+            }
+        }
+
+        // predict: positive integer
+        if (config.predict != null) {
+            if (!Number.isInteger(config.predict) || config.predict < 1) {
+                errors.push("predict must be a positive integer.");
+            }
+        }
+
+        // think: string
+        if (config.think != null) {
+            if (this.#allowedThinkValues && Array.isArray(this.#allowedThinkValues)) {
+                if (!this.#allowedThinkValues.includes(config.think)) {
+                    errors.push(
+                        `think must be one of: ${this.#allowedThinkValues.join(", ")}. ` +
+                        `Got: ${JSON.stringify(config.think)}`
+                    );
+                }
+            } else {
+                errors.push("This model does not support thinking.");
+            }
+        }
+
+        if (errors.length > 0) {
+            throw new Error(`Invalid config: ${errors.join(" ")}`);
+        }
+
+        return config;
+    }
+    
     async getConfig() {
         if (!this.#configInitialized) {
             const modelValue = await this.getModelValue();
@@ -362,6 +432,9 @@ export default class OllamaProvider {
     // --- Message Generation ---
     
     async generateMessage(systemPrompt, chatMessages, model, config) {
+        model = this.#validateModel(model);
+        config = this.#validateConfig(config);
+
         // Pick exactly one client: local first, Cloud as fallback
         const client = this.localClient ?? this.cloudClient;
 
@@ -371,8 +444,6 @@ export default class OllamaProvider {
                 "At least one of localClient or cloudClient must be set."
             );
         }
-
-        model = this.#validateModel(model);
 
         const response = await client.chat({
             model: model,
@@ -388,7 +459,7 @@ export default class OllamaProvider {
                 num_ctx: config.context,
                 num_predict: config.predict
             },
-            think: config.think,
+            think: config.think ?? undefined,
             stream: true
         });
 
