@@ -63,8 +63,6 @@ export default class OllamaProvider {
                 headers: { Authorization: `Bearer ${this.apiKey}` },
             });
         }
-
-        this.#setModelNeedsUpdate();  
     }
 
     getProviderConfig() {
@@ -111,6 +109,7 @@ export default class OllamaProvider {
         };
 
         this.#configure(merged);
+        this.#setModelNeedsUpdate();
         this.#insertValues(this.getProviderConfig(), values);
     }
 
@@ -330,6 +329,8 @@ export default class OllamaProvider {
         this.resetProviderConfigValues();
         await this.resetModelValue();
         this.resetConfigValues();
+
+        this.#setModelNeedsUpdate();  
     }
 
     // --- Message Generation ---
