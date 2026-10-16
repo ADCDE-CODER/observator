@@ -1,10 +1,10 @@
 import { Ollama } from "ollama";
 
 export default class OllamaProvider {
-    // Private State Flags for Initialization Tracking
     #providerConfigInitialized = false;
     #modelInitialized = false; 
     #configInitialized = false;
+    #allowedThinkValues = null;
 
     constructor(config = {}) {
         this.defaultConfig = config;
@@ -21,6 +21,7 @@ export default class OllamaProvider {
 
     #setConfigNeedsUpdate() {
         this.#configInitialized = false;
+        this.#allowedThinkValues = null;
     }
 
     #extractValues(fields) {
@@ -110,6 +111,7 @@ export default class OllamaProvider {
 
         this.#configure(merged);
         this.#setModelNeedsUpdate();
+        this.#setConfigNeedsUpdate(); 
         this.#insertValues(this.getProviderConfig(), values);
     }
 
@@ -241,6 +243,7 @@ export default class OllamaProvider {
     async setModelValue(value) {
         const modelField = await this.getModel();
         modelField.selectModel.value = value;
+        this.#setConfigNeedsUpdate();
     }
 
     async resetModelValue() {
@@ -250,17 +253,26 @@ export default class OllamaProvider {
 
     // --- General Config ---
 
-    getConfig() {
+    async getConfig() {
         if (!this.#configInitialized) {
-            this.config = {
-                think: {
+            const modelValue = await this.getModelValue();
+            const modelDetails = modelValue ? await this.showModelDetails(modelValue) : null;
+
+            const thinking = modelDetails?.thinking;
+            const thinkField = {};
+            
+            if (thinking && Array.isArray(thinking.values) && thinking.values.length > 0) {
+                thinkField.think = {
                     type: "select",
                     label: "Think",
-                    default: "medium",
-                    value: "medium",
-                    options: ["low", "medium", "high", "max"],
-                    disabled: false
-                },
+                    default: thinking.default ?? thinking.values[0],
+                    value: thinking.default ?? thinking.values[0],
+                    options: thinking.values,
+                    disabled: false,
+                };
+            }
+
+            const optionsField = {
                 temperature: {
                     type: "number",
                     label: "Temperature",
@@ -315,22 +327,24 @@ export default class OllamaProvider {
                 }
             };
 
+            this.config = Object.assign(thinkField, optionsField);
+            this.#allowedThinkValues = thinking?.values ?? null;
             this.#configInitialized = true;
         }
         
         return this.config;
     }
 
-    getConfigValues() {
-        return this.#extractValues(this.getConfig());
+    async getConfigValues() {
+        return this.#extractValues(await this.getConfig());
     }
 
-    setConfigValue(values) {
-        this.#insertValues(this.getConfig(), values);
+    async setConfigValue(values) {
+        this.#insertValues(await this.getConfig(), values);
     }
 
-    resetConfigValues() {
-        this.#resetValues(this.getConfig());
+    async resetConfigValues() {
+        this.#resetValues(await this.getConfig());
     }
 
     // --- Global Reset ---
@@ -342,6 +356,7 @@ export default class OllamaProvider {
         this.resetConfigValues();
 
         this.#setModelNeedsUpdate();  
+        this.#setConfigNeedsUpdate();
     }
 
     // --- Message Generation ---

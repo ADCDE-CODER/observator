@@ -9,7 +9,7 @@ export default class ChatMetadataService {
             provider: this.aiService.getProviderField(),
             providerConfig: this.aiService.getProviderConfigField(provider),
             model: await this.aiService.getModelField(provider),
-            config: this.aiService.getConfigField(provider)
+            config: await this.aiService.getConfigField(provider)
         };
     }
 
@@ -25,7 +25,7 @@ export default class ChatMetadataService {
         this.aiService.setProviderValue(provider);
         this.aiService.setProviderConfigValue(provider, providerConfig);
         await this.aiService.setModelValue(provider, model);
-        this.aiService.setConfigValue(provider, config);
+        await this.aiService.setConfigValue(provider, config);
     }
 
     async create(chatId) {
@@ -167,7 +167,7 @@ export default class ChatMetadataService {
         return { model: await this.aiService.getModelField(providerValue) };
     }
 
-    updateConfig(config, chatId) {
+    async updateConfig(config, chatId) {
         if (config.section !== "config") {
             throw new Error("The section is not a config");
         }
@@ -177,7 +177,7 @@ export default class ChatMetadataService {
         }
 
         const providerValue = this.aiService.getProviderValue();
-        this.aiService.setConfigValue(providerValue, config.value);
+        await this.aiService.setConfigValue(providerValue, config.value);
 
         const metadata = this.chatMetadataModel.updateConfig(config.value, chatId);
 
@@ -185,7 +185,7 @@ export default class ChatMetadataService {
             throw new Error("Update failed.");
         }
 
-        return { config: this.aiService.getConfigField(providerValue) };
+        return { config: await this.aiService.getConfigField(providerValue) };
     }
 
     resetProvider() {
@@ -218,13 +218,13 @@ export default class ChatMetadataService {
         };
     }
 
-    resetConfig() {
+    async resetConfig() {
         const providerValue = this.aiService.getProviderValue();
-        this.aiService.resetConfigValues(providerValue);
+        await this.aiService.resetConfigValues(providerValue);
 
         return { 
             section: "config",
-            config: this.aiService.getConfigField(providerValue) 
+            config: await this.aiService.getConfigField(providerValue) 
         };
     }
 }

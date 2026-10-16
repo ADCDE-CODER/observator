@@ -70,12 +70,12 @@ export default class ChatMetadataController {
         }
     }
 
-    updateConfig(req, res) {
+    async updateConfig(req, res) {
         const config = req.body;
         const chatId = req.chat.id;
         
         try {
-            const metadata = this.chatMetadataService.updateConfig(config, chatId);
+            const metadata = await this.chatMetadataService.updateConfig(config, chatId);
             res.status(200).json({message: 'The config updated successfully', metadata}); 
         } catch (error) {
             console.error(error);
@@ -113,9 +113,9 @@ export default class ChatMetadataController {
         }
     }
 
-    resetConfig(req, res) {
+    async resetConfig(req, res) {
         try {
-            const metadata = this.chatMetadataService.resetConfig();
+            const metadata = await this.chatMetadataService.resetConfig();
             res.status(200).json({message: "The config has been restored", metadata}); 
         } catch (error) {
             console.error(error);

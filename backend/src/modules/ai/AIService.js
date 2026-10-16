@@ -136,24 +136,24 @@ export default class AIService {
     
     // --- General Config ---
 
-    getConfigField(provider) {
+    async getConfigField(provider) {
         const aiProvider = this.#getProvider(provider);
-        return aiProvider.getConfig();    
+        return await aiProvider.getConfig();    
     }
 
-    getConfigValues(provider) {
+    async getConfigValues(provider) {
         const aiProvider = this.#getProvider(provider);
-        return aiProvider.getConfigValues();
+        return await aiProvider.getConfigValues();
     }
 
-    setConfigValue(provider, values) {
+    async setConfigValue(provider, values) {
         const aiProvider = this.#getProvider(provider);
-        aiProvider.setConfigValue(values);
+        await aiProvider.setConfigValue(values);
     }
 
-    resetConfigValues(provider) {
+    async resetConfigValues(provider) {
         const aiProvider = this.#getProvider(provider);
-        aiProvider.resetConfigValues();
+        await aiProvider.resetConfigValues();
     }
 
     // --- Global Reset ---
