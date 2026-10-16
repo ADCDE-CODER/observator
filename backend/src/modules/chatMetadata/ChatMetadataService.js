@@ -121,7 +121,8 @@ export default class ChatMetadataService {
 
         return { 
             providerConfig: this.aiService.getProviderConfigField(providerValue),
-            model: await this.aiService.getModelField(providerValue)
+            model: await this.aiService.getModelField(providerValue),
+            config: await this.aiService.getConfigField(providerValue)
         };
     }
 
@@ -164,7 +165,10 @@ export default class ChatMetadataService {
             throw new Error("Update failed.");
         }
 
-        return { model: await this.aiService.getModelField(providerValue) };
+        return { 
+            model: await this.aiService.getModelField(providerValue),
+            config: await this.aiService.getConfigField(providerValue)
+        };
     }
 
     async updateConfig(config, chatId) {
