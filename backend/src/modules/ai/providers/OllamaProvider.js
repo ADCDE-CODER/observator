@@ -127,6 +127,17 @@ export default class OllamaProvider {
         return model.trim();
     }
 
+    async showModelDetails(model) {
+        model = this.#validateModel(model);
+        const client = this.localClient ?? this.cloudClient;
+
+        if (!client) {
+            throw new Error("No client available to fetch model details.");
+        }
+        
+        return await client.show({ model });
+    }
+
     async listLocalModels() {
         if (!this.localClient) {
             return [];
