@@ -1,5 +1,4 @@
 import { Ollama } from "ollama";
-import { env } from "../../../config/env.js";
 
 export default class OllamaProvider {
     // Private State Flags for Initialization Tracking
@@ -335,7 +334,7 @@ export default class OllamaProvider {
 
     // --- Message Generation ---
     
-    async generateMessage(chatMessages, model, config) {
+    async generateMessage(systemPrompt, chatMessages, model, config) {
         // Pick exactly one client: local first, Cloud as fallback
         const client = this.localClient ?? this.cloudClient;
 
@@ -351,10 +350,7 @@ export default class OllamaProvider {
         const response = await client.chat({
             model: model,
             messages: [
-                {
-                    role: "system",
-                    content: env.systemPrompt
-                },
+                { role: "system", content: systemPrompt ?? "" },
                 ...chatMessages
             ],
             options: {

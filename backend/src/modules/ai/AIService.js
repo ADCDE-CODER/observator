@@ -166,7 +166,7 @@ export default class AIService {
 
     // --- Message Generation ---
     
-    async generateMessage(chatMessages, metadata) {
+    async generateMessage(systemPrompt, chatMessages, metadata) {
         if (!chatMessages) {
             const error = new Error("Chat messages are required");
             error.status = 400;
@@ -207,7 +207,7 @@ export default class AIService {
         
         try {
             const aiProvider = this.#getProvider(provider);
-            return await aiProvider.generateMessage(chatMessages, model, config);
+            return await aiProvider.generateMessage(systemPrompt, chatMessages, model, config);
         } catch (error) {
             throw error;
         }

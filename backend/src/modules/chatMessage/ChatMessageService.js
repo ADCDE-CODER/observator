@@ -1,3 +1,5 @@
+import { env } from "../../config/env.js";
+
 export default class ChatMessageService {
     constructor(chatMessageModel, userChatMessageService, assistantChatMessageService, chatMetadataService, aiService) {
         this.chatMessageModel = chatMessageModel;
@@ -9,7 +11,7 @@ export default class ChatMessageService {
 
     async generateResponse(conversationContext, chatId, onChunk) {
         const metadata = this.chatMetadataService.fetchChatMetadata(chatId);
-        const stream = await this.aiService.generateMessage(conversationContext, metadata);
+        const stream = await this.aiService.generateMessage(env.systemPrompt, conversationContext, metadata);
 
         // Stream the content chunk by chunk
         let inThinking = false
