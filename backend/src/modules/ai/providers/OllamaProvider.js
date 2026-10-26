@@ -206,6 +206,8 @@ export default class OllamaProvider {
 
             // pullModel & deleteModel only when localClient exists
             if (hasLocal) {
+                const localModels = await this.listLocalModels();
+
                 modelFields.pullModel = {
                     type: "text",
                     label: "Pull a model",
@@ -218,8 +220,8 @@ export default class OllamaProvider {
                     label: "Delete a model",
                     default: null,
                     value: null,
-                    options: models,
-                    disabled: models.length === 0
+                    options: localModels,
+                    disabled: localModels.length === 0
                 };
             }
 
