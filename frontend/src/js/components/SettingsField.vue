@@ -1,10 +1,9 @@
 <script setup>
-    defineOptions({
-        name: 'SettingsField'
-    })
-
-    const {section} = defineProps({
-        section: Object
+    const props = defineProps({
+        section: {
+            type: Object,
+            required: true
+        } 
     });
 
     function isField(value) {
@@ -28,10 +27,9 @@
     }
 </script>
 
-<template>
-    <div class="field-container" v-for="(item, key) in section" :key="key">        
-        <!-- Field -->
-        <div class="field" v-if="isField(item)">
+<template >
+    <template v-for="(item, key) in props.section" :key="key">
+        <div class="field" v-if="isField(item)">        
             <label>{{ item.label }}:</label>
             
             <!-- TEXT / NUMBER / DATE / RANGE -->
@@ -55,7 +53,7 @@
     
             <!-- SELECT -->
             <select v-else-if="item.type === 'select'" :disabled="item.disabled" v-model="item.value">
-                <option v-for="option in item.options" :key="option" :value="option">
+                <option v-for="(option, index) in item.options" :key="index" :value="option">
                     {{ option }}
                 </option>
             </select>
@@ -77,20 +75,21 @@
                 v-model="item.value" 
             />
         </div>
-
-        <!-- Group Recursive call -->
-        <SettingsField v-else :section="item"/>
-    </div>
+    </template>
 </template>
 
 <style scoped>
-    .field-container, .field {
+    .field {
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
         width: 100%;
         margin-bottom: 0.5rem;
+    }
+
+    label {
+        text-align: center;
     }
 
     .number, .text, select {
