@@ -1,11 +1,19 @@
 <script setup>
     import SettingsField from './SettingsField.vue';
 
-    const emit = defineEmits(["apply-settings", "reset-settings"])
+    const emit = defineEmits(["apply-settings", "reset-settings"]);
     const props = defineProps({
-        selectedId: Number,
-        settings: Object
-    });
+        selectedId: {
+            type: Number
+        },
+        settings: {
+            type: Object
+        }
+    })
+    
+    function capitalize(section) {
+        return section.charAt(0).toUpperCase() + section.slice(1);
+    }
 
     function getObjectValues(object) {
         const values = {};
@@ -17,36 +25,18 @@
         return values
     }
 
-    function applyProvider() {
-        const provider = {
-            section: "provider",
-            value: getObjectValues(props.settings.provider)
+    function apply(section) {
+        const settings = {
+            section: section,
+            value: getObjectValues(props.settings[section])
         };
-        emit('apply-settings', provider);
+        
+        emit('apply-settings', settings);
     }
 
-    function applyProviderConfig() {
-        const providerConfig = {
-            section: "providerConfig",
-            value: getObjectValues(props.settings.providerConfig)
-        };
-        emit('apply-settings', providerConfig);
-    }
-
-    function applyModel() {
-        const model = {
-            section: "model",
-            value: getObjectValues(props.settings.model)
-        };
-        emit('apply-settings', model);
-    }
-
-    function applyConfig() {
-        const config = {
-            section: "config",
-            value: getObjectValues(props.settings.config)
-        };
-        emit('apply-settings', config);
+    function reset(section) {
+        const endpoint = `reset${capitalize(section)}`;
+        emit('reset-settings', endpoint);
     }
 </script>
 
@@ -65,43 +55,12 @@
     <div class="chat-settings" v-show="props.selectedId">
         <h2>Settings</h2>
         <div class="settings">
-            <!-- Provider -->
-            <form class="form-section" @submit.prevent="applyProvider()">
-                <h3 class="section-heading">Provider</h3>
-                <SettingsField :section="{ provider: props.settings.provider }" />
+            <form class="form-section" v-for="section in Object.keys(props.settings)" :key="section" @submit.prevent="apply(section)">
+                <h3 class="section-heading">{{ capitalize(section) }}</h3>
+                <SettingsField :section="props.settings[section]" />
                 <div class="button-container">
                     <button class="secondary-button" type="submit">Apply</button>
-                    <button class="reset-button" type="button" @click="emit('reset-settings', 'resetprovider')">⟳</button>
-                </div>
-            </form>
-
-            <!-- Provider config -->
-            <form class="form-section" @submit.prevent="applyProviderConfig()">
-                <h3 class="section-heading">Provider Config</h3>
-                <SettingsField :section="{ provider: props.settings.providerConfig }" />
-                <div class="button-container">
-                    <button class="secondary-button" type="submit">Apply</button>
-                    <button class="reset-button" type="button" @click="emit('reset-settings', 'resetproviderconfig')">⟳</button>
-                </div>
-            </form>
-
-            <!-- Model -->
-            <form class="form-section" @submit.prevent="applyModel()">
-                <h3 class="section-heading">Model</h3>
-                <SettingsField :section="{ model: props.settings.model }" />
-                <div class="button-container">
-                    <button class="secondary-button" type="submit">Apply</button>
-                    <button class="reset-button" type="button" @click="emit('reset-settings', 'resetmodel')">⟳</button>
-                </div>
-            </form>
-
-            <!-- Config -->
-            <form class="form-section" @submit.prevent="applyConfig()">
-                <h3 class="section-heading">Config</h3>
-                <SettingsField :section="{ config: props.settings.config }" />
-                <div class="button-container">
-                    <button class="secondary-button" type="submit">Apply</button>
-                    <button class="reset-button" type="button" @click="emit('reset-settings', 'resetconfig')">⟳</button>
+                    <button class="reset-button" type="button" @click="reset(section)">⟳</button>
                 </div>
             </form>
         </div>
