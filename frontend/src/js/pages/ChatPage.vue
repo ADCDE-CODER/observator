@@ -165,8 +165,7 @@
     async function getSettings(chatId, userToken) {
         try {
             const result = await getChatMetadata(chatId, userToken);
-            console.log(result)
-            settings.value = result.metadata
+            settings.value = result.metadata;
         } catch (error) {
             alert(error.message);
         }
@@ -181,7 +180,9 @@
 
             if (settingsObject.section === "providerConfig") {
                 const result = await applyProviderConfig(settingsObject, chatId, userToken);
-                settings.value.providerConfig = result.metadata.providerConfig
+                settings.value.providerConfig = result.metadata.providerConfig;
+                settings.value.model = result.metadata.model;
+                settings.value.config = result.metadata.config;
             }
 
             if (settingsObject.section === "model") {
@@ -193,13 +194,14 @@
 
                     if (eventType === "complete") {
                         settings.value.model = data.metadata.model;
+                        settings.value.config = data.metadata.config;
                     }
                 });
             }
 
             if (settingsObject.section === "config") {
                 const result = await applyConfig(settingsObject, chatId, userToken);
-                settings.value.config = result.metadata.config
+                settings.value.config = result.metadata.config;
             }
         } catch (error) {
             alert(error.message);
@@ -211,7 +213,7 @@
             const result = await restartChatMetadata(endpoint, chatId, userToken);
             
             if (result.metadata.section === "provider") {
-                settings.value = result.metadata;
+                settings.value.provider = result.metadata.provider;
             }
 
             if (result.metadata.section === "providerConfig") {
