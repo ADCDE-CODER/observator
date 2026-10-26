@@ -103,13 +103,7 @@ export default class OllamaProvider {
     }
 
     setProviderConfigValue(values) {
-        const merged = {
-            localHost: values.localHost ?? this.localHost,
-            cloudHost: values.cloudHost ?? this.cloudHost,
-            apiKey: values.apiKey ?? this.apiKey
-        };
-
-        this.#configure(merged);
+        this.#configure(values);
         this.#setModelNeedsUpdate();
         this.#setConfigNeedsUpdate(); 
         this.#insertValues(this.getProviderConfig(), values);
@@ -332,6 +326,7 @@ export default class OllamaProvider {
             const thinkField = {};
             
             if (thinking && Array.isArray(thinking.values) && thinking.values.length > 0) {
+                this.#allowedThinkValues = thinking?.values ?? null;
                 thinkField.think = {
                     type: "select",
                     label: "Think",
@@ -398,7 +393,6 @@ export default class OllamaProvider {
             };
 
             this.config = Object.assign(thinkField, optionsField);
-            this.#allowedThinkValues = thinking?.values ?? null;
             this.#configInitialized = true;
         }
         
@@ -445,7 +439,7 @@ export default class OllamaProvider {
             );
         }
 
-        const response = await client.chat({
+        const body = {
             model: model,
             messages: [
                 { role: "system", content: systemPrompt ?? "" },
@@ -461,7 +455,9 @@ export default class OllamaProvider {
             },
             think: config.think ?? undefined,
             stream: true
-        });
+        };
+
+        const response = await client.chat(body);
 
         return response;
     }
