@@ -5,10 +5,10 @@
     import ProgressOverlay from '../components/ProgressOverlay.vue';
     import { onMounted, ref } from 'vue';
     import { authState } from '../state/authState';
-    import { applyProvider, applyProviderConfig, applyModel, applyConfig, getChatMetadata, restartChatMetadata } from '../services/chatMetadataService.js';
-    import { addMessages, getMessages } from '../services/messageService';
-    import { addChat, getChats, modifyChat, removeChat } from '../services/chatService';
     import { MarkdownUtil } from '../utils/MarkdownUtil.js';
+    import ChatService from '../modules/chat/ChatService.js';
+    import ChatMessageService from '../modules/chatMessage/ChatMessageService.js';
+    import ChatMetadataService from '../modules/chatMetadata/ChatMetadataService.js';
 
     const selectedChatId = ref(null);
     const chats = ref([]);
@@ -17,21 +17,29 @@
     const progress = ref({});
     const showProgress = ref(false);
 
+    let chatService;
+    let chatMessageService;
+    let chatMetadataService;
+
     onMounted(async () => {
         if (authState.user != null) {
-            await receiveAllChats(authState.user.token);
+            const userToken = authState.user.token;
+            chatService = new ChatService(userToken);
+            chatMessageService = new ChatMessageService(userToken);
+            chatMetadataService = new ChatMetadataService(userToken);
+            await receiveAllChats(userToken);
         }
 
         if (authState.user != null && authState.selectedChatId != null) {
             selectedChatId.value = authState.selectedChatId;
-            await receiveAllMessages(selectedChatId.value, authState.user.token);
-            await getSettings(selectedChatId.value, authState.user.token);
+            await receiveAllMessages(selectedChatId.value);
+            await getSettings(selectedChatId.value);
         }
     });
 
-    async function createChat(title, userToken) {
+    async function createChat(title) {
         try {
-            const result = await addChat(title, userToken);
+            const result = await chatService.createChat(title);
             alert(result.message);
             chats.value.unshift(result.chat.lastChatItem) 
         } catch (error) {
@@ -39,23 +47,23 @@
         }
     }
 
-    async function receiveAllChats(userToken) {
+    async function receiveAllChats() {
         try {
-            const result = await getChats(userToken);
+            const result = await chatService.getAllChats();
             chats.value = result.chats.reverse();
         } catch (error) {
             alert(error.message);
         }
     }
 
-    async function renameChat(title, id, userToken) {
+    async function renameChat(id, title) {
         const chat = chats.value.find((chat) => {
             return chat.id === id 
         });
 
         if (chat) {
             try {
-                const result = await modifyChat(title, id, userToken);
+                const result = await chatService.updateChat(id, title);
                 alert(result.message);
                 chat.title = title;
             } catch (error) {
@@ -64,14 +72,14 @@
         }
     }
 
-    async function deleteChat(id, userToken) {
+    async function deleteChat(id) {
         const index = chats.value.findIndex((chat) => {
             return chat.id === id 
         });
 
         if (index !== -1) {
             try {
-                const result = await removeChat(id, userToken);
+                const result = await chatService.removeChat(id);
                 alert(result.message);
                 chats.value.splice(index, 1);
                 clearSelection();
@@ -84,8 +92,8 @@
     function selectChat(id) {
         selectedChatId.value = id;
         authState.setSelectedChatId(id);
-        receiveAllMessages(id, authState.user.token);
-        getSettings(id, authState.user.token);
+        receiveAllMessages(id);
+        getSettings(id);
     }
 
     function clearSelection() {
@@ -93,7 +101,7 @@
         authState.setSelectedChatId(null);
     }
 
-    async function createMessage(userChatMessage, username, chatId, userToken) {
+    async function createMessage(chatId, userChatMessage, username) {
         const userMessage = { ...userChatMessage };
         userMessage.sender = username;
         userMessage.content = MarkdownUtil.renderMarkdown(userMessage.content);
@@ -104,7 +112,7 @@
         let lastMessageIndex = null;
 
         try {
-            await addMessages(userChatMessage, chatId, userToken, (assistantChatMessage) => {
+            await chatMessageService.sendMessage(chatId, userChatMessage, (assistantChatMessage) => {
                 const currentMessage = assistantChatMessage;
                 
                 if (!lastMessageIndex) {
@@ -141,9 +149,9 @@
         }
     }
 
-    async function receiveAllMessages(id, userToken) {
+    async function receiveAllMessages(id) {
         try {
-            const result = await getMessages(id, userToken);
+            const result = await chatMessageService.getMessages(id);
             
             result.chatMessages.forEach(message => {
                 if (message.role === "assistant") {
@@ -162,31 +170,31 @@
         }
     }
 
-    async function getSettings(chatId, userToken) {
+    async function getSettings(chatId) {
         try {
-            const result = await getChatMetadata(chatId, userToken);
+            const result = await chatMetadataService.getMetadata(chatId);
             settings.value = result.metadata;
         } catch (error) {
             alert(error.message);
         }
     }
 
-    async function applySettings(settingsObject, chatId, userToken) {
+    async function applySettings(chatId, settingsObject) {
         try {
             if (settingsObject.section === "provider") {
-                const result = await applyProvider(settingsObject, chatId, userToken);
+                const result = await chatMetadataService.updateProvider(chatId, settingsObject);
                 settings.value = result.metadata
             }
 
             if (settingsObject.section === "providerConfig") {
-                const result = await applyProviderConfig(settingsObject, chatId, userToken);
+                const result = await chatMetadataService.updateProviderConfig(chatId, settingsObject);
                 settings.value.providerConfig = result.metadata.providerConfig;
                 settings.value.model = result.metadata.model;
                 settings.value.config = result.metadata.config;
             }
 
             if (settingsObject.section === "model") {
-                await applyModel(settingsObject, chatId, userToken, (eventType, data) => {
+                await chatMetadataService.updateModel(chatId, settingsObject, (eventType, data) => {
                     if (eventType === "progress") {
                         progress.value = data;
                         showProgress.value = true;
@@ -200,7 +208,7 @@
             }
 
             if (settingsObject.section === "config") {
-                const result = await applyConfig(settingsObject, chatId, userToken);
+                const result = await chatMetadataService.updateConfig(chatId, settingsObject);
                 settings.value.config = result.metadata.config;
             }
         } catch (error) {
@@ -208,9 +216,9 @@
         }
     }
 
-    async function resetSettings(endpoint, chatId, userToken) {
+    async function resetSettings(chatId, endpoint) {
         try {
-            const result = await restartChatMetadata(endpoint, chatId, userToken);
+            const result = await chatMetadataService.reset(chatId, endpoint);
             
             if (result.metadata.section === "provider") {
                 settings.value.provider = result.metadata.provider;
@@ -248,22 +256,22 @@
        :chats="chats" 
        @select-chat="(id) => selectChat(id)"
        @clear-selection="() => clearSelection()"
-       @create-chat="() => createChat(null, authState.user.token)"
-       @delete-chat="(id) => deleteChat(id, authState.user.token)"
-       @rename-chat="(id, title) => renameChat(title, id, authState.user.token)"
+       @create-chat="() => createChat(null)"
+       @delete-chat="(id) => deleteChat(id)"
+       @rename-chat="(id, title) => renameChat(id, title)"
        />
 
        <ChatMessages
        :selected-id="selectedChatId"
        :messages="messages"
-       @create-message="(userChatMessage) => createMessage(userChatMessage, authState.user.username, authState.selectedChatId, authState.user.token)"
+       @create-message="(userChatMessage) => createMessage(authState.selectedChatId, userChatMessage, authState.user.username)"
        />
 
        <ChatSettings
        :selected-id="selectedChatId"
        :settings="settings"
-       @apply-settings="(settings) => applySettings(settings, authState.selectedChatId, authState.user.token)"
-       @reset-settings="(endpoint) => resetSettings(endpoint, authState.selectedChatId, authState.user.token)"
+       @apply-settings="(settings) => applySettings(authState.selectedChatId, settings)"
+       @reset-settings="(endpoint) => resetSettings(authState.selectedChatId, endpoint)"
        />
 
        <ProgressOverlay
