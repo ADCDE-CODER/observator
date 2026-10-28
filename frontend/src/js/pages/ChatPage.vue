@@ -166,6 +166,7 @@
         }
     }
 
+    // Settings / Metadata
     async function getSettings(chatId) {
         try {
             const result = await chatMetadataService.getMetadata(chatId);
@@ -177,33 +178,27 @@
 
     async function applySettings(chatId, settingsObject) {
         try {
-            if (settingsObject.section === "provider") {
+            if (settingsObject.section === 'provider') {
                 const result = await chatMetadataService.updateProvider(chatId, settingsObject);
-                settings.value = result.metadata
-            }
-
-            if (settingsObject.section === "providerConfig") {
+                settings.value = result.metadata;
+            } else if (settingsObject.section === 'providerConfig') {
                 const result = await chatMetadataService.updateProviderConfig(chatId, settingsObject);
                 settings.value.providerConfig = result.metadata.providerConfig;
                 settings.value.model = result.metadata.model;
                 settings.value.config = result.metadata.config;
-            }
-
-            if (settingsObject.section === "model") {
+            } else if (settingsObject.section === 'model') {
                 await chatMetadataService.updateModel(chatId, settingsObject, (eventType, data) => {
-                    if (eventType === "progress") {
+                    if (eventType === 'progress') {
                         progress.value = data;
                         showProgress.value = true;
                     }
-
-                    if (eventType === "complete") {
+                    
+                    if (eventType === 'complete') {
                         settings.value.model = data.metadata.model;
                         settings.value.config = data.metadata.config;
                     }
                 });
-            }
-
-            if (settingsObject.section === "config") {
+            } else if (settingsObject.section === 'config') {
                 const result = await chatMetadataService.updateConfig(chatId, settingsObject);
                 settings.value.config = result.metadata.config;
             }
