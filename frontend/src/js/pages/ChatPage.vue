@@ -250,35 +250,35 @@
         <h2>No user</h2>
     </section>
 
-    <section class="chat" v-show="authState.user"> 
-       <ChatList 
-       :selected-chat-id="selectedChatId" 
-       :chats="chats" 
-       @select-chat="(id) => selectChat(id)"
-       @clear-selection="() => clearSelection()"
-       @create-chat="() => createChat(null)"
-       @delete-chat="(id) => deleteChat(id)"
-       @rename-chat="(id, title) => renameChat(id, title)"
-       />
+    <section class="chat" v-show="authState.user">
+        <ChatList
+            :selected-chat-id="selectedChatId"
+            :chats="chats"
+            @select-chat="(id) => selectChat(id)"
+            @clear-selection="() => clearSelection()"
+            @create-chat="() => createChat(null)"
+            @delete-chat="(id) => deleteChat(id)"
+            @rename-chat="(id, title) => renameChat(id, title)"
+        />
 
-       <ChatMessages
-       :selected-id="selectedChatId"
-       :messages="messages"
-       @create-message="(userChatMessage) => createMessage(authState.selectedChatId, userChatMessage, authState.user.username)"
-       />
+        <ChatMessages
+            :selected-id="selectedChatId"
+            :messages="messages"
+            @create-message="(userChatMessage) => createMessage(selectedChatId, userChatMessage, authState.user.username)"
+        />
 
-       <ChatSettings
-       :selected-id="selectedChatId"
-       :settings="settings"
-       @apply-settings="(settings) => applySettings(authState.selectedChatId, settings)"
-       @reset-settings="(endpoint) => resetSettings(authState.selectedChatId, endpoint)"
-       />
+        <ChatSettings
+            :selected-id="selectedChatId"
+            :settings="settings"
+            @apply-settings="(settings) => applySettings(selectedChatId, settings)"
+            @reset-settings="(endpoint) => resetSettings(selectedChatId, endpoint)"
+        />
 
-       <ProgressOverlay
-       :show-progress="showProgress"
-       :progress="progress"
-       @close="() => closeProgress()"
-       />
+        <ProgressOverlay
+            :show-progress="showProgress"
+            :progress="progress"
+            @close="() => closeProgress()"
+        />
     </section>
 </template>
 
