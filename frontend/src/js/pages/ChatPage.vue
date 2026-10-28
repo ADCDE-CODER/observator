@@ -95,47 +95,49 @@
         authState.setSelectedChatId(null);
     }
 
+    // Messages
     async function createMessage(chatId, userChatMessage, username) {
-        const userMessage = { ...userChatMessage };
-        userMessage.sender = username;
-        userMessage.content = MarkdownUtil.renderMarkdown(userMessage.content);
+        const userMessage = {
+            ...userChatMessage,
+            sender: username,
+            content: MarkdownUtil.renderMarkdown(userChatMessage.content),
+        };
         messages.value.push(userMessage);
-        
-        let thinkingBuffer = "";
-        let contentBuffer = "";
+
+        const buffers = { thinking: '', content: '' };
         let lastMessageIndex = null;
 
         try {
             await chatMessageService.sendMessage(chatId, userChatMessage, (assistantChatMessage) => {
-                const currentMessage = assistantChatMessage;
-                
-                if (!lastMessageIndex) {
-                    if(currentMessage.thinking) {
-                        thinkingBuffer = currentMessage.thinking;
-                        currentMessage.thinking = MarkdownUtil.renderMarkdown(thinkingBuffer);
-                    } else if (currentMessage.content) {
-                        contentBuffer = currentMessage.content;
-                        currentMessage.thinking = MarkdownUtil.renderMarkdown(contentBuffer);
+                // First chunk, create the assistant bubble
+                if (lastMessageIndex === null) {
+                    if (assistantChatMessage.thinking) {
+                        buffers.thinking = assistantChatMessage.thinking;
+                        assistantChatMessage.thinking = MarkdownUtil.renderMarkdown(buffers.thinking);
+                    } else if (assistantChatMessage.content) {
+                        buffers.content = assistantChatMessage.content;
+                        assistantChatMessage.content = MarkdownUtil.renderMarkdown(buffers.content);
                     }
-                    
-                    currentMessage.sender = currentMessage.model;
-    
-                    messages.value.push(currentMessage);
+
+                    assistantChatMessage.sender = assistantChatMessage.model;
+                    messages.value.push(assistantChatMessage);
                     lastMessageIndex = messages.value.length - 1;
-                } else {
-                    const targetMessage = messages.value[lastMessageIndex];
-    
-                    if (currentMessage.thinking) {
-                        thinkingBuffer += currentMessage.thinking;
-                        targetMessage.thinking = MarkdownUtil.renderMarkdown(thinkingBuffer);
-                    } else if (currentMessage.content) {
-                        contentBuffer += currentMessage.content;
-                        targetMessage.content = MarkdownUtil.renderMarkdown(contentBuffer);
-                    }
-    
-                    if(currentMessage.done) {
-                        targetMessage.createdAt = currentMessage.createdAt;
-                    }
+                    return;
+                }
+
+                // Subsequent chunks, mutate the existing bubble
+                const targetMessage = messages.value[lastMessageIndex];
+
+                if (assistantChatMessage.thinking) {
+                    buffers.thinking += assistantChatMessage.thinking;
+                    targetMessage.thinking = MarkdownUtil.renderMarkdown(buffers.thinking);
+                } else if (assistantChatMessage.content) {
+                    buffers.content += assistantChatMessage.content;
+                    targetMessage.content = MarkdownUtil.renderMarkdown(buffers.content);
+                }
+
+                if (assistantChatMessage.done) {
+                    targetMessage.createdAt = assistantChatMessage.createdAt;
                 }
             });
         } catch (error) {
