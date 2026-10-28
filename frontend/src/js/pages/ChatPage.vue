@@ -1,15 +1,22 @@
 <script setup>
+    import { ref, onMounted } from 'vue';
     import ChatList from '../components/ChatList.vue';
     import ChatMessages from '../components/ChatMessage.vue';
     import ChatSettings from '../components/ChatSettings.vue';
     import ProgressOverlay from '../components/ProgressOverlay.vue';
-    import { onMounted, ref } from 'vue';
     import { authState } from '../state/authState';
     import { MarkdownUtil } from '../utils/MarkdownUtil.js';
     import ChatService from '../modules/chat/ChatService.js';
     import ChatMessageService from '../modules/chatMessage/ChatMessageService.js';
     import ChatMetadataService from '../modules/chatMetadata/ChatMetadataService.js';
 
+    // Services
+    const token = authState.user.token;
+    const chatService = new ChatService(token);
+    const chatMessageService = new ChatMessageService(token);
+    const chatMetadataService = new ChatMetadataService(token);
+
+    // Reactive state
     const selectedChatId = ref(null);
     const chats = ref([]);
     const messages = ref([]);
@@ -17,20 +24,11 @@
     const progress = ref({});
     const showProgress = ref(false);
 
-    let chatService;
-    let chatMessageService;
-    let chatMetadataService;
-
+    // Initial data load
     onMounted(async () => {
-        if (authState.user != null) {
-            const userToken = authState.user.token;
-            chatService = new ChatService(userToken);
-            chatMessageService = new ChatMessageService(userToken);
-            chatMetadataService = new ChatMetadataService(userToken);
-            await receiveAllChats(userToken);
-        }
+        await receiveAllChats();
 
-        if (authState.user != null && authState.selectedChatId != null) {
+        if (authState.selectedChatId != null) {
             selectedChatId.value = authState.selectedChatId;
             await receiveAllMessages(selectedChatId.value);
             await getSettings(selectedChatId.value);
@@ -41,7 +39,7 @@
         try {
             const result = await chatService.createChat(title);
             alert(result.message);
-            chats.value.unshift(result.chat.lastChatItem) 
+            chats.value.unshift(result.chat.lastChatItem);
         } catch (error) {
             alert(error.message);
         }
