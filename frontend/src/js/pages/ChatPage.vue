@@ -210,21 +210,16 @@
     async function resetSettings(chatId, endpoint) {
         try {
             const result = await chatMetadataService.reset(chatId, endpoint);
-            
-            if (result.metadata.section === "provider") {
-                settings.value.provider = result.metadata.provider;
-            }
+            const { section, ...fields } = result.metadata;
 
-            if (result.metadata.section === "providerConfig") {
-                settings.value.providerConfig = result.metadata.providerConfig;
-            }
-
-            if (result.metadata.section === "model") {
-                settings.value.model = result.metadata.model;
-            }
-
-            if (result.metadata.section === "config") {
-                settings.value.config = result.metadata.config;
+            if (section === 'provider') {
+                settings.value.provider = fields.provider;
+            } else if (section === 'providerConfig') {
+                settings.value.providerConfig = fields.providerConfig;
+            } else if (section === 'model') {
+                settings.value.model = fields.model;
+            } else if (section === 'config') {
+                settings.value.config = fields.config;
             }
         } catch (error) {
             alert(error.message);
