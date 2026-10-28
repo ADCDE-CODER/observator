@@ -35,6 +35,7 @@
         }
     });
 
+    // Chat
     async function createChat(title) {
         try {
             const result = await chatService.createChat(title);
@@ -55,38 +56,33 @@
     }
 
     async function renameChat(id, title) {
-        const chat = chats.value.find((chat) => {
-            return chat.id === id 
-        });
+        const chat = chats.value.find(chat => chat.id === id);
+        if (!chat) return;
 
-        if (chat) {
-            try {
-                const result = await chatService.updateChat(id, title);
-                alert(result.message);
-                chat.title = title;
-            } catch (error) {
-                alert(error.message);
-            }
+        try {
+            const result = await chatService.updateChat(id, title);
+            alert(result.message);
+            chat.title = title;
+        } catch (error) {
+            alert(error.message);
         }
     }
 
     async function deleteChat(id) {
-        const index = chats.value.findIndex((chat) => {
-            return chat.id === id 
-        });
+        const index = chats.value.findIndex(chat => chat.id === id);
+        if (index === -1) return;
 
-        if (index !== -1) {
-            try {
-                const result = await chatService.removeChat(id);
-                alert(result.message);
-                chats.value.splice(index, 1);
-                clearSelection();
-            } catch (error) {
-                alert(error.message);
-            }
+        try {
+            const result = await chatService.removeChat(id);
+            alert(result.message);
+            chats.value.splice(index, 1);
+            clearSelection();
+        } catch (error) {
+            alert(error.message);
         }
     }
 
+    // Selection
     function selectChat(id) {
         selectedChatId.value = id;
         authState.setSelectedChatId(id);
