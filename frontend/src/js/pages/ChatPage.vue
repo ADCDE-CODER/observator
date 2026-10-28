@@ -55,12 +55,12 @@
         }
     }
 
-    async function renameChat(id, title) {
-        const chat = chats.value.find(chat => chat.id === id);
+    async function renameChat(chatId, title) {
+        const chat = chats.value.find(chat => chat.id === chatId);
         if (!chat) return;
 
         try {
-            const result = await chatService.updateChat(id, title);
+            const result = await chatService.updateChat(chatId, title);
             alert(result.message);
             chat.title = title;
         } catch (error) {
@@ -68,12 +68,12 @@
         }
     }
 
-    async function deleteChat(id) {
-        const index = chats.value.findIndex(chat => chat.id === id);
+    async function deleteChat(chatId) {
+        const index = chats.value.findIndex(chat => chat.id === chatId);
         if (index === -1) return;
 
         try {
-            const result = await chatService.removeChat(id);
+            const result = await chatService.removeChat(chatId);
             alert(result.message);
             chats.value.splice(index, 1);
             clearSelection();
@@ -83,11 +83,11 @@
     }
 
     // Selection
-    function selectChat(id) {
-        selectedChatId.value = id;
-        authState.setSelectedChatId(id);
-        receiveAllMessages(id);
-        getSettings(id);
+    function selectChat(chatId) {
+        selectedChatId.value = chatId;
+        authState.setSelectedChatId(chatId);
+        receiveAllMessages(chatId);
+        getSettings(chatId);
     }
 
     function clearSelection() {
@@ -145,9 +145,9 @@
         }
     }
 
-    async function receiveAllMessages(id) {
+    async function receiveAllMessages(chatId) {
         try {
-            const result = await chatMessageService.getMessages(id);
+            const result = await chatMessageService.getMessages(chatId);
 
             result.chatMessages.forEach(message => {
                 if (message.role === 'assistant') {
