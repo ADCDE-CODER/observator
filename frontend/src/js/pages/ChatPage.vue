@@ -148,12 +148,12 @@
     async function receiveAllMessages(id) {
         try {
             const result = await chatMessageService.getMessages(id);
-            
+
             result.chatMessages.forEach(message => {
-                if (message.role === "assistant") {
+                if (message.role === 'assistant') {
                     message.thinking = MarkdownUtil.renderMarkdown(message.thinking);
                     message.sender = message.model;
-                } else if (message.role === "user") {
+                } else if (message.role === 'user') {
                     message.sender = authState.user.username;
                 }
 
