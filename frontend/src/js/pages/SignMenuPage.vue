@@ -3,23 +3,24 @@
     import SignupForm from '../components/SignupForm.vue';
     import SigninForm from '../components/SigninForm.vue';
     import { useRouter } from 'vue-router';
-    import { createAccount, readAccount } from '../services/userService.js';
     import { authState } from '../state/authState.js';
+    import UserService from '../modules/user/UserService.js';
 
+    const userService = new UserService();
     const router = useRouter();
 
     async function doSignup(user) {
         try {
-            const result = await createAccount(user);
+            const result = await userService.signup(user);
             alert(result.message);
         } catch (error) {
             alert(error.message);
         }
     }
 
-    async function doSignin(user) {                
+    async function doSignin(user) {
         try {
-            const result = await readAccount(user);
+            const result = await userService.signin(user);
             alert(result.message);
 
             authState.setUser(result.user);
