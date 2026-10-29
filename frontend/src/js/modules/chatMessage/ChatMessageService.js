@@ -22,7 +22,7 @@ export default class ChatMessageService {
             throw new Error("Callback missing.");
         }
             
-        await this.chatMessageApi.sendMessage(chatId, userChatMessage, onChunk);
+        return await this.chatMessageApi.sendMessage(chatId, userChatMessage, onChunk);
     }
 
     async getMessages(chatId) {
