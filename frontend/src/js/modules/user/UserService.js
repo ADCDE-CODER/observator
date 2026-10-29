@@ -1,8 +1,9 @@
 import UserAPI from "./UserApi.js";
 
 export default class UserService {
-    constructor() {
-        this.userApi = new UserAPI();
+    constructor({ token } = {}) {
+        this.token = token;
+        this.userApi = new UserAPI(token);
     }
 
     async signup(user) {
@@ -35,5 +36,13 @@ export default class UserService {
         }
 
         return await this.userApi.signin(user);
+    }
+
+    async deleteAccount() { 
+        if (!this.token) {
+            throw new Error("Token missing.");
+        }
+
+        return await this.userApi.deleteAccount();
     }
 }
