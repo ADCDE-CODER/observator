@@ -24,25 +24,34 @@ export default class ChatMessageAPI extends BaseAPI {
             throw new Error("Response body is not a stream");
         }
 
+        let finalMessages = null;
+
         while (true) {
             const { value, done } = await reader.read();
             if (done) break;
 
             if (value) {
                 // Decode the binary chunk
-                const lines = decoder.decode(value).split("\n"); 
-
+                const lines = decoder.decode(value, { stream: true }).split("\n\n");
+    
                 for (const line of lines) {
                     if (line.startsWith("data: ")) {
                         const data = line.replace("data: ", "");
                         const assistantChatMessage  = JSON.parse(data);
-
-                        // Call the provided callback function with the text chunk
-                        onChunk(assistantChatMessage); 
+        
+                        if (assistantChatMessage.type === "final") {
+                            finalMessages = assistantChatMessage.message;
+                            continue;
+                        }
+        
+                        // Normal streaming event (thinking / content / done)
+                        onChunk(assistantChatMessage);
                     }
                 }
             }
         }
+
+        return finalMessages;
     }
 
     async getMessages(chatId) {
