@@ -110,6 +110,10 @@ export default class ChatMetadataService {
 
         const model = await this.aiService.getModelValue(providerValue);
 
+        if (providerConfig.value.apiKey) {
+            delete providerConfig.value.apiKey
+        }
+
         const metadata = {
             ...this.chatMetadataModel.updateProviderConfig(providerConfig.value, chatId),
             ...this.chatMetadataModel.updateModel(model, chatId)
