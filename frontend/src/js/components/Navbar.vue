@@ -1,8 +1,10 @@
 <script setup>
 	import LogoIcon from './LogoIcon.vue';
 	import ProfileIcon from './ProfileIcon.vue';
+	import TrashIcon from './TrashIcon.vue';
 	import { onMounted, onUnmounted, ref } from "vue";
 	import { useRouter } from "vue-router";
+	import UserService from '../modules/user/UserService.js';
 	
 	const router = useRouter();
 	const isDropdownOpen = ref(false);
@@ -38,6 +40,16 @@
 		authState.clearAllLocalStorage();
 		router.push('/');
 	}
+
+	function deleteAccount() {
+		if (confirm("Do you want to permanently delete your account?")) { 
+			const token = authState.user.token;
+			const userService = new UserService({token})
+            userService.deleteAccount();
+			authState.clearAllLocalStorage();
+			router.push('/');
+        }
+	}
 </script>
 
 <template>
@@ -71,6 +83,9 @@
 					<RouterLink class="dropdown-item" to="/">Settings 🚧</RouterLink>
 					<div class="divider"></div>
 					<button class="dropdown-item secondary-button" @click="goLogout()">Log out</button>
+					<button class="dropdown-item delete-button" @click="deleteAccount()">
+						<TrashIcon color="red" width="15" height="15" aria-label="Trash icon"/>Delete Account
+					</button>
 				</div>
 			</div>
 		</div>
@@ -165,7 +180,10 @@
 		color: var(--color-on-secondary-container);
 	}
 
-	.primary-button, .secondary-button {
+	.primary-button, .secondary-button, .delete-button {
+		display: flex;
+		align-items: center;
+		justify-content: center;
 		width: 100%;
 		padding: 0.5rem;
 		box-sizing: border-box;
@@ -194,5 +212,15 @@
 	.secondary-button:hover {
         background-color: var(--color-secondary-container);
 		color: var(--color-on-secondary-container);
+    }
+
+	.delete-button {
+		background-color: transparent;
+		color: red;
+    }
+
+    .delete-button:hover {
+        background-color: rgba(255, 0, 0, 0.25);
+        color: red;
     }
 </style>
