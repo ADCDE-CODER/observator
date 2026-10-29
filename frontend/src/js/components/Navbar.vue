@@ -67,7 +67,7 @@
 			</div>
 			<nav class="navbar-links">
 				<RouterLink class="nav-link" to="/chat">Chat</RouterLink>
-				<RouterLink class="nav-link" to="/iris">Iris</RouterLink>
+				<!--<RouterLink class="nav-link" to="/iris">Iris</RouterLink> -->
 			</nav>
 
 			<div class="navbar-profile">

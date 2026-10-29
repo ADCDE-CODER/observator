@@ -9,7 +9,7 @@ export const router = createRouter({
     routes: [
         { path: '/', component: HomePage },
         { path: '/chat', component: ChatPage },
-        { path: '/iris', component: IrisPage },
+        //{ path: '/iris', component: IrisPage },
         { path: '/sign', component: SignMenuPage }
     ]
 });
