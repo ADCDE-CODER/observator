@@ -1,10 +1,11 @@
 <script setup>
     import { ref } from 'vue';
     import { DateUtil } from '../utils/DateUtil';
+    import TrashIcon from './TrashIcon.vue';
     
     const userInput = ref(null);
     const userInputContext = ref('');
-    const emit = defineEmits(["create-message"]);
+    const emit = defineEmits(["create-message", "delete-message"]);
     const {selectedId, messages} = defineProps({
         selectedId: Number,
         messages: Array
@@ -63,6 +64,12 @@
         userInputContext.value = '';
         userInput.value.style.height = 'auto';
     }
+
+    function deleteMessage(messageId) {
+        if (confirm("Do you want to permanently delete your message and the assistant's message?")) { 
+            emit("delete-message", messageId);
+        }
+    }
 </script>
 
 <template>
@@ -81,7 +88,12 @@
         <h2>Message</h2>
         <div class="output-container">
             <section v-for="message in messages" :key="message.id" :class="message.role">
-                <strong>{{ message.sender }}:</strong>
+                <div class="sender-title">
+                    <strong>{{ message.sender }}:</strong>
+                    <button v-if="message.role === 'user'" class="delete-button" @click="deleteMessage(message.id)">
+                        <TrashIcon color="red" width="15" height="15" aria-label="Trash icon"/>
+                    </button>
+                </div>
 
                 <details v-if="message.thinking" class="thinking-dropdown" @toggle="message.showThinking = $event.target.open">
                     <summary>{{ message.showThinking ? 'Hide thinking' : 'Show thinking' }}</summary>
@@ -145,6 +157,27 @@
     .assistant {
         background-color: var(--color-surface-container-highest);
         color: var(--color-on-surface);
+    }
+
+    .sender-title {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .delete-button {
+        background-color: transparent;
+        color: red;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 15px;
+        cursor: pointer;
+        transition: background-color 1s, color 1s;
+    }
+
+    .delete-button:hover {
+        background-color: rgba(255, 0, 0, 0.25);
+        color: red;
     }
 
     .thinking-dropdown {
