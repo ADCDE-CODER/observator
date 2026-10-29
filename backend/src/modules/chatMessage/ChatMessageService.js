@@ -13,40 +13,57 @@ export default class ChatMessageService {
         const metadata = this.chatMetadataService.fetchChatMetadata(chatId);
         const stream = await this.aiService.generateMessage(env.systemPrompt, conversationContext, metadata);
 
-        // Stream the content chunk by chunk
-        let inThinking = false
-        let assistantChatMessage = {};
+        let phase = "idle"; // "idle" -> "thinking" -> "content"
+        const assistantChatMessage = {
+            thinking: "",
+            content: "",
+        };
+
         for await (const chunk of stream) {
             if (!chunk || !chunk.message) {
                 continue;
             }
 
-            if(chunk.message.thinking) {
-                if(!inThinking) {
-                    inThinking = true;
+            // --- Thinking phase ---
+            if (chunk.message.thinking) {
+                if (phase === "idle") {
+                    // Transition: idle -> thinking
+                    phase = "thinking";
                     assistantChatMessage.thinking = "Thinking:\n\n";
                     onChunk({ done: chunk.done, role: chunk.message.role, model: chunk.model, thinking: "Thinking:\n\n" });
                 }
 
                 assistantChatMessage.thinking += chunk.message.thinking;
-                onChunk ({ done: chunk.done, role: chunk.message.role, model: chunk.model, thinking: chunk.message.thinking });
-            } else if (chunk.message.content) {
-                if(inThinking) {
-                    inThinking = false;
+                onChunk({ done: chunk.done, role: chunk.message.role, model: chunk.model, thinking: chunk.message.thinking });
+                continue;
+            }
+
+            // --- Content phase ---
+            if (chunk.message.content) {
+                if (phase === "thinking") {
+                    // Transition: thinking -> content
+                    phase = "content";
                     assistantChatMessage.content = "\n\nAnswer:\n\n";
-                    onChunk({ done: chunk.done, role: chunk.message.role, model: chunk.model, content: "\n\nAnswer:\n" });
+                    onChunk({ done: chunk.done, role: chunk.message.role, model: chunk.model, content: "\n\nAnswer:\n\n" });
                 }
 
                 assistantChatMessage.content += chunk.message.content;
                 onChunk({ done: chunk.done, role: chunk.message.role, model: chunk.model, content: chunk.message.content });
+                continue;
             }
 
+            // --- Stream finished ---
             if (chunk.done) {
                 assistantChatMessage.role = chunk.message.role;
                 assistantChatMessage.model = chunk.model;
                 assistantChatMessage.createdAt = chunk.created_at;
                 onChunk({ done: chunk.done, role: chunk.message.role, model: chunk.model, createdAt: chunk.created_at });
             }
+        }
+
+        // Clean up empty fields (e.g. no thinking -> remove empty string)
+        if (!assistantChatMessage.thinking) {
+            delete assistantChatMessage.thinking;
         }
 
         return assistantChatMessage;
