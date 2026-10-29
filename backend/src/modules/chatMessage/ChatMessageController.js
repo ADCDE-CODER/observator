@@ -18,22 +18,17 @@ export default class ChatMessageController {
                 conversationContext.push({role: userChatMessage.role, content: userChatMessage.content, images: userChatMessage.images});
 
                 const assistantChatMessage = await this.chatMessageService.generateResponse(conversationContext, chatId, (event) => {
-                    if (event.thinking) {
-                        res.write(`data: ${JSON.stringify(event)}\n\n`);
-                    } else if (event.content) {
-                        res.write(`data: ${JSON.stringify(event)}\n\n`);
-                    }
-
-                    if (event.done) {
-                        res.write(`data: ${JSON.stringify(event)}\n\n`); 
-                    }
+                    res.write(`data: ${JSON.stringify(event)}\n\n`);
                 });
                 
-                // End response when streaming is complete. 
-                res.end();
-
-                // Create the user and assistant messages in database.
+                // Save the user's and the assistant's messages
                 this.chatMessageService.create(userChatMessage, assistantChatMessage, chatId);
+
+                // Get the user's and the assistant's messages with IDss
+                const finalMessages = this.chatMessageService.getChatMessages("ASC", chatId);
+
+                res.write(`data: ${JSON.stringify({ type: "final", message: finalMessages })}\n\n`);
+                res.end();
             } catch (error) {
                 console.error(error);
                 res.status(error.status || 500).json({message: error.message});
