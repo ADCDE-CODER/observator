@@ -123,15 +123,19 @@ export default class OllamaProvider {
         return model.trim();
     }
 
+    async #isLocal(model) {
+        const localModels = await this.listLocalModels();
+        return localModels.some(m => m === model);
+    }
+
     async showModelDetails(model) {
         model = this.#validateModel(model);
-        const client = this.localClient ?? this.cloudClient;
 
-        if (!client) {
-            throw new Error("No client available to fetch model details.");
+        if (await this.#isLocal(model)) {
+            return this.localClient.show({ model });
+        } else {
+            return this.cloudClient.show({ model });
         }
-        
-        return await client.show({ model });
     }
 
     async listLocalModels() {
@@ -431,8 +435,7 @@ export default class OllamaProvider {
         model = this.#validateModel(model);
         config = this.#validateConfig(config);
 
-        // Pick exactly one client: local first, Cloud as fallback
-        const client = this.localClient ?? this.cloudClient;
+        const client = await this.#isLocal(model) ? this.localClient : this.cloudClient;
 
         if (!client) {
             throw new Error(
