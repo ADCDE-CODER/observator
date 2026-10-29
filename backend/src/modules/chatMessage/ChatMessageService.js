@@ -13,7 +13,6 @@ export default class ChatMessageService {
         const metadata = this.chatMetadataService.fetchChatMetadata(chatId);
         const stream = await this.aiService.generateMessage(env.systemPrompt, conversationContext, metadata);
 
-        let phase = "idle"; // "idle" -> "thinking" -> "content"
         const assistantChatMessage = {
             thinking: "",
             content: "",
@@ -26,13 +25,6 @@ export default class ChatMessageService {
 
             // --- Thinking phase ---
             if (chunk.message.thinking) {
-                if (phase === "idle") {
-                    // Transition: idle -> thinking
-                    phase = "thinking";
-                    assistantChatMessage.thinking = "Thinking:\n\n";
-                    onChunk({ done: chunk.done, role: chunk.message.role, model: chunk.model, thinking: "Thinking:\n\n" });
-                }
-
                 assistantChatMessage.thinking += chunk.message.thinking;
                 onChunk({ done: chunk.done, role: chunk.message.role, model: chunk.model, thinking: chunk.message.thinking });
                 continue;
@@ -40,13 +32,6 @@ export default class ChatMessageService {
 
             // --- Content phase ---
             if (chunk.message.content) {
-                if (phase === "thinking") {
-                    // Transition: thinking -> content
-                    phase = "content";
-                    assistantChatMessage.content = "\n\nAnswer:\n\n";
-                    onChunk({ done: chunk.done, role: chunk.message.role, model: chunk.model, content: "\n\nAnswer:\n\n" });
-                }
-
                 assistantChatMessage.content += chunk.message.content;
                 onChunk({ done: chunk.done, role: chunk.message.role, model: chunk.model, content: chunk.message.content });
                 continue;
