@@ -11,7 +11,7 @@ export default class ChatModel {
                 title TEXT NOT NULL,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                 user_id INTEGER NOT NULL,
-                FOREIGN KEY (user_id) REFERENCES user(id)
+                FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
             );
         `;
         this.db.exec(table);
