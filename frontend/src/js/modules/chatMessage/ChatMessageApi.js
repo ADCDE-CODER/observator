@@ -57,4 +57,8 @@ export default class ChatMessageAPI extends BaseAPI {
     async getMessages(chatId) {
         return await this.request(`/${chatId}/chatMessages`, { method: "GET" });
     }
+
+    async deleteMessage(chatId, messageId) {
+        return await this.request(`/${chatId}/chatMessages/${messageId}`, { method: "DELETE" });
+    }
 }

@@ -32,5 +32,9 @@ export default class ChatMessageService {
         
         return await this.chatMessageApi.getMessages(chatId);
     }
+
+    async deleteMessage(chatId, messageId) {
+        return this.chatMessageApi.deleteMessage(chatId, messageId);
+    }
 }
 
