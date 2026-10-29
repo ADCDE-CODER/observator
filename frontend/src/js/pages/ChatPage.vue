@@ -166,6 +166,16 @@
         }
     }
 
+    async function deleteMessage(chatId, messageId) {
+        try {
+            const result = await chatMessageService.deleteMessage(chatId, messageId);
+            await receiveAllMessages(chatId);
+            alert(result.message);
+        } catch (error) {
+            alert(error.message);
+        }
+    }
+
     // Settings / Metadata
     async function getSettings(chatId) {
         try {
@@ -251,6 +261,7 @@
             :selected-id="selectedChatId"
             :messages="messages"
             @create-message="(userChatMessage) => createMessage(selectedChatId, userChatMessage, authState.user.username)"
+            @delete-message="(messageId) => deleteMessage(selectedChatId, messageId)"
         />
 
         <ChatSettings
