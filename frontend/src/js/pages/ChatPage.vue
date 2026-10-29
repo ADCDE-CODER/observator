@@ -108,7 +108,7 @@
         let lastMessageIndex = null;
 
         try {
-            await chatMessageService.sendMessage(chatId, userChatMessage, (assistantChatMessage) => {
+            const finalAssistantChatMessage = await chatMessageService.sendMessage(chatId, userChatMessage, (assistantChatMessage) => {
                 // First chunk, create the assistant bubble
                 if (lastMessageIndex === null) {
                     if (assistantChatMessage.thinking) {
@@ -140,6 +140,11 @@
                     targetMessage.createdAt = assistantChatMessage.createdAt;
                 }
             });
+
+            // Add an id for each message
+            for (let i = 0; i < finalAssistantChatMessage.length; i++) {
+                messages.value[i].id = finalAssistantChatMessage[i].id;
+            }
         } catch (error) {
             alert(error.message);
         }
