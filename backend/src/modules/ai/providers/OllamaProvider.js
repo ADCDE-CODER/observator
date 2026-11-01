@@ -142,9 +142,15 @@ export default class OllamaProvider {
         if (!this.localClient) {
             return [];
         }
-
-        const response = await this.localClient.list();
-        return response.models.map((model) => model.model);
+        
+        // If local is not running, return an empty list of models
+        try {
+            const response = await this.localClient.list();
+            return response.models.map((model) => model.model);
+        } catch (error) {
+            console.warn("Local is not running: ", error)
+            return [];
+        }
     }
 
     async listCloudModels() {
@@ -152,8 +158,13 @@ export default class OllamaProvider {
             return [];
         }
 
-        const response = await this.cloudClient.list();
-        return response.models.map((model) => model.model);
+        try {
+            const response = await this.cloudClient.list();
+            return response.models.map((model) => model.model);
+        } catch (error) {
+            console.warn("Cloud is not running: ", error)
+            return [];
+        }
     }
 
     async listModels() {
