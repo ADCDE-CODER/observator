@@ -92,4 +92,33 @@ For a development workflow (hot-reload, etc.), **open two separate terminals:**
 |----------|-----------|-------------|
 | 1        | backend/  | npm run dev |
 | 2        | frontend/ | npm run dev |
+
 Both processes must be running simultaneously. Stop them with Ctrl + C in each terminal when you're done.
+
+## Setup with Docker
+1. Before running Docker, ensure your `.env` file is configured.
+    ```sh
+    # Before (Local Host):
+    # OLLAMA_LOCAL_HOST_URL=http://localhost:11434
+
+    # After (Docker Service Name):
+    OLLAMA_LOCAL_HOST_URL=http://ollama:11434 
+    ```
+    (If you are using a custom Ollama URL, replace ollama with your custom host name.)
+    
+    **Note:** Ollama runs in its own Docker container. When the backend tries to connect to localhost, it looks inside the backend container itself, not your local computer.
+
+2. Start the application which start the frontend, backend and Ollama containers.
+    ```sh
+    $ docker compose up -d
+    ```
+3. When docker is running, you get access to a local HTTP address.
+    ```sh
+    http://localhost:8080
+    ```
+
+### Stop the application
+1. To stop and remove the containers and Docker network.
+    ```sh
+    docker compose down
+    ```

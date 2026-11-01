@@ -1,0 +1,44 @@
+services:
+  frontend:
+    build: 
+      context: ./frontend
+    container_name: my_frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    networks:
+      - app-network
+    restart: unless-stopped
+  
+  backend:
+    build: 
+      context: ./backend
+    container_name: my_backend
+    expose:
+      - "3000"
+    environment:
+      OLLAMA_LOCAL_HOST_URL: http://ollama:11434
+    volumes:
+      - backend-data:/app/data
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: my_ollama
+    expose:
+      - "11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    networks:
+      - app-network
+    restart: unless-stopped
+
+networks:
+  app-network:
+
+volumes:
+  backend-data:
+  ollama-data:
